@@ -1,0 +1,84 @@
+<header class="shadow-sm border-b border-gray-200 bg-white">
+  <nav class="flex justify-between items-center px-8 py-4">
+    <!-- Logo -->
+    <div class="flex items-center space-x-1">
+      <img src="assets/images/logo.svg" alt="FitStudio Logo" class="h-6 w-6" />
+      <h2 class="text-2xl font-bold text-black">
+        Fit<span class="text-orange-500">Studio</span>
+      </h2>
+    </div>
+
+    <!-- Center Nav Links -->
+    <ul class="flex space-x-8 text-gray-800 font-medium">
+      <li>
+        <a
+          routerLink="/home"
+          routerLinkActive="text-orange-500 font-semibold"
+          class="hover:text-orange-500 transition-colors duration-300"
+        >
+          Home
+        </a>
+      </li>
+      <li>
+        <a
+          routerLink="/plans"
+          routerLinkActive="text-orange-500 font-semibold"
+          class="hover:text-orange-500 transition-colors duration-300"
+        >
+          Our Plans
+        </a>
+      </li>
+      <li>
+        <a
+          routerLink="/trainers"
+          routerLinkActive="text-orange-500 font-semibold"
+          class="hover:text-orange-500 transition-colors duration-300"
+        >
+          Our Trainers
+        </a>
+      </li>
+      <li>
+        <a
+          routerLink="/store"
+          routerLinkActive="text-orange-500 font-semibold"
+          class="hover:text-orange-500 transition-colors duration-300"
+        >
+          Store
+        </a>
+      </li>
+    </ul>
+
+    <!-- Right Side Auth Buttons -->
+    <ul class="flex items-center space-x-4 font-medium">
+      <!-- Show when user is not logged in -->
+      @if (!isLoggedIn) {
+      <li>
+        <a
+          routerLink="/login"
+          class="hover:text-orange-500 transition-colors duration-300"
+          >Login</a
+        >
+      </li>
+      <li>
+        <a
+          routerLink="/signup"
+          class="bg-orange-500 text-white px-4 py-2 rounded-full hover:bg-orange-600 transition-colors duration-300"
+        >
+          Sign Up
+        </a>
+      </li>
+      } @else {
+      <li>
+        <button
+          (click)="logout()"
+          class="text-black hover:text-orange-500 transition-colors duration-300"
+        >
+          Logout
+        </button>
+      </li>
+      }
+
+      <!-- Show when user is logged in -->
+    </ul>
+  </nav>
+</header>
