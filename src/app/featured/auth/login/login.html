@@ -1,27 +1,94 @@
-<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <div>
-        <label for="identifier"> Enter userId or Email</label>
-        <input type="text" formControlName="identifier"
-         id="identifier" placeholder="UserId or Email" />
-         @if(loginForm.get('identifier') ?.invalid && loginForm.get('identifier')?.touched) {
-            @if(loginForm.get('identifier')?.errors?.['required']) {
-                <small>Email or user id is requried</small>
+<div class="flex justify-center items-center min-h-screen bg-gray-50">
+  <div class="bg-white p-10 rounded-xl shadow-md w-full max-w-md">
+    <!-- Logo -->
+    <div class="flex flex-col items-center mb-6">
+      <div class="flex items-center space-x-2 mb-2">
+        <img src="assets/images/logo.svg" alt="FitStudio Logo" class="h-6 w-6" />
+        <h2 class="text-2xl font-bold text-black">
+          Fit<span class="text-orange-500">Studio</span>
+        </h2>
+      </div>
+      <h3 class="text-xl font-bold text-gray-900 mb-1">Welcome Back</h3>
+      <p class="text-gray-500 text-center">
+        Login to continue your fitness journey
+      </p>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
+      <!-- Email / User ID -->
+      <div>
+        <label for="identifier" class="block text-sm font-semibold mb-1">Email</label>
+        <input
+          id="identifier"
+          type="text"
+          formControlName="identifier"
+          placeholder="your@email.com"
+          class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
+        />
+
+        @if (loginForm.get('identifier')?.invalid && loginForm.get('identifier')?.touched) {
+          <small class="text-red-500 text-sm">
+            @if (loginForm.get('identifier')?.errors?.['required']) {
+              Email or User ID is required
             } @else if (loginForm.get('identifier')?.errors?.['minlength']) {
-                <small>Email or user id must be at least 6 characters long</small>
+              Email or User ID must be at least 6 characters
             }
-         }
-    </div>
-    <div>
-        <label for="password"> Enter Password</label>
-        <input type="password" formControlName="password"
-         id="password" placeholder="Password" />
-            @if(loginForm.get('password') ?.invalid && loginForm.get('password')?.touched) {
-                @if(loginForm.get('password')?.errors?.['required']) {
-                    <small>Password is requried</small>
-                } @else if (loginForm.get('password')?.errors?.['minlength']) {
-                    <small>Password must be at least 6 characters long</small>
-                }
+          </small>
+        }
+      </div>
+
+      <!-- Password -->
+      <div>
+        <label for="password" class="block text-sm font-semibold mb-1">Password</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="••••••••"
+          class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
+        />
+
+        @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+          <small class="text-red-500 text-sm">
+            @if (loginForm.get('password')?.errors?.['required']) {
+              Password is required
+            } @else if (loginForm.get('password')?.errors?.['minlength']) {
+              Password must be at least 6 characters long
             }
-    </div>
-    <button type="submit" >Login</button>
-</form>
+          </small>
+        }
+
+        <!-- Forgot password link -->
+        <div class="text-right mt-2">
+          <a
+            routerLink="/forgot-password"
+            class="text-orange-500 text-sm font-medium hover:underline"
+          >
+            Forgot password?
+          </a>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition-all font-semibold"
+        [disabled]="loginForm.invalid"
+      >
+        Login
+      </button>
+    </form>
+
+    <!-- Signup link -->
+    <p class="text-center text-gray-500 mt-6">
+      Don’t have an account?
+      <a
+        routerLink="/signup"
+        class="text-orange-500 font-semibold hover:underline"
+      >
+        Sign up
+      </a>
+    </p>
+  </div>
+</div>
