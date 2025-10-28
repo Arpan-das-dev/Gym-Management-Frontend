@@ -1,1 +1,111 @@
-<p>homepage works!</p>
+<app-navbar></app-navbar>
+
+<!-- Hero Section -->
+<section
+  class="relative flex flex-col items-center justify-center text-center min-h-[90vh] bg-cover bg-center bg-no-repeat"
+  style="background-image: url('pexels-heyho-7031706.jpg');"
+>
+  <!-- Overlay -->
+<div class="absolute inset-0 bg-linear-to-r from-black/60 via-orange-900/40 to-transparent"></div>
+
+  <!-- Content -->
+  <div class="relative z-10 px-6 sm:px-12">
+   <h1 class="text-5xl sm:text-6xl font-extrabold text-orange-50 mb-4 drop-shadow-lg">
+  Transform Your <span class="text-orange-400">Body & Mind</span>
+</h1>
+<p class="text-lg sm:text-xl text-orange-100 max-w-2xl mx-auto mb-8">
+  Join FitPro Gym and unlock your potential with expert guidance, premium equipment, and a supportive community.
+</p>
+
+    <div class="flex flex-wrap justify-center gap-4">
+      <button
+        class="px-6 py-3 rounded-xl text-lg font-semibold bg-orange-500 text-white 
+         hover:bg-orange-600 hover:shadow-[0_0_15px_rgba(255,165,0,0.6)] 
+         transition-transform transform hover:scale-105"
+        (click)="getStarted()"
+      >
+        Start Your Journey
+      </button>
+      <button
+        class="px-6 py-3 rounded-xl text-lg font-semibold bg-white/10 text-white border border-white hover:bg-white/20 shadow-lg transition-transform transform hover:scale-105"
+        (click)="viewPlans()"
+      >
+        View Plans
+      </button>
+    </div>
+  </div>
+</section>
+
+
+<!-- Why Choose Section -->
+<section class="bg-gray-50 py-20">
+  <div class="text-center mb-12">
+    <h2 class="text-4xl font-extrabold text-gray-900">
+      Why Choose <span class="text-orange-500">Fit</span><span class="text-blue-600">Studio?</span>
+    </h2>
+  </div>
+
+  <!-- Cards Container -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto px-6">
+    <!-- Card 1 -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+      <div class="flex items-center justify-center w-12 h-12 rounded-full bg-orange-100 mb-4">
+        <fa-icon [icon]="icons.dumbell" class="text-orange-500 text-3xl"></fa-icon>
+      </div>
+      <h3 class="text-xl font-bold mb-2">Expert Training</h3>
+      <p class="text-gray-600">
+        Work with certified trainers who customize workouts to your goals.
+      </p>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+      <div class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 mb-4">
+        <fa-icon [icon]="icons.chart" class="text-blue-500 text-3xl"></fa-icon>
+      </div>
+      <h3 class="text-xl font-bold mb-2">Track Progress</h3>
+      <p class="text-gray-600">
+        Monitor your PRs, body composition, and monthly improvements.
+      </p>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+      <div class="flex items-center justify-center w-12 h-12 rounded-full bg-orange-100 mb-4">
+        <fa-icon [icon]="icons.users" class="text-yellow-500 text-3xl"></fa-icon>
+      </div>
+      <h3 class="text-xl font-bold mb-2">Community</h3>
+      <p class="text-gray-600">
+        Join a supportive community of fitness enthusiasts.
+      </p>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+      <div class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 mb-4">
+        <fa-icon [icon]="icons.badge" class="text-green-600 text-3xl"></fa-icon>
+      </div>
+      <h3 class="text-xl font-bold mb-2">Flexible Plans</h3>
+      <p class="text-gray-600">
+        Choose from various membership options that fit your lifestyle.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="bg-white text-center py-16">
+  <h3 class="text-3xl font-extrabold text-gray-900 mb-4">
+    Ready to Transform Your Body?
+  </h3>
+  <p class="text-gray-600 mb-8">
+    Join thousands of members who’ve already started their fitness journey with FitStudio.
+  </p>
+  <button
+    class="px-8 py-3 rounded-xl bg-orange-500 text-white text-lg font-semibold hover:bg-orange-600 shadow-lg transition"
+    (click)="getStarted()"
+  >
+    Start Your Journey Today
+  </button>
+</section>
+
