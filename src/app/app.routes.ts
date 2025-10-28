@@ -1,9 +1,11 @@
 import { Routes } from '@angular/router';
 import { Login } from './featured/auth/login/login';
 import { Signup } from './featured/auth/signup/signup';
+import { Homepage } from './shared/components/homepage/homepage';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
+    { path: 'home', component: Homepage },
     { path: 'login', component: Login },
     { path: 'signup', component: Signup },
     {
