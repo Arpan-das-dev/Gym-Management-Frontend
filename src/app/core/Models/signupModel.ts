@@ -6,5 +6,5 @@ export interface signupModel {
     password: string;
     gender: string;
     role : string;
-    joiningDate: Date;
+    joinDate: string;
 }
