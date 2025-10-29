@@ -14,14 +14,6 @@ export class Login {
 
   loginForm: FormGroup;
 
-  identifier: string = '';
-  password: string = '';
-
-  data: loginModel = {
-    identifier: this.identifier,
-    password: this.password,
-  };
-
   validated: boolean = false;
   constructor(private authservice: Authservice, private router: Router,
     private formBuilder: FormBuilder
@@ -33,7 +25,12 @@ export class Login {
   }
   onSubmit() {
     if(this.loginForm.valid){
-       this.authservice.login(this.data).subscribe({
+      const data : loginModel ={
+        identifier : this.loginForm.get('identifier')?.value,
+        password : this.loginForm.get('password')?.value
+      }
+      console.log(data);
+       this.authservice.login(data).subscribe({
       next: (response) => {
         console.log('Login successful:', response);
         this.router.navigate(['/home']);

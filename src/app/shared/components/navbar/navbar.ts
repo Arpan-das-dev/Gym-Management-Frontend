@@ -1,12 +1,12 @@
 
 import { Component, OnInit } from '@angular/core';
 import { Authservice } from '../../../core/services/authservice';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
   standalone:true,
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
@@ -18,9 +18,11 @@ export class Navbar implements OnInit {
     
   }
   logout(){
-
+    this.authservice.logout();
+    this.router.navigate(['/login'])
   }
   ngOnInit(): void {
-      
+      this.isLoggedIn = this.authservice.isLoggedIn();
+      this.userRole = this.authservice.getUserRole();
   }
 }
