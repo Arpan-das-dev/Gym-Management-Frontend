@@ -48,10 +48,14 @@ export class Authservice {
 
   // signup method 
   signup(data: signupModel) :Observable<string> {
-    return this.http.post<string>(this.authServiceLoginUrl+"/signuup",data).pipe(
+    const url = `${this.authServiceLoginUrl}/signup`;
+    console.log('➡ AuthService.signup() called — HttpClient instance:', this.http);
+  console.log('➡ Sending signup to:', url);
+  console.log('📦 Payload:', data);
+    return this.http.post<string>(url,data).pipe(
       tap(response=>{
         console.log(response);
-        this.router.navigate(['/login']);
+        return response;
       }), catchError(error=>{
         console.error("Signup error:", error);
         return throwError(()=> new Error("Signup failed"));
