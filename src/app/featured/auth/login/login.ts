@@ -33,6 +33,7 @@ export class Login {
        this.authservice.login(data).subscribe({
       next: (response) => {
         console.log('Login successful:', response);
+        localStorage.setItem('identifer',data.identifier)
         this.router.navigate(['/home']);
       },
       error: (error) => {
