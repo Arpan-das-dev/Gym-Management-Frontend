@@ -1,0 +1,107 @@
+<app-navbar></app-navbar>
+
+<section class="relative bg-cover bg-center bg-no-repeat py-20 px-6"
+  style="background-image: url('planBg.jpg');">
+  
+  <!-- 🔹 Background Filter Overlay -->
+  <div class="absolute inset-0 bg-linear-to-b from-white/80 via-white/70 to-white/80 backdrop-blur-sm pointer-events-none"></div>
+
+  <div class="relative max-w-7xl mx-auto text-center mb-16 z-10">
+    <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-3">
+      Choose Your <span class="text-orange-500">Fit</span><span class="text-blue-600">Plan</span>
+    </h1>
+    <p class="text-gray-700 text-lg">
+      Pick the membership plan that fits your fitness goals and lifestyle.
+    </p>
+  </div>
+
+  <!-- Plan Cards (Centered & Max 3 per row) -->
+  <div class="relative z-10 flex justify-center">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      @for (plan of plans; track plan.planId) {
+      <div
+        class="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-transform duration-300 hover:-translate-y-2 flex flex-col justify-between border border-gray-200 p-6"
+        [ngClass]="{ 'ring-4 ring-blue-500 scale-105': isPopular(plan.planId) }"
+      >
+        <!-- Most Popular Badge -->
+        @if (isPopular(plan.planId)) {
+        <div
+          class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-xs font-semibold px-4 py-1 rounded-full shadow-md"
+        >
+          <fa-icon [icon]="icons.star" class="mr-1"></fa-icon> Most Popular
+        </div>
+        }
+
+        <!-- Plan Info -->
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-3 text-center">{{ plan.planName }}</h2>
+          <div class="text-center mb-6">
+            <span class="text-4xl font-extrabold text-orange-500">₹{{ plan.price }}</span>
+            <span class="text-gray-600 text-sm block mt-1">for {{ plan.duration }} days</span>
+          </div>
+
+          <ul class="text-gray-700 text-sm text-left space-y-2 mb-8 min-h-40 px-4">
+            @for (feature of plan.planFeatures; track feature) {
+            <li class="flex items-start">
+              <fa-icon [icon]="icons.check" class="text-orange-500 mt-1 mr-2"></fa-icon>
+              <span>{{ feature }}</span>
+            </li>
+            }
+          </ul>
+        </div>
+
+        <!-- Buy Button -->
+        <div class="mt-auto flex justify-center">
+          <button
+            (click)="buyPlan(plan.planId)"
+            class="w-3/4 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 rounded-full transition-transform transform hover:scale-105 flex items-center justify-center gap-2"
+          >
+            <fa-icon [icon]="icons.dumbell"></fa-icon>
+            Buy Plan
+          </button>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- Shared Benefits Section -->
+  <div class="relative z-10 mt-20 text-center">
+    <h3 class="text-2xl font-bold text-gray-800 mb-6">All Plans Include</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto text-gray-700">
+      <div class="flex flex-col items-center">
+        <div class="bg-orange-100 rounded-full w-12 h-12 flex items-center justify-center mb-3">
+          <fa-icon [icon]="icons.cancel" class="text-orange-500 text-xl"></fa-icon>
+        </div>
+        <p class="font-medium">No Commitment</p>
+        <p class="text-sm text-gray-500">Cancel anytime</p>
+      </div>
+
+      <div class="flex flex-col items-center">
+        <div class="bg-blue-100 rounded-full w-12 h-12 flex items-center justify-center mb-3">
+          <fa-icon [icon]="icons.clock" class="text-blue-500 text-xl"></fa-icon>
+        </div>
+        <p class="font-medium">24/7 Access</p>
+        <p class="text-sm text-gray-500">Train on your schedule</p>
+      </div>
+
+      <div class="flex flex-col items-center">
+        <div class="bg-orange-100 rounded-full w-12 h-12 flex items-center justify-center mb-3">
+          <fa-icon [icon]="icons.dumbell" class="text-orange-500 text-xl"></fa-icon>
+        </div>
+        <p class="font-medium">Modern Equipment</p>
+        <p class="text-sm text-gray-500">Latest fitness tech</p>
+      </div>
+
+      <div class="flex flex-col items-center">
+        <div class="bg-blue-100 rounded-full w-12 h-12 flex items-center justify-center mb-3">
+          <fa-icon [icon]="icons.support" class="text-blue-500 text-xl"></fa-icon>
+        </div>
+        <p class="font-medium">Expert Support</p>
+        <p class="text-sm text-gray-500">Professional guidance</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<app-footer></app-footer>
