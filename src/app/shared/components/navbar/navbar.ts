@@ -1,17 +1,19 @@
 
-import { Component, OnInit } from '@angular/core';
+import { Component,  OnInit } from '@angular/core';
 import { Authservice } from '../../../core/services/authservice';
 import { Router, RouterLink } from '@angular/router';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
   standalone:true,
-  imports: [RouterLink],
+  imports: [RouterLink,NgClass],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
 export class Navbar implements OnInit {
 
+  isMenuOpen = false;
   isLoggedIn = false;
   userRole: string | null = null;
   constructor(private authservice: Authservice, private router: Router){

@@ -1,75 +1,85 @@
 <header
-  class="sticky top-0 z-50 bg-linear-to-r from-blue-500 via-yellow-300 to-gray-900 shadow-md border-b border-gray-200 "
-  
+  class="sticky top-0 z-50 bg-gradient-to-r from-blue-500 via-yellow-300 to-gray-900 shadow-md border-b border-gray-200"
 >
-  <nav class="flex justify-between items-center px-8 py-4">
-    <!-- Logo -->
-    <div class="flex items-center space-x-1">
-      <img src="55212605-gym-fitness-club-bodybuilding-icon-vector.png" alt="FitStudio Logo" class="h-6 w-6 " />
-      <h2 class="text-2xl font-bold text-white" >
+  <nav class="flex items-center justify-between px-6 py-3 md:px-10 relative">
+    <!-- ===== LOGO ===== -->
+    <div class="flex items-center justify-center flex-shrink-0">
+      <img src="gymlogo.png" alt="Left Arm" class="h-8 w-8 sm:h-10 sm:w-10 object-contain -mr-1 " />
+      <h2 class="text-xl sm:text-2xl font-bold text-white mx-1 leading-none">
         Fit<span class="text-orange-500">Studio</span>
       </h2>
+      <img
+        src="gymlogo.png"
+        alt="Right Arm"
+        class="h-8 w-8 sm:h-10 sm:w-10 object-contain -ml-1 transform scale-x-[-1] "
+      />
     </div>
 
-    <!-- Center Nav Links -->
+    <!-- ===== MOBILE MENU BUTTON ===== -->
+    <button
+      class="md:hidden text-white text-2xl focus:outline-none"
+      (click)="isMenuOpen = !isMenuOpen"
+    >
+      <i class="fa" [ngClass]="isMenuOpen ? 'fa-times' : 'fa-bars'"></i>
+    </button>
+
+    <!-- ===== CENTER LINKS ===== -->
     <ul
-      class="flex space-x-8 font-medium text-white transition-colors duration-300"
+      class="hidden md:flex space-x-8 font-medium text-white absolute left-1/2 transform -translate-x-1/2"
     >
       <li>
         <a
           routerLink="/home"
           routerLinkActive="text-orange-500 font-semibold"
           class="hover:text-orange-400 transition-colors duration-300"
+          >Home</a
         >
-          Home
-        </a>
       </li>
       <li>
         <a
           routerLink="/plans"
           routerLinkActive="text-orange-500 font-semibold"
           class="hover:text-orange-400 transition-colors duration-300"
+          >Our Plans</a
         >
-          Our Plans
-        </a>
       </li>
       <li>
         <a
           routerLink="/trainers"
           routerLinkActive="text-orange-500 font-semibold"
           class="hover:text-orange-400 transition-colors duration-300"
+          >Our Trainers</a
         >
-          Our Trainers
-        </a>
       </li>
       <li>
         <a
           routerLink="/about"
           routerLinkActive="text-orange-500 font-semibold"
           class="hover:text-orange-400 transition-colors duration-300"
+          >About Us</a
         >
-          About Us
-        </a>
       </li>
     </ul>
 
-    <!-- Right Side -->
-    <ul class="flex items-center space-x-6 font-medium">
-      <!-- Dashboard (visible for logged-in users) -->
+    <!-- ===== RIGHT SIDE ===== -->
+    <ul class="hidden md:flex items-center space-x-6 font-medium text-white">
       @if (isLoggedIn) {
       <li>
         <a
           routerLink="/dashboard"
-          routerLinkActive="text-orange-500 font-semibold"
+          class="hover:text-orange-500 transition-colors duration-300"
+          >Dashboard</a
+        >
+      </li>
+      <li>
+        <button
+          (click)="logout()"
           class="hover:text-orange-500 transition-colors duration-300"
         >
-          Dashboard
-        </a>
+          Logout
+        </button>
       </li>
-      }
-
-      <!-- Auth Buttons -->
-      @if (!isLoggedIn) {
+      } @else {
       <li>
         <a
           routerLink="/login"
@@ -85,16 +95,73 @@
           Sign Up
         </a>
       </li>
-      } @else {
-      <li>
-        <button
-          (click)="logout()"
-          class="hover:text-orange-500 transition-colors duration-300"
-        >
-          Logout
-        </button>
-      </li>
       }
     </ul>
+
+    <!-- ===== MOBILE MENU (Animated) ===== -->
+    <div
+      class="md:hidden absolute top-full left-0 w-full bg-gray-900/95 backdrop-blur-lg text-white font-medium flex flex-col items-center space-y-4 py-6 transition-all duration-500 ease-in-out"
+      [ngClass]="isMenuOpen ? 'opacity-100 translate-y-0 visible' : 'opacity-0 -translate-y-5 invisible'"
+    >
+      <a
+        routerLink="/home"
+        routerLinkActive="text-orange-500 font-semibold"
+        class="hover:text-orange-400 transition-colors duration-300"
+        (click)="isMenuOpen = false"
+        >Home</a
+      >
+      <a
+        routerLink="/plans"
+        routerLinkActive="text-orange-500 font-semibold"
+        class="hover:text-orange-400 transition-colors duration-300"
+        (click)="isMenuOpen = false"
+        >Our Plans</a
+      >
+      <a
+        routerLink="/trainers"
+        routerLinkActive="text-orange-500 font-semibold"
+        class="hover:text-orange-400 transition-colors duration-300"
+        (click)="isMenuOpen = false"
+        >Our Trainers</a
+      >
+      <a
+        routerLink="/about"
+        routerLinkActive="text-orange-500 font-semibold"
+        class="hover:text-orange-400 transition-colors duration-300"
+        (click)="isMenuOpen = false"
+        >About Us</a
+      >
+
+      <div class="border-t border-gray-600 w-3/4"></div>
+
+      @if (isLoggedIn) {
+      <a
+        routerLink="/dashboard"
+        class="hover:text-orange-500 transition-colors duration-300"
+        (click)="isMenuOpen = false"
+        >Dashboard</a
+      >
+      <button
+        (click)="logout(); isMenuOpen = false"
+        class="hover:text-orange-500 transition-colors duration-300"
+      >
+        Logout
+      </button>
+      } @else {
+      <a
+        routerLink="/login"
+        class="hover:text-orange-500 transition-colors duration-300"
+        (click)="isMenuOpen = false"
+        >Login</a
+      >
+      <a
+        routerLink="/signup"
+        class="bg-orange-500 text-white px-4 py-2 rounded-full hover:bg-orange-600 transition-colors duration-300"
+        (click)="isMenuOpen = false"
+      >
+        Sign Up
+      </a>
+      }
+    </div>
   </nav>
 </header>
