@@ -3,11 +3,12 @@ import { Navbar } from "../navbar/navbar";
 import { Router } from '@angular/router';
 import { Authservice } from '../../../core/services/authservice';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faDumbbell, faChartLine, faUsers, faIdBadge, IconDefinition, } from '@fortawesome/free-solid-svg-icons';
+import { faDumbbell, faChartLine, faUsers, faIdBadge } from '@fortawesome/free-solid-svg-icons';
+import { Footer } from "../footer/footer";
 
 @Component({
   selector: 'app-homepage',
-  imports: [Navbar,FontAwesomeModule],
+  imports: [Navbar, FontAwesomeModule, Footer],
   standalone:true,
   templateUrl: './homepage.html',
   styleUrl: './homepage.css',
