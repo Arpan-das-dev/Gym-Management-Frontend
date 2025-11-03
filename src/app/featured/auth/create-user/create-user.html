@@ -1,0 +1,192 @@
+<!-- Background Section -->
+<div
+  class="flex justify-center items-center min-h-screen bg-cover bg-center"
+  style="background-image: url('assets/images/bg-fitness.jpg')"
+>
+  <!-- Glassmorphic Card -->
+  <div
+    class="bg-white/90 dark:bg-gray-900/80 backdrop-blur-md p-10 rounded-2xl shadow-xl w-full max-w-lg border border-orange-400/30"
+  >
+    <!-- Header -->
+    <div class="flex flex-col items-center mb-6">
+      <div class="flex items-center space-x-2 mb-2">
+        <img src="assets/images/logo.svg" alt="FitStudio Logo" class="h-8 w-8" />
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white">
+          Admin <span class="text-orange-500">Panel</span>
+        </h2>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Create New User
+      </h3>
+      <p class="text-gray-500 text-center text-sm">
+        Add a new member, trainer, or admin to the system
+      </p>
+    </div>
+
+    <!-- Success Message -->
+    @if (successMessage) {
+      <div
+        class="flex items-center gap-2 mb-4 p-3 rounded-lg bg-green-100 text-green-700 border border-green-400 animate-fade-in"
+      >
+        <i class="fa-solid fa-circle-check text-green-600"></i>
+        <span>{{ successMessage }}</span>
+      </div>
+    }
+
+    <!-- Error Message -->
+    @if (errorMessage) {
+      <div
+        class="flex items-center gap-2 mb-4 p-3 rounded-lg bg-red-100 text-red-700 border border-red-400 animate-fade-in"
+      >
+        <i class="fa-solid fa-circle-xmark text-red-600"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+    }
+
+    <!-- Create User Form -->
+    <form [formGroup]="createUser" (ngSubmit)="onSubmit()" class="space-y-4">
+      <!-- First Name -->
+      <div>
+        <label for="firstName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          First Name
+        </label>
+        <input
+          id="firstName"
+          formControlName="firstName"
+          type="text"
+          placeholder="John"
+          class="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent p-2.5 text-sm text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+        />
+        @if (createUser.get('firstName')?.touched && createUser.get('firstName')?.invalid) {
+          <p class="text-red-500 text-xs mt-1">First name must be at least 4 characters long.</p>
+        }
+      </div>
+
+      <!-- Last Name -->
+      <div>
+        <label for="lastName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          Last Name
+        </label>
+        <input
+          id="lastName"
+          formControlName="lastName"
+          type="text"
+          placeholder="Doe"
+          class="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent p-2.5 text-sm text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+        />
+        @if (createUser.get('lastName')?.touched && createUser.get('lastName')?.invalid) {
+          <p class="text-red-500 text-xs mt-1">Last name must be at least 4 characters long.</p>
+        }
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          Email
+        </label>
+        <input
+          id="email"
+          formControlName="email"
+          type="email"
+          placeholder="user@email.com"
+          class="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent p-2.5 text-sm text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+        />
+        @if (createUser.get('email')?.touched && createUser.get('email')?.invalid) {
+          <p class="text-red-500 text-xs mt-1">Please enter a valid email.</p>
+        }
+      </div>
+
+      <!-- Phone -->
+      <div>
+        <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          Phone
+        </label>
+        <input
+          id="phone"
+          formControlName="phone"
+          type="text"
+          maxlength="12"
+          placeholder="9876543210"
+          class="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent p-2.5 text-sm text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+        />
+        @if (createUser.get('phone')?.touched && createUser.get('phone')?.invalid) {
+          <p class="text-red-500 text-xs mt-1">Enter a valid phone number.</p>
+        }
+      </div>
+
+      <!-- Password -->
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          Password
+        </label>
+        <input
+          id="password"
+          formControlName="password"
+          type="password"
+          placeholder="********"
+          class="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent p-2.5 text-sm text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+        />
+        @if (createUser.get('password')?.touched && createUser.get('password')?.invalid) {
+          <p class="text-red-500 text-xs mt-1">Password must be at least 6 characters long.</p>
+        }
+      </div>
+
+      <!-- Gender -->
+      <div>
+        <label for="gender" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          Gender
+        </label>
+        <select
+          id="gender"
+          formControlName="gender"
+          class="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent p-2.5 text-sm text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+        >
+          <option value="">Select Gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+        @if (createUser.get('gender')?.touched && createUser.get('gender')?.invalid) {
+          <p class="text-red-500 text-xs mt-1">Please select a gender.</p>
+        }
+      </div>
+
+      <!-- Role -->
+      <div>
+        <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          Role
+        </label>
+        <select
+          id="role"
+          formControlName="role"
+          class="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent p-2.5 text-sm text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+        >
+          <option value="">Select Role</option>
+          <option value="member">Member</option>
+          <option value="trainer">Trainer</option>
+          <option value="admin">Admin</option>
+        </select>
+        @if (createUser.get('role')?.touched && createUser.get('role')?.invalid) {
+          <p class="text-red-500 text-xs mt-1">Please select a role.</p>
+        }
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        [disabled]="createUser.invalid"
+        class="w-full py-2.5 mt-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg shadow-md transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Create User
+      </button>
+
+      <!-- Back to Dashboard -->
+      <p class="text-center text-sm text-gray-600 dark:text-gray-400 mt-3">
+        Return to
+        <a routerLink="/dashboard" class="text-orange-500 hover:underline">
+          Dashboard
+        </a>
+      </p>
+    </form>
+  </div>
+</div>
