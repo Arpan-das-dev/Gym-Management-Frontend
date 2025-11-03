@@ -4,6 +4,7 @@ import { Signup } from './featured/auth/signup/signup';
 import { Homepage } from './shared/components/homepage/homepage';
 import { Plan } from './featured/plan/plan';
 import { roleGuard } from './core/guards/role-guard';
+import { ProfileCard } from './shared/components/profile-card/profile-card';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -11,6 +12,8 @@ export const routes: Routes = [
     { path: 'login', component: Login },
     { path: 'signup', component: Signup },
     { path: 'plans', component: Plan },
+    { path: 'profile', component: ProfileCard},
+    
     {
         path: 'verify-email',
         loadComponent: () => import('./featured/auth/email-verification/email-verification')
@@ -41,6 +44,12 @@ export const routes: Routes = [
         canActivate :[roleGuard],
         data: { roles: ['ADMIN'] },
         loadComponent: () => import('./featured/admin-dashboard/admin-dashboard').then(m => m.AdminDashboard)
+    },
+    { path: 'createUser', 
+        canActivate:[roleGuard],
+        data:{roles:['ADMIN']},
+        loadComponent: () => import('./featured/auth/create-user/create-user')
+        .then(m=> m.CreateUser)
     },
     { path: '**', redirectTo: '/error' }
 ];
