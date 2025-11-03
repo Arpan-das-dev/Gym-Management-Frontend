@@ -70,7 +70,7 @@ export class Signup implements OnInit {
 
   roleMapper(role: string): string {
   const upperRole = role.toUpperCase();
-  const currentUserRole = localStorage.getItem('role');
+  const currentUserRole = this.authservice.getUserRole();
 
   if (currentUserRole !== 'ADMIN') {
     if (upperRole === 'TRAINER') return 'TRAINER_PENDING';
