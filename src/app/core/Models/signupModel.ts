@@ -22,3 +22,16 @@ export interface userDetailModel{
   phoneVerified: boolean;
   isApproved: boolean;
 }
+
+export interface createTrainerModel{
+      firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    password: string;
+    gender: string;
+    role : string;
+    joinDate: string;
+    specialties: string[];
+    experience: number;
+}
