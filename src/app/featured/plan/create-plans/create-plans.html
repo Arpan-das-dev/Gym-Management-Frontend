@@ -1,0 +1,135 @@
+<div class="min-h-screen flex items-center justify-center bg-cover bg-center"
+     style="background-image: url('createPlanBG.jpg')">
+
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
+
+    <!-- Header -->
+    <div class="flex items-center justify-center mb-4">
+      <fa-icon [icon]="icons.dumbell" class="text-3xl text-orange-500 mr-2"></fa-icon>
+      <h1 class="text-3xl font-extrabold text-gray-800">
+        Fit<span class="text-orange-500">Studio</span>
+      </h1>
+    </div>
+
+    <h2 class="text-xl font-semibold text-center text-gray-800">Create New Plan</h2>
+    <p class="text-sm text-gray-500 text-center mb-6">Add a new subscription plan to your gym</p>
+
+    <!-- Success Alert -->
+    @if (successMessage) {
+      <div class="flex items-center gap-2 bg-green-100 text-green-700 px-4 py-3 rounded-lg mb-4">
+        <fa-icon [icon]="icons.checkCircle" class="text-green-600"></fa-icon>
+        <span class="font-medium">{{ successMessage }}</span>
+      </div>
+    }
+
+    <!-- Error Alert -->
+    @if (errorMessage) {
+      <div class="flex items-center gap-2 bg-red-100 text-red-700 px-4 py-3 rounded-lg mb-4">
+        <fa-icon [icon]="icons.exclamationCircle" class="text-red-600"></fa-icon>
+        <span class="font-medium">{{ errorMessage }}</span>
+      </div>
+    }
+
+    <!-- Form -->
+    <form [formGroup]="planForm" (ngSubmit)="onSumbit()" class="space-y-4">
+
+      <!-- Plan Name -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Plan Name</label>
+        <input formControlName="planName" type="text"
+               placeholder="e.g., Premium Plan"
+               class="w-full bg-gray-100 text-gray-800 placeholder-gray-400 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-orange-500"/>
+        @if (planForm.get('planName')?.touched && planForm.get('planName')?.invalid) {
+          <p class="text-red-500 text-xs mt-1">
+            <fa-icon [icon]="icons.warning" class="mr-1"></fa-icon>
+            Plan name is required and must be at least 3 characters.
+          </p>
+        }
+      </div>
+
+      <!-- Price -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
+        <input formControlName="price" type="number" step="0.01" min="0.01"
+               placeholder="e.g., 4999.00"
+               class="w-full bg-gray-100 text-gray-800 placeholder-gray-400 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-orange-500"/>
+        @if (planForm.get('price')?.touched && planForm.get('price')?.invalid) {
+          <p class="text-red-500 text-xs mt-1">
+            <fa-icon [icon]="icons.warning" class="mr-1"></fa-icon>
+            Price is required and must be greater than 0.
+          </p>
+        }
+      </div>
+
+      <!-- Duration -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Plan Duration (days)</label>
+        <input formControlName="duration" type="number" min="1"
+               placeholder="e.g., 7, 14, 180, 365"
+               class="w-full bg-gray-100 text-gray-800 placeholder-gray-400 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-orange-500"/>
+        @if (planForm.get('duration')?.touched && planForm.get('duration')?.invalid) {
+          <p class="text-red-500 text-xs mt-1">
+            <fa-icon [icon]="icons.warning" class="mr-1"></fa-icon>
+            Duration is required and must be at least 1 month.
+          </p>
+        }
+      </div>
+
+      <!-- Features -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Plan Features</label>
+
+        <div formArrayName="features">
+  @for (feature of features.controls; track $index) {
+    <div class="flex items-center gap-2 mb-2">
+      <input
+        [formControlName]="$index"
+        type="text"
+        placeholder="Feature {{ $index + 1 }}"
+        class="flex-1 bg-gray-100 text-gray-800 placeholder-gray-400 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-orange-500"
+      />
+      <button
+        type="button"
+        (click)="removeFeature($index)"
+        class="bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition"
+      >
+        <fa-icon [icon]="icons.xmark"></fa-icon>
+      </button>
+    </div>
+  }
+</div>
+
+        <button type="button" (click)="addFeature()"
+                class="border border-orange-500 text-orange-500 rounded-lg px-3 py-1 hover:bg-orange-500 hover:text-white transition w-full text-sm font-medium">
+          <fa-icon [icon]="icons.plus" class="mr-1"></fa-icon> Add Feature
+        </button>
+
+        @if (features.length === 0 && isSubmitted) {
+          <p class="text-red-500 text-xs mt-1">
+            <fa-icon [icon]="icons.warning" class="mr-1"></fa-icon>
+            At least one feature is required.
+          </p>
+        }
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit"
+              [disabled]="loading"
+              class="w-full bg-orange-500 hover:bg-orange-600 transition text-white py-2 rounded-lg font-semibold flex items-center justify-center">
+        @if (!loading) {
+          <fa-icon [icon]="icons.clipBoardList" class="mr-2"></fa-icon>
+          <span>Create Plan</span>
+        } @else {
+          <div class="spinner"></div>
+        }
+      </button>
+
+      <!-- Dashboard Button -->
+      <button type="button" (click)="moveTodashBoard()"
+              class="w-full border border-gray-400 text-gray-700 hover:bg-gray-100 transition py-2 rounded-lg mt-2">
+        ← Return to Dashboard
+      </button>
+
+    </form>
+  </div>
+</div>
