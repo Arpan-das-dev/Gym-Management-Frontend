@@ -122,7 +122,7 @@ export class AdminDashboard implements OnInit {
   }
 
   createPlan() {
-    console.log('Navigating to create plan page...');
+    this.router.navigate(['createPlan'])
   }
 
   createProduct() {
