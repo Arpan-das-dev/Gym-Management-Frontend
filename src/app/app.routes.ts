@@ -5,6 +5,10 @@ import { Homepage } from './shared/components/homepage/homepage';
 import { Plan } from './featured/plan/plan';
 import { roleGuard } from './core/guards/role-guard';
 import { ProfileCard } from './shared/components/profile-card/profile-card';
+import { CreatePlans } from './featured/plan/create-plans/create-plans';
+import { authGuard } from './core/guards/auth-guard';
+import { Component } from '@angular/core';
+import { BuyPlan } from './featured/plan/buy-plan/buy-plan';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -46,10 +50,17 @@ export const routes: Routes = [
         loadComponent: () => import('./featured/admin-dashboard/admin-dashboard').then(m => m.AdminDashboard)
     },
     { path: 'createUser', 
-        canActivate:[roleGuard],
+        canActivate:[roleGuard,authGuard],
         data:{roles:['ADMIN']},
         loadComponent: () => import('./featured/auth/create-user/create-user')
         .then(m=> m.CreateUser)
     },
+    { path: 'createPlan', 
+        canActivate:[roleGuard,authGuard],
+        data:{roles:['ADMIN']},
+        loadComponent:() => import('./featured/plan/create-plans/create-plans')
+        .then(m=>m.CreatePlans)   
+    },
+    { path: 'buyPlan', component: BuyPlan},
     { path: '**', redirectTo: '/error' }
 ];
