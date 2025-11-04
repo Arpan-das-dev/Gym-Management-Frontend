@@ -1,0 +1,6 @@
+<app-navbar></app-navbar>
+<label for="Cupon code"> enter a cupon code(in any)</label>
+ <input type="text" required placeholder="eg: EXAMPLE123" [(ngModel)]="cuponCode">
+ <button type="button" (click)="cuponCodeCheck()">check avialability</button>
+ <button type="button" (click)="buy()"> Buy plan</button>
+<app-footer></app-footer>
