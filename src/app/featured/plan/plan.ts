@@ -42,7 +42,15 @@ export class Plan implements OnInit {
       }
     })
   }
-  buyPlan(planId: string) { }
+  buyPlan(planId: string) { 
+    const plan : plansResponseModel | undefined = this.plans.find(p => p.planId === planId);
+    if(plan){
+    this.router.navigate(['/buyPlan'], {state :{plan}});
+    } else{
+      this.errorOccurred = true;
+      this.errorMessage = "Something went wrong please try again later"
+    }
+  }
   isPopular(planId: string): boolean {
     return true;
   }
