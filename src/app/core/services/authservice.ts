@@ -7,13 +7,15 @@ import { signupModel, userDetailModel } from '../Models/signupModel';
 import { Router } from '@angular/router';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
 import { jwtPayload } from '../Models/jwtModel';
+import { CookieService } from 'ngx-cookie-service';
+
 @Injectable({
   providedIn: 'root'
 })
 export class Authservice {
   authServiceLoginUrl = "http://localhost:8080/fitStudio/auth"
   constructor(private http: HttpClient,
-    private router: Router
+    private router: Router, private cookies: CookieService
   ) { }
 
   login(data: loginModel): Observable<loginResponse> {
@@ -211,6 +213,24 @@ export class Authservice {
   loadUserInfo(identifier: string): Observable<userDetailModel>{
     const url = `${this.authServiceLoginUrl}/userDetails?identifier=${identifier}`;
     console.log("sending request to "+url);
-    return this.http.get<userDetailModel>(url).pipe();
+    return this.http.get<userDetailModel>(url).pipe(
+      tap(user=>{
+        this.cookies.set('userId',user.id,{path: '/', sameSite: 'Strict'})
+        this.cookies.set('userMail',user.email,{path:'/',sameSite:'Strict'})
+        this.cookies.set('userName',`${user.firstName} ${user.lastName}`,{path:'/', sameSite:'Strict'})
+      })
+    );
+  }
+
+  getUserId(){
+    return this.cookies.get('userId')
+  }
+
+  getUserMail(){
+    return this.cookies.get('userMail')
+  }
+
+  getUserName(){
+    return this.cookies.get('userName')
   }
 }
