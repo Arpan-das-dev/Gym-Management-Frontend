@@ -29,3 +29,27 @@ export interface plansResponseModel {
      */
     planFeatures: string[];
 }
+export interface PlanCreateRequestDto{
+    /** Plan name is required */
+  planName: string;
+
+  /** Price is required and must be greater than 0 */
+  price: string;
+
+  /** Duration is required and must be at least 1 */
+  duration: number;
+
+  /** Features list cannot be null and must have at least one non-blank feature */
+  features: string[]; 
+}
+
+export interface PlanPaymentRequestDto {
+  userName: string;
+  userId: string;
+  userMail: string;
+  planId: string;
+  currency: string;
+  amount: number;
+  cuponCode: string;
+  paymentDate: string; 
+}
