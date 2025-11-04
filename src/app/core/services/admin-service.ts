@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { signupModel } from '../Models/signupModel';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { UserCreationResponseDto } from '../Models/genericResponseModels';
+import { genericResponseMessage, UserCreationResponseDto } from '../Models/genericResponseModels';
+import { PlanCreateRequestDto } from '../Models/planModel';
 
 @Injectable({
   providedIn: 'root'
@@ -37,5 +38,13 @@ export class AdminService {
     const params = new HttpParams()
       .set('identifier', id).set('role', role);
     return this.httpClient.delete<string>(url, { params: params });
+  }
+
+  // managing plans via admin service
+  planManagementUrl="http://localhost:8080/fitStudio/admin/plans"
+
+  createPlan(data: PlanCreateRequestDto) : Observable<genericResponseMessage>{
+    const url = `${this.planManagementUrl}/createPlan`;
+    return this.httpClient.post<genericResponseMessage>(url,data);
   }
 }
