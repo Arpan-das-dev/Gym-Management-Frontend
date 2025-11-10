@@ -3,30 +3,40 @@ import { Router } from '@angular/router';
 import { AdminService } from '../../core/services/admin-service';
 import { Authservice } from '../../core/services/authservice';
 import { userDetailModel } from '../../core/Models/signupModel';
-import { Navbar } from "../../shared/components/navbar/navbar";
+import { Navbar } from '../../shared/components/navbar/navbar';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faBoxesPacking, faCamera, faClipboardList, faDumbbell, faTrash, faUser, faUserPlus, faUserShield } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBoxesPacking,
+  faCamera,
+  faClipboardList,
+  faDumbbell,
+  faTrash,
+  faUser,
+  faUserPlus,
+  faUserShield,
+} from '@fortawesome/free-solid-svg-icons';
 import { NgClass, NgStyle } from '@angular/common';
-import { Footer } from "../../shared/components/footer/footer";
+import { Footer } from '../../shared/components/footer/footer';
+import { PlanService } from '../../core/services/plan-service';
+import { genericResponseMessage } from '../../core/Models/genericResponseModels';
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [Navbar, FontAwesomeModule, NgStyle, Footer,NgClass],
+  imports: [Navbar, FontAwesomeModule, NgStyle, Footer, NgClass],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css',
 })
 export class AdminDashboard implements OnInit {
-
   icons = {
-    member : faUser,
-    trainer : faDumbbell,
-    admined : faUserShield,
-    camera : faCamera,
+    member: faUser,
+    trainer: faDumbbell,
+    admined: faUserShield,
+    camera: faCamera,
     trash: faTrash,
     createMember: faUserPlus,
     plan: faClipboardList,
-    product: faBoxesPacking
-  }
+    product: faBoxesPacking,
+  };
   trainerRequests = [
     {
       id: 1,
@@ -74,55 +84,70 @@ export class AdminDashboard implements OnInit {
       active: true,
     },
   ];
-  constructor(private router: Router, private adminservice: AdminService, private authservice: Authservice) { }
+  constructor(
+    private router: Router,
+    private adminservice: AdminService,
+    private authservice: Authservice,
+    private planService: PlanService
+  ) {}
   admin: userDetailModel = {
-    id: "",
-    firstName: "",
-    lastName: "",
-    gender: "",
-    email: "",
-    phone: "",
-    role: "",          // You can make this more specific if RoleType enums/values are known
-    joinDate: "",     // LocalDate maps to string in ISO format (e.g. yyyy-MM-dd)
+    id: '',
+    firstName: '',
+    lastName: '',
+    gender: '',
+    email: '',
+    phone: '',
+    role: '', // You can make this more specific if RoleType enums/values are known
+    joinDate: '', // LocalDate maps to string in ISO format (e.g. yyyy-MM-dd)
     emailVerified: false,
     phoneVerified: false,
-    isApproved: false
-  }
+    isApproved: false,
+  };
   ngOnInit(): void {
-   this.loadUserInfo()
+    this.loadUserInfo();
+    this.getTotalUsers();
   }
-  loadUserInfo(){
-     const identifer = localStorage.getItem('identifer');
+  loadUserInfo() {
+    const identifer = localStorage.getItem('identifer');
     if (identifer !== null) {
-      console.log("sending request");
+      console.log('sending request');
       console.log(identifer);
       this.authservice.loadUserInfo(identifer).subscribe({
         next: (res) => {
           this.admin = res;
-          console.log("Admin::=>",this.admin);
-          
-        }
-      })
+          console.log('Admin::=>', this.admin);
+        },
+      });
     }
-    console.log("nothing found");
+    console.log('nothing found');
   }
-  totalUsers = 123
-  userGrowth = 2
-  viewAllUsers(){}
+  totalUsers = 0;
+  getTotalUsers(): void {
+    this.planService.getTotalUserForAllPlans().subscribe({
+      next: (res) => {
+        console.log(res);
+        this.totalUsers = res;
+      },
+      error: (err) => {
+        console.error('Failed to load total users:', err);
+      },
+    });
+  }
+  viewAllUsers() {}
   totalRevenue = 46;
   revenueGrowth = 10;
-  viewRevenueDetails(){}
-  activeSubscriptions = 23
-  subscriptionGrowth = 2
-  totalOrders = 234
-  orderGrowth = 2
-  viewOrders(){}
+  viewRevenueDetails() {}
+  activeSubscriptions = 23;
+  subscriptionGrowth = 2;
+  totalOrders = 234;
+  orderGrowth = 2;
+  viewOrders() {}
   createUser() {
-    this.router.navigate(['/createUser'])
+    this.router.navigate(['/createUser']);
   }
 
   createPlan() {
-    this.router.navigate(['createPlan'])
+    this.router.navigate(['createPlan']);
   }
 
   createProduct() {
@@ -152,5 +177,4 @@ export class AdminDashboard implements OnInit {
   loadMoreAssignments() {
     console.log('Loading more assignment requests...');
   }
-
 }
