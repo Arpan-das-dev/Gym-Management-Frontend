@@ -1,14 +1,14 @@
 export interface loginModel {
-    identifier: string;
-    password: string;
+  identifier: string;
+  password: string;
 }
 
 export interface loginResponse {
-    token: string;
-    role: string;
+  token: string;
+  role: string;
 }
 
 export interface emailVerificationModel {
-    email: string;
-    otp: string;
-}   
+  email: string;
+  otp: string;
+}
