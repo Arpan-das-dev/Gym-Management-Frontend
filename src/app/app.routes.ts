@@ -16,51 +16,70 @@ export const routes: Routes = [
     { path: 'login', component: Login },
     { path: 'signup', component: Signup },
     { path: 'plans', component: Plan },
-    { path: 'profile', component: ProfileCard},
-    
+    { path: 'profile', component: ProfileCard },
+
     {
         path: 'verify-email',
-        loadComponent: () => import('./featured/auth/email-verification/email-verification')
-            .then(m => m.EmailVerification)
+        loadComponent: () =>
+            import('./featured/auth/email-verification/email-verification').then(
+                (m) => m.EmailVerification
+            ),
     },
     {
         path: 'verify-phone',
-        loadComponent: () => import('./featured/auth/phone-verification/phone-verification')
-            .then(m => m.PhoneVerification)
+        loadComponent: () =>
+            import('./featured/auth/phone-verification/phone-verification').then(
+                (m) => m.PhoneVerification
+            ),
     },
     {
         path: 'forgot-password',
-        loadComponent: () => import('./featured/auth/forgot-password/forgot-password')
-            .then(m => m.ForgotPassword)
+        loadComponent: () =>
+            import('./featured/auth/forgot-password/forgot-password').then(
+                (m) => m.ForgotPassword
+            ),
     },
     {
         path: 'reset-password',
-        loadComponent: () => import('./featured/auth/reset-password/reset-password')
-            .then(m => m.ResetPassword)
+        loadComponent: () =>
+            import('./featured/auth/reset-password/reset-password').then(
+                (m) => m.ResetPassword
+            ),
     },
     {
         path: 'change-password',
-        loadComponent: () => import('./featured/auth/change-password/change-password')
-            .then(m => m.ChangePassword)
+        loadComponent: () =>
+            import('./featured/auth/change-password/change-password').then(
+                (m) => m.ChangePassword
+            ),
     },
     {
         path: 'dashboard',
-        canActivate :[roleGuard],
+        canActivate: [roleGuard],
         data: { roles: ['ADMIN'] },
-        loadComponent: () => import('./featured/admin-dashboard/admin-dashboard').then(m => m.AdminDashboard)
+        loadComponent: () =>
+            import('./featured/admin-dashboard/admin-dashboard').then(
+                (m) => m.AdminDashboard
+            ),
     },
-    { path: 'createUser', 
-        canActivate:[roleGuard,authGuard],
-        data:{roles:['ADMIN']},
-        loadComponent: () => import('./featured/auth/create-user/create-user')
-        .then(m=> m.CreateUser)
+    {
+        path: 'createUser',
+        canActivate: [roleGuard, authGuard],
+        data: { roles: ['ADMIN'] },
+        loadComponent: () =>
+            import('./featured/auth/create-user/create-user').then(
+                (m) => m.CreateUser
+            ),
     },
-    { path: 'createPlan', 
-        canActivate:[roleGuard,authGuard],
-        data:{roles:['ADMIN']},
-        loadComponent:() => import('./featured/plan/create-plans/create-plans')
-        .then(m=>m.CreatePlans)   
+    {
+        path: 'createPlan',
+        canActivate: [roleGuard, authGuard],
+        data: { roles: ['ADMIN'] },
+        loadComponent: () =>
+            import('./featured/plan/create-plans/create-plans').then(
+                (m) => m.CreatePlans
+            ),
     },
-    { path: 'buyPlan', component: BuyPlan},
-    { path: '**', redirectTo: '/error' }
+    { path: 'buyPlan', component: BuyPlan },
+    { path: '**', redirectTo: '/error' },
 ];
