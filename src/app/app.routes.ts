@@ -80,6 +80,40 @@ export const routes: Routes = [
                 (m) => m.CreatePlans
             ),
     },
-    { path: 'buyPlan', component: BuyPlan },
+    {
+        path: 'buyPlan', canActivate: [authGuard],
+        loadComponent: () =>
+            import('./featured/plan/buy-plan/buy-plan').then(
+                m => m.BuyPlan
+            )
+    },
+    {
+        path: 'managePlans', canActivate: [roleGuard, authGuard],
+        data: { roles: ['ADMIN'] },
+        loadComponent: () =>
+            import('./featured/plan/manage-plans/manage-plans').then(
+                m => (m.ManagePlans)
+            ),
+
+    },
+
+    {
+        path: 'manageProducts', canActivate: [roleGuard, authGuard],
+        data: { roles: ['ADMIN'] },
+        loadComponent: () =>
+            import('./featured/store/product-managements/product-managements').then(
+                m => m.ProductManagements
+            )
+    },
+
+    {
+        path: 'recentTransactions', canActivate: [authGuard, roleGuard],
+        data: { roles: ['ADMIN'] },
+        loadComponent: () =>
+            import('./featured/plan/recent-transactions/recent-transactions').then(
+                m => m.RecentTransactions
+            )
+    },
+
     { path: '**', redirectTo: '/error' },
 ];
