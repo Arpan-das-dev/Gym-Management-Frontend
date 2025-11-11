@@ -77,4 +77,23 @@ export interface MonthlyRevenueResponseDto {
   changeInPercentage: number;
 }
 
+export interface TotalUserResponseDto {
+  totalActiveUsers: number;
+  userChange: number;
+}
 
+export interface PlanUpdateRequestDto {
+  id: string
+  planName: string;
+  price: number;
+  duration: number;
+  features: string[];
+}
+
+export interface UpdateResponseDto {
+  id: string;
+  planName: string;
+  price: number;
+  duration: number;
+  features: string[];
+}
