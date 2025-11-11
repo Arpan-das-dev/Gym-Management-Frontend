@@ -5,24 +5,23 @@ import { Authservice } from '../../core/services/authservice';
 import { userDetailModel } from '../../core/Models/signupModel';
 import { Navbar } from '../../shared/components/navbar/navbar';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import {
-  faBoxesPacking,
-  faCamera,
-  faClipboardList,
-  faDumbbell,
-  faTrash,
-  faUser,
-  faUserPlus,
-  faUserShield,
-} from '@fortawesome/free-solid-svg-icons';
-import { NgClass, NgStyle } from '@angular/common';
+import {faBoxesPacking,faCamera,faCheck,faCheckCircle,faChevronDown,faClipboardList,
+        faDumbbell,faTimes,faTimesCircle,faTrash,faUser, faUserPlus, faUserShield,} from '@fortawesome/free-solid-svg-icons';
+import { CommonModule, DatePipe, NgClass, NgStyle } from '@angular/common';
 import { Footer } from '../../shared/components/footer/footer';
 import { PlanService } from '../../core/services/plan-service';
 import { genericResponseMessage } from '../../core/Models/genericResponseModels';
+import { MonthlyRevenueResponseDto, TotalUserResponseDto } from '../../core/Models/planModel';
+import { erroResponseModel } from '../../core/Models/errorResponseModel';
+import { AllMemberRequestDtoList, AllPendingRequestResponseWrapperDto, ApprovalRequestDto, ApprovalResponseDto, MemberRequestResponse, PendingRequestResponseDto, TrainerAssignmentResponseDto } from '../../core/Models/adminServiceModels';
+import { FormsModule } from '@angular/forms';
+import { ManagePlans } from "./manage-plans/manage-plans";
+import { ManageProducts } from "./manage-products/manage-products";
+import { Transactions } from "./transactions/transactions";
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [Navbar, FontAwesomeModule, NgStyle, Footer, NgClass],
+  imports: [Navbar, FontAwesomeModule, NgStyle, Footer, NgClass, FormsModule, DatePipe, ManagePlans, ManageProducts, Transactions],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css',
 })
@@ -36,60 +35,25 @@ export class AdminDashboard implements OnInit {
     createMember: faUserPlus,
     plan: faClipboardList,
     product: faBoxesPacking,
-  };
-  trainerRequests = [
-    {
-      id: 1,
-      name: 'Rohan Sharma',
-      experience: '3 years',
-      image: 'assets/images/trainer1.jpg',
-      active: true,
-    },
-    {
-      id: 2,
-      name: 'Sneha Patel',
-      experience: '5 years',
-      image: 'assets/images/trainer2.jpg',
-      active: false,
-    },
-    {
-      id: 3,
-      name: 'Arjun Mehta',
-      experience: '2 years',
-      image: 'assets/images/trainer3.jpg',
-      active: true,
-    },
-  ];
 
-  assignmentRequests = [
-    {
-      id: 1,
-      member: 'Priya Das',
-      trainer: 'Rohan Sharma',
-      image: 'assets/images/member1.jpg',
-      active: true,
-    },
-    {
-      id: 2,
-      member: 'Aman Verma',
-      trainer: 'Sneha Patel',
-      image: 'assets/images/member2.jpg',
-      active: false,
-    },
-    {
-      id: 3,
-      member: 'Ritu Sen',
-      trainer: 'Arjun Mehta',
-      image: 'assets/images/member3.jpg',
-      active: true,
-    },
-  ];
+    // icons for member's requests for trainer
+    chevronDown: faChevronDown,
+    check: faCheck,
+    checkCircle: faCheckCircle,
+    timesCircle: faTimesCircle,
+    times: faTimes,
+  };
+
+  // Toasts
+  toasts: { id: number; message: string; type: 'success' | 'error' }[] = [];
+
   constructor(
     private router: Router,
     private adminservice: AdminService,
     private authservice: Authservice,
     private planService: PlanService
   ) {}
+
   admin: userDetailModel = {
     id: '',
     firstName: '',
@@ -106,6 +70,10 @@ export class AdminDashboard implements OnInit {
   ngOnInit(): void {
     this.loadUserInfo();
     this.getTotalUsers();
+    this.getRevenue();
+    this.getSubScriptionsDetails();
+    this.loadAllRequests();
+    this.loadAllMemberRequests();
   }
   loadUserInfo() {
     const identifer = localStorage.getItem('identifer');
@@ -121,27 +89,77 @@ export class AdminDashboard implements OnInit {
     }
     console.log('nothing found');
   }
+
+  // total users section
   totalUsers = 0;
+  userChange = 0;
+  sign = ''
   getTotalUsers(): void {
     this.planService.getTotalUserForAllPlans().subscribe({
-      next: (res) => {
+      next: (res:TotalUserResponseDto) => {
         console.log(res);
-        this.totalUsers = res;
+        this.totalUsers = res.totalActiveUsers;
+        this.userChange = res.userChange;
+        res.userChange>=0? this.sign = "+" : this.sign = "-"
       },
       error: (err) => {
         console.error('Failed to load total users:', err);
       },
     });
   }
-  viewAllUsers() {}
-  totalRevenue = 46;
-  revenueGrowth = 10;
-  viewRevenueDetails() {}
-  activeSubscriptions = 23;
-  subscriptionGrowth = 2;
+  viewAllUsers() {
+    this.router.navigate(['']); // navigate to view all users page
+  }
+
+  // total revenue section
+  totalRevenue = 0;
+  revenueGrowth = 0;
+  viewRevenueDetails() {
+    this.router.navigate(['']); // navigate to view all revenue details page
+  }
+  getRevenue() {
+    this.planService.getMonthlyRevenue().subscribe({
+      next: (res: MonthlyRevenueResponseDto) => {
+        this.totalRevenue = res.currentMonthReview;
+        this.revenueGrowth = res.changeInPercentage;
+      },
+      error: (err: erroResponseModel) => {
+        console.log(`error occured on ${err.timestamp.toString}`);
+        console.log(`${err.status}:: error for path ${err.path}`);
+        console.log(
+          `error occured due to:: ${err.message} becuase--> ${err.error}`
+        );
+      },
+    });
+  }
+
+  // subscription details card info
+  activeSubscriptions = 0;
+  subscriptionGrowth = 0;
+  getSubScriptionsDetails() {
+    this.planService.getTotalUserForAllPlans().subscribe({
+      next: (res: TotalUserResponseDto) => {
+        this.activeSubscriptions = res.totalActiveUsers;
+        this.subscriptionGrowth = res.userChange;
+      },
+      error: (err: erroResponseModel) => {
+        console.log(`error occured on ${err.timestamp.toString}`);
+        console.log(`${err.status}:: error for path ${err.path}`);
+        console.log(
+          `error occured due to:: ${err.message} becuase--> ${err.error}`
+        );
+      },
+    });
+  }
+
+  // total orders for this cuurrent month sections and this will integrate later when we design for those page
   totalOrders = 234;
   orderGrowth = 2;
-  viewOrders() {}
+  viewOrders() {
+    this.router.navigate(['']); // navigate to store orders page
+  }
+
+  // create sections which will lead to each create page
   createUser() {
     this.router.navigate(['/createUser']);
   }
@@ -154,27 +172,195 @@ export class AdminDashboard implements OnInit {
     console.log('Navigating to create product page...');
   }
 
-  approveTrainer(id: number) {
-    console.log('Trainer approved:', id);
+  // approve sections
+  // 1. for user request to access to the platform
+
+  pendingRequests: PendingRequestResponseDto[] = [];
+  loadAllRequests() {
+    this.adminservice.loadAllJoiningRequests().subscribe({
+      next: (res: AllPendingRequestResponseWrapperDto) => {
+        this.pendingRequests = res.responseDtoList;
+        console.log(res);
+        console.log(this.pendingRequests);
+        
+      },
+      error: (err: erroResponseModel) => {
+        console.log(`error occured on ${err.timestamp.toString}`);
+        console.log(`${err.status}:: error for path ${err.path}`);
+        console.log(
+          `error occured due to:: ${err.message} becuase--> ${err.error}`
+        );
+      },
+    });
+  }
+  isActive(email: string) {
+    return true;
+  }
+  getProfileImage(email: string) {
+    return '';
   }
 
-  rejectTrainer(id: number) {
-    console.log('Trainer rejected:', id);
+  approvedSuccessMessage: string = '';
+  approvedErrorMessage: string = '';
+  approveTrainer(
+    email: string,
+    name: string,
+    joinDate: string,
+    phone: string,
+    role: string,
+    index: number
+  ) {
+    console.log('Trainer approved:');
+    const data: ApprovalRequestDto = {
+      email: email,
+      name: name,
+      joinDate: joinDate,
+      phone: phone,
+      role: role,
+    };
+    this.adminservice.approveUserRequest(data).subscribe({
+      next: (res: ApprovalResponseDto) => {
+        console.log(res);
+        this.approvedSuccessMessage = `request approved for the user ${name} mail sent to ${email}`;
+        this.pendingRequests.splice(index, 1);
+      },
+      error: (err: erroResponseModel) => {
+        console.log(`error occured on ${err.timestamp.toString}`);
+        console.log(`${err.status}:: error for path ${err.path}`);
+        console.log(
+          `error occured due to:: ${err.message} becuase--> ${err.error}`
+        );
+        this.approvedErrorMessage = err.message;
+      },
+    });
   }
 
-  loadMoreTrainers() {
-    console.log('Loading more trainer requests...');
+  rejectUserSuccessMessage = '';
+  rejectUserErrorMessage = '';
+  rejectTrainer(
+    email: string,
+    name: string,
+    joinDate: string,
+    phone: string,
+    role: string,
+    index: number
+  ) {
+    const data: ApprovalRequestDto = {
+      email: email,
+      name: name,
+      joinDate: joinDate,
+      phone: phone,
+      role: role,
+    };
+    this.adminservice.declienUserRequest(data).subscribe({
+      next: (res: ApprovalResponseDto) => {
+        console.log(res);
+        this.rejectUserSuccessMessage = `request declined for the user ${name} mail sent to ${email}`;
+        this.pendingRequests.splice(index, 1);
+      },
+      error: (err: erroResponseModel) => {
+        console.log(`error occured on ${err.timestamp.toString}`);
+        console.log(`${err.status}:: error for path ${err.path}`);
+        console.log(
+          `error occured due to:: ${err.message} becuase--> ${err.error}`
+        );
+        this.approvedErrorMessage = err.message;
+      },
+    });
   }
 
-  approveAssignment(id: number) {
-    console.log('Assignment approved:', id);
+  // 2. request section for member's to assign trainer
+
+  memberRequest: MemberRequestResponse[] = [];
+  expandedIndex: number | null = null;
+
+  // Modal
+  showApprovalModal = false;
+  modalRequestId: string = '';
+  eligibilityDate: string = '';
+  modalError: string = '';
+  modalLoading = false;
+
+  loadAllMemberRequests() {
+    this.adminservice.loadAllMemberRequestForTrainer().subscribe({
+      next: (res: AllMemberRequestDtoList) => {
+        this.memberRequest = res.requestDtoList;
+      },
+      error: (err: erroResponseModel) => {
+        console.log(`error occured on ${err.timestamp.toString}`);
+        console.log(`${err.status}:: error for path ${err.path}`);
+        console.log(
+          `error occured due to:: ${err.message} becuase--> ${err.error}`
+        );
+        this.approvedErrorMessage = err.message;
+      },
+    });
   }
 
-  rejectAssignment(id: number) {
-    console.log('Assignment rejected:', id);
+  // drop down more details section
+
+  toggleExpand(index: number) {
+    this.expandedIndex = this.expandedIndex === index ? null : index;
   }
 
-  loadMoreAssignments() {
-    console.log('Loading more assignment requests...');
+  openApprovalModal(requestId: string) {
+    this.modalRequestId = requestId;
+    this.showApprovalModal = true;
+    this.modalError = '';
+  }
+
+  closeApprovalModal() {
+    this.showApprovalModal = false;
+    this.modalError = '';
+    this.eligibilityDate = '';
+  }
+
+  submitApproval() {
+    if (!this.eligibilityDate) {
+      this.modalError = 'Please select an eligibility date.';
+      return;
+    }
+
+    this.modalLoading = true;
+
+    // fake 1ms delay
+    setTimeout(() => {
+      this.adminservice
+        .approveMemberRequest(this.modalRequestId, this.eligibilityDate)
+        .subscribe({
+          next: (res: TrainerAssignmentResponseDto) => {
+            this.modalLoading = false;
+            this.showApprovalModal = false;
+            this.pushToast(
+              `Trainer ${res.trainerName} assigned to member ${res.memberId}`,
+              'success'
+            );
+          },
+          error: () => {
+            this.modalLoading = false;
+            this.modalError = 'Failed to approve request. Try again.';
+          },
+        });
+    }, 1);
+  }
+
+  rejectAssignment(requestId: string) {
+    this.adminservice.declineMemberRequest(requestId).subscribe({
+      next: () => {
+        this.pushToast('Request declined successfully', 'success');
+        this.memberRequest = this.memberRequest.filter(
+          (r) => r.requestId !== requestId
+        );
+      },
+      error: () => this.pushToast('Failed to decline request', 'error'),
+    });
+  }
+
+  pushToast(message: string, type: 'success' | 'error') {
+    const id = Date.now();
+    this.toasts.push({ id, message, type });
+    setTimeout(() => {
+      this.toasts = this.toasts.filter((t) => t.id !== id);
+    }, 5000);
   }
 }
