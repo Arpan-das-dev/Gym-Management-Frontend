@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { plansResponseModel } from '../Models/planModel';
+import { plansResponseModel, PlanUpdateRequestDto } from '../Models/planModel';
 import { Authservice } from './authservice';
 import { genericResponseMessage } from '../Models/genericResponseModels';
 import { CuponValidationResponse } from '../Models/cuponCodeModels';
@@ -16,10 +16,16 @@ export class PlanService {
 
    planService_Base_Url_cuponCodeManagement:string = "http://localhost:8080/fitStudio/plan-service/cupon"
    
+   // plan management service logics 
+   //1. get all plans from backend
     getAllPlans(): Observable<{ responseDtoList: plansResponseModel[] }> {
       const url = `${this.planService_Base_URL}/all/getPlans`
     return this.httpClient.get<{ responseDtoList: plansResponseModel[] }>(url);
   }
+
+
+  //2. update plans
+  
 
  getDiscount(cuponCode: string): Observable<CuponValidationResponse> {
   const url = `${this.planService_Base_Url_cuponCodeManagement}/all/validateCuponCode`;
