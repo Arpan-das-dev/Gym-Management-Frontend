@@ -2,36 +2,27 @@
 
 <!-- Dashboard Background -->
 <div
-  class="min-h-screen bg-linear-to-br from-[#0d0d0f] via-[#1b1e2d] to-[#2e2a24] flex flex-col items-center pt-12 pb-16"
->
+  class="min-h-screen bg-linear-to-br from-[#0d0d0f] via-[#1b1e2d] to-[#2e2a24] flex flex-col items-center pt-12 pb-16">
   <!-- Admin Profile Card -->
-  <div
-    class="max-w-6xl w-full mx-6 p-8 rounded-3xl shadow-2xl flex flex-col md:flex-row items-center gap-10
+  <div class="max-w-6xl w-full mx-6 p-8 rounded-3xl shadow-2xl flex flex-col md:flex-row items-center gap-10
            bg-linear-to-br from-[#2a2a2a]/80 via-[#222]/70 to-[#1a1a1a]/80 backdrop-blur-md border border-gray-700 
-           text-white hover:shadow-orange-400/40 transition-all duration-500"
-  >
+           text-white hover:shadow-orange-400/40 transition-all duration-500">
     <!-- Profile Image -->
     <div class="relative shrink-0 group">
       <div
         class="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-3xl border-4 border-orange-500 shadow-lg 
                bg-center bg-cover bg-no-repeat transition-transform duration-500 group-hover:scale-105 group-hover:shadow-orange-400/40"
-        [ngStyle]="{'background-image': 'url(pexels-heyho-7031706.jpg)'}"
-      ></div>
+        [ngStyle]="{'background-image': 'url(pexels-heyho-7031706.jpg)'}"></div>
 
       <!-- Action Buttons -->
       <div
-        class="absolute bottom-3 right-3 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-      >
-        <button
-          class="bg-blue-500 hover:bg-blue-600 p-2 rounded-full shadow-md hover:scale-110 transition-transform"
-          title="Upload new image"
-        >
+        class="absolute bottom-3 right-3 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <button class="bg-blue-500 hover:bg-blue-600 p-2 rounded-full shadow-md hover:scale-110 transition-transform"
+          title="Upload new image">
           <fa-icon [icon]="icons.camera" class="text-white text-lg"></fa-icon>
         </button>
-        <button
-          class="bg-red-500 hover:bg-red-600 p-2 rounded-full shadow-md hover:scale-110 transition-transform"
-          title="Delete image"
-        >
+        <button class="bg-red-500 hover:bg-red-600 p-2 rounded-full shadow-md hover:scale-110 transition-transform"
+          title="Delete image">
           <fa-icon [icon]="icons.trash" class="text-white text-lg"></fa-icon>
         </button>
       </div>
@@ -53,28 +44,22 @@
 
     <!-- Stats Cards (Inside Profile Card) -->
     <div class="grid grid-cols-3 gap-6 text-center">
-      <div
-        class="bg-linear-to-r from-orange-500 to-orange-700 p-5 rounded-xl shadow-lg hover:scale-105 hover:shadow-orange-400/40
-               flex flex-col items-center justify-center transition-all duration-300"
-      >
+      <div class="bg-linear-to-r from-orange-500 to-orange-700 p-5 rounded-xl shadow-lg hover:scale-105 hover:shadow-orange-400/40
+               flex flex-col items-center justify-center transition-all duration-300">
         <fa-icon [icon]="icons.member" class="text-3xl mb-2"></fa-icon>
         <span class="font-semibold">Active Members</span>
         <span class="text-lg font-bold">128</span>
       </div>
 
-      <div
-        class="bg-linear-to-r from-blue-500 to-blue-700 p-5 rounded-xl shadow-lg hover:scale-105 hover:shadow-blue-400/40
-               flex flex-col items-center justify-center transition-all duration-300"
-      >
+      <div class="bg-linear-to-r from-blue-500 to-blue-700 p-5 rounded-xl shadow-lg hover:scale-105 hover:shadow-blue-400/40
+               flex flex-col items-center justify-center transition-all duration-300">
         <fa-icon [icon]="icons.trainer" class="text-3xl mb-2"></fa-icon>
         <span class="font-semibold">Active Trainers</span>
         <span class="text-lg font-bold">12</span>
       </div>
 
-      <div
-        class="bg-linear-to-r from-gray-900 to-gray-800 p-5 rounded-xl shadow-lg hover:scale-105 hover:shadow-gray-500/40
-               flex flex-col items-center justify-center transition-all duration-300 text-yellow-300"
-      >
+      <div class="bg-linear-to-r from-gray-900 to-gray-800 p-5 rounded-xl shadow-lg hover:scale-105 hover:shadow-gray-500/40
+               flex flex-col items-center justify-center transition-all duration-300 text-yellow-300">
         <fa-icon [icon]="icons.admined" class="text-3xl mb-2"></fa-icon>
         <span class="font-semibold">Active Admins</span>
         <span class="text-lg font-bold">3</span>
@@ -86,57 +71,53 @@
   <div class="max-w-6xl w-full mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-6">
     <!-- Total Users -->
     <div
-      class="bg-[#1e1e1e] border border-orange-500 rounded-2xl p-6 shadow-md hover:shadow-orange-400/40 transition-all duration-300 flex flex-col justify-between text-white"
-    >
+      class="bg-[#1e1e1e] border border-orange-500 rounded-2xl p-6 shadow-md hover:shadow-orange-400/40 transition-all duration-300 flex flex-col justify-between text-white">
       <div>
         <h3 class="font-semibold text-orange-400">Total Users</h3>
         <p class="text-3xl font-bold mt-2">{{ totalUsers }}</p>
+        <p [ngClass]="{'text-green-500':userChange>=0,'text-red-500':userChange<0}" class="text-sm mt-1"> {{sign}}
+          {{userChange}} % from last month
+        </p>
       </div>
       <button
         class="mt-4 bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 rounded-xl transition-colors duration-300"
-        (click)="viewAllUsers()"
-      >
+        (click)="viewAllUsers()">
         View All Users
       </button>
     </div>
 
     <!-- Revenue -->
     <div
-      class="bg-[#1e1e1e] border border-sky-500 rounded-2xl p-6 shadow-md hover:shadow-sky-400/40 transition-all duration-300 flex flex-col justify-between text-white"
-    >
+      class="bg-[#1e1e1e] border border-sky-500 rounded-2xl p-6 shadow-md hover:shadow-sky-400/40 transition-all duration-300 flex flex-col justify-between text-white">
       <div>
         <h3 class="font-semibold text-sky-400">Revenue</h3>
         <p class="text-3xl font-bold mt-2">₹{{ totalRevenue }}</p>
-        <p class="text-green-400 text-sm mt-1">+{{ revenueGrowth }}% from last month</p>
+        <p class="text-green-400 text-sm mt-1">{{ revenueGrowth }}% from last month</p>
       </div>
       <button
         class="mt-4 bg-sky-500 hover:bg-sky-600 text-white font-medium py-2 rounded-xl transition-colors duration-300"
-        (click)="viewRevenueDetails()"
-      >
+        (click)="viewRevenueDetails()">
         View Details
       </button>
     </div>
 
     <!-- Active Subscriptions -->
     <div
-      class="bg-[#1e1e1e] border border-yellow-500 rounded-2xl p-6 shadow-md hover:shadow-yellow-400/40 transition-all duration-300 flex flex-col justify-between text-white"
-    >
+      class="bg-[#1e1e1e] border border-yellow-500 rounded-2xl p-6 shadow-md hover:shadow-yellow-400/40 transition-all duration-300 flex flex-col justify-between text-white">
       <div>
         <h3 class="font-semibold text-yellow-400">Active Subscriptions</h3>
         <p class="text-3xl font-bold mt-2">{{ activeSubscriptions }}</p>
         <p class="text-green-400 text-sm mt-1">+{{ subscriptionGrowth }}% from last month</p>
       </div>
       <button
-        class="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 rounded-xl transition-colors duration-300"
-      >
+        class="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 rounded-xl transition-colors duration-300">
         Manage Plans
       </button>
     </div>
 
     <!-- Store Orders -->
     <div
-      class="bg-[#1e1e1e] border border-gray-600 rounded-2xl p-6 shadow-md hover:shadow-gray-500/40 transition-all duration-300 flex flex-col justify-between text-white"
-    >
+      class="bg-[#1e1e1e] border border-gray-600 rounded-2xl p-6 shadow-md hover:shadow-gray-500/40 transition-all duration-300 flex flex-col justify-between text-white">
       <div>
         <h3 class="font-semibold text-gray-300">Store Orders</h3>
         <p class="text-3xl font-bold mt-2">{{ totalOrders }}</p>
@@ -144,201 +125,268 @@
       </div>
       <button
         class="mt-4 bg-white/10 hover:bg-white/20 text-yellow-300 font-medium py-2 rounded-xl transition-colors duration-300"
-        (click)="viewOrders()"
-      >
+        (click)="viewOrders()">
         View Orders
       </button>
     </div>
   </div>
   <!-- ========================= -->
-<!-- CREATE & REQUESTS SECTION -->
-<!-- ========================= -->
+  <!-- CREATE & REQUESTS SECTION -->
+  <!-- ========================= -->
 
-<div class="max-w-6xl w-full mt-10 grid grid-cols-1 lg:grid-cols-3 gap-6 px-6">
-  <!-- === CREATE USER CARD === -->
-  <div
-    class="bg-[#1e1e1e]/80 p-6 rounded-3xl border border-orange-500 shadow-md hover:shadow-orange-400/40 transition-all duration-500 flex flex-col items-center text-center"
-  >
+  <div class="max-w-6xl w-full mt-10 grid grid-cols-1 lg:grid-cols-3 gap-6 px-6">
+    <!-- === CREATE USER CARD === -->
     <div
-      class="w-14 h-14 flex items-center justify-center bg-orange-500/20 rounded-full mb-4 border border-orange-400"
-    >
-      <fa-icon [icon]="icons.createMember" class="text-orange-400 text-2xl"></fa-icon>
+      class="bg-[#1e1e1e]/80 p-6 rounded-3xl border border-orange-500 shadow-md hover:shadow-orange-400/40 transition-all duration-500 flex flex-col items-center text-center">
+      <div
+        class="w-14 h-14 flex items-center justify-center bg-orange-500/20 rounded-full mb-4 border border-orange-400">
+        <fa-icon [icon]="icons.createMember" class="text-orange-400 text-2xl"></fa-icon>
+      </div>
+      <h3 class="text-xl font-semibold text-white mb-2">Create User</h3>
+      <p class="text-gray-400 mb-4 text-sm">Add a new member, trainer, or admin to the platform</p>
+      <button
+        class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-6 rounded-xl transition-all duration-300"
+        (click)="createUser()">
+        Add User
+      </button>
     </div>
-    <h3 class="text-xl font-semibold text-white mb-2">Create User</h3>
-    <p class="text-gray-400 mb-4 text-sm">Add a new member, trainer, or admin to the platform</p>
-    <button
-      class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-6 rounded-xl transition-all duration-300"
-      (click)="createUser()"
-    >
-      Add User
-    </button>
+
+    <!-- === CREATE PLAN CARD === -->
+    <div
+      class="bg-[#1e1e1e]/80 p-6 rounded-3xl border border-blue-500 shadow-md hover:shadow-blue-400/40 transition-all duration-500 flex flex-col items-center text-center">
+      <div class="w-14 h-14 flex items-center justify-center bg-blue-500/20 rounded-full mb-4 border border-blue-400">
+        <fa-icon [icon]="icons.plan" class="text-blue-400 text-2xl"></fa-icon>
+      </div>
+      <h3 class="text-xl font-semibold text-white mb-2">Create New Plan</h3>
+      <p class="text-gray-400 mb-4 text-sm">Design new gym membership or subscription plans</p>
+      <button
+        class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-xl transition-all duration-300"
+        (click)="createPlan()">
+        Add Plan
+      </button>
+    </div>
+
+    <!-- === CREATE PRODUCT CARD === -->
+    <div
+      class="bg-[#1e1e1e]/80 p-6 rounded-3xl border border-green-500 shadow-md hover:shadow-green-400/40 transition-all duration-500 flex flex-col items-center text-center">
+      <div class="w-14 h-14 flex items-center justify-center bg-green-500/20 rounded-full mb-4 border border-green-400">
+        <fa-icon [icon]="icons.product" class="text-green-400 text-2xl"></fa-icon>
+      </div>
+      <h3 class="text-xl font-semibold text-white mb-2">Create New Product</h3>
+      <p class="text-gray-400 mb-4 text-sm">Add new store items, equipment, or accessories on store</p>
+      <button
+        class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-6 rounded-xl transition-all duration-300"
+        (click)="createProduct()">
+        Add Product
+      </button>
+    </div>
   </div>
 
-  <!-- === CREATE PLAN CARD === -->
-  <div
-    class="bg-[#1e1e1e]/80 p-6 rounded-3xl border border-blue-500 shadow-md hover:shadow-blue-400/40 transition-all duration-500 flex flex-col items-center text-center"
-  >
-    <div
-      class="w-14 h-14 flex items-center justify-center bg-blue-500/20 rounded-full mb-4 border border-blue-400"
-    >
-      <fa-icon [icon]="icons.plan" class="text-blue-400 text-2xl"></fa-icon>
-    </div>
-    <h3 class="text-xl font-semibold text-white mb-2">Create New Plan</h3>
-    <p class="text-gray-400 mb-4 text-sm">Design new gym membership or subscription plans</p>
-    <button
-      class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-xl transition-all duration-300"
-      (click)="createPlan()"
-    >
-      Add Plan
-    </button>
-  </div>
+  <!-- =========================== -->
+  <!-- TRAINER REQUESTS SECTION -->
+  <!-- =========================== -->
 
-  <!-- === CREATE PRODUCT CARD === -->
-  <div
-    class="bg-[#1e1e1e]/80 p-6 rounded-3xl border border-green-500 shadow-md hover:shadow-green-400/40 transition-all duration-500 flex flex-col items-center text-center"
-  >
+  <div class="max-w-6xl w-full mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6 px-6">
+    <!-- === TRAINER APPROVAL REQUESTS === -->
     <div
-      class="w-14 h-14 flex items-center justify-center bg-green-500/20 rounded-full mb-4 border border-green-400"
-    >
-      <fa-icon [icon]="icons.product" class="text-green-400 text-2xl"></fa-icon>
+      class="bg-[#1e1e1e]/80 p-6 rounded-3xl border border-orange-500 shadow-md hover:shadow-orange-400/40 transition-all duration-500 flex flex-col">
+      <h2 class="text-xl font-semibold text-orange-400 mb-3">User Approval Requests</h2>
+      <p class="text-gray-400 mb-4 text-sm">Approve or reject users to allow access this platform</p>
+
+      <div class="overflow-y-auto max-h-72 pr-2 space-y-3 custom-scrollbar">
+  @for (request of pendingRequests; track $index) {
+    <div
+      class="flex justify-between items-center bg-[#2a2a2a]/70 rounded-xl p-3 border border-gray-700 hover:border-orange-400 transition-all duration-300">
+      
+      <!-- Profile & Name -->
+      <div class="flex items-center gap-3">
+        <div class="relative w-12 h-12 rounded-full border-2 border-gray-500 flex items-center justify-center text-white text-xl">
+          <fa-icon [icon]="icons.member"></fa-icon>
+        </div>
+        <div>
+          <h4 class="font-semibold text-white">{{ request.name }}</h4>
+          <p class="text-sm text-gray-400"> joined on: {{ request.joinDate }}</p>
+          <p class="text-sm text-gray-400">
+            Request role: {{
+              request.role.includes('TRAINER') ? 'TRAINER' :
+              request.role.includes('ADMIN') ? 'ADMIN' :
+              request.role
+            }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-2">
+        <button
+          class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg text-sm transition-all duration-300"
+          (click)="approveTrainer(request.email, request.name, request.joinDate, request.phone, request.role, $index)">
+          Approve
+        </button>
+        <button
+          class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm transition-all duration-300"
+          (click)="rejectTrainer(request.email, request.name, request.joinDate, request.phone, request.role, $index)">
+          Reject
+        </button>
+      </div>
     </div>
-    <h3 class="text-xl font-semibold text-white mb-2">Create New Product</h3>
-    <p class="text-gray-400 mb-4 text-sm">Add new store items, equipment, or accessories on store</p>
-    <button
-      class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-6 rounded-xl transition-all duration-300"
-      (click)="createProduct()"
-    >
-      Add Product
-    </button>
-  </div>
+  }
 </div>
 
-<!-- =========================== -->
-<!-- TRAINER REQUESTS SECTION -->
-<!-- =========================== -->
 
-<div class="max-w-6xl w-full mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6 px-6">
-  <!-- === TRAINER APPROVAL REQUESTS === -->
-  <div
-    class="bg-[#1e1e1e]/80 p-6 rounded-3xl border border-orange-500 shadow-md hover:shadow-orange-400/40 transition-all duration-500 flex flex-col"
-  >
-    <h2 class="text-xl font-semibold text-orange-400 mb-3">Trainer Approval Requests</h2>
-    <p class="text-gray-400 mb-4 text-sm">Approve or reject users applying to become trainers</p>
+      @if (pendingRequests.length === 0) {
+      <p class="text-center text-gray-400 py-6">No User requests found.</p>
+      }
 
-    <div class="overflow-y-auto max-h-72 pr-2 space-y-3 custom-scrollbar">
-      @for (request of trainerRequests; track request.id) {
+    </div>
+
+    <!-- === TRAINER ASSIGNMENT REQUESTS === -->
+    <!-- MEMBER REQUESTS FOR TRAINER SECTION -->
+    <section class="bg-[#1a1b1f]/80 p-6 rounded-3xl border border-sky-500 shadow-md">
+      <h2 class="text-xl font-semibold text-sky-400 mb-2">
+        Trainer Assignment Requests
+      </h2>
+      <p class="text-gray-400 mb-4 text-sm">
+        Manage trainer requests sent by members
+      </p>
+
+      <div class="overflow-y-auto max-h-[400px] pr-2 space-y-3 custom-scrollbar">
+        @if (memberRequest.length === 0) {
+        <p class="text-center text-gray-500 py-6">
+          No trainer assignment requests available.
+        </p>
+        } @else {
+        @for (req of memberRequest; track req.requestId; let i = $index) {
         <div
-          class="flex justify-between items-center bg-[#2a2a2a]/70 rounded-xl p-3 border border-gray-700 hover:border-orange-400 transition-all duration-300"
-        >
-          <!-- Profile & Name -->
-          <div class="flex items-center gap-3">
-            <div
-              class="relative w-12 h-12 rounded-full border-2"
-              [ngClass]="request.active ? 'border-green-500' : 'border-gray-500'"
-            >
-              <img
-                [src]="request.image"
-                alt="trainer profile"
-                class="w-full h-full object-cover rounded-full"
-              />
+          class="bg-[#222328] border border-gray-700 rounded-xl p-4 hover:border-sky-400 transition-all duration-300">
+          <!-- Compact View -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <img [src]="req.memberProfileImageUrl" alt="member"
+                class="w-12 h-12 rounded-full border border-gray-600" />
+              <div>
+                <div class="text-white font-semibold">
+                  {{ req.memberName }}
+                </div>
+                <div class="text-xs text-gray-400">
+                  Requested trainer:
+                  <span class="text-sky-400">{{ req.trainerName }}</span>
+                </div>
+              </div>
             </div>
-            <div>
-              <h4 class="font-semibold text-white">{{ request.name }}</h4>
-              <p class="text-sm text-gray-400">{{ request.experience }} experience</p>
-            </div>
+
+            <button (click)="toggleExpand(i)" class="text-gray-400 hover:text-white transition">
+              <fa-icon [icon]="icons.chevronDown" [ngClass]="{
+                  'rotate-180 transition-transform duration-300':
+                    expandedIndex === i
+                }"></fa-icon>
+            </button>
           </div>
 
-          <!-- Actions -->
-          <div class="flex gap-2">
-            <button
-              class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg text-sm transition-all duration-300"
-              (click)="approveTrainer(request.id)"
-            >
-              Approve
+          <!-- Expanded Section -->
+          @if (expandedIndex === i) {
+          <div class="mt-3 border-t border-gray-700 pt-3">
+            <div class="grid grid-cols-2 gap-3 text-sm text-gray-300">
+              <div>
+                <div class="text-xs text-gray-400">Request Date</div>
+                <div>{{ req.requestDate | date: 'mediumDate' }}</div>
+              </div>
+              <div>
+                <div class="text-xs text-gray-400">Plan Name</div>
+                <div>{{ req.memberPlanName }}</div>
+              </div>
+              <div>
+                <div class="text-xs text-gray-400">Plan valid till</div>
+                <div>{{ req.memberPlanExpirationDate }} </div>
+              </div>
+            </div>
+
+            <div class="mt-4 flex gap-2">
+              <button class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg"
+                (click)="openApprovalModal(req.requestId)">
+                Approve
+              </button>
+              <button class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
+                (click)="rejectAssignment(req.requestId)">
+                Decline
+              </button>
+            </div>
+          </div>
+          }
+        </div>
+        }
+        }
+      </div>
+    </section>
+
+    <!-- APPROVAL MODAL -->
+    @if (showApprovalModal) {
+    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+      <div class="bg-[#1c1d22] w-[95%] max-w-md rounded-2xl p-6 border border-gray-700 relative">
+        <!-- Close -->
+        <button (click)="closeApprovalModal()" class="absolute right-4 top-4 text-gray-400 hover:text-white">
+          <fa-icon [icon]="icons.times"></fa-icon>
+        </button>
+
+        <h3 class="text-lg font-semibold text-white mb-4">
+          Approve Trainer Assignment
+        </h3>
+
+        @if (modalError) {
+        <div class="bg-red-600 text-white text-sm p-2 rounded-md flex items-center gap-2 mb-3">
+          <fa-icon [icon]="icons.timesCircle"></fa-icon>
+          <span>{{ modalError }}</span>
+        </div>
+        }
+
+        <form (ngSubmit)="submitApproval()">
+          <label class="text-sm text-gray-300 mb-1 block">
+            Eligibility Date
+          </label>
+          <input type="date" [(ngModel)]="eligibilityDate" name="eligibility" required
+            class="w-full p-2 bg-[#2a2b30] text-white rounded-md border border-gray-600" />
+
+          <div class="mt-4 flex justify-end gap-2">
+            <button type="button" (click)="closeApprovalModal()"
+              class="px-4 py-2 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600">
+              Cancel
             </button>
-            <button
-              class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm transition-all duration-300"
-              (click)="rejectTrainer(request.id)"
-            >
-              Reject
+
+            <button type="submit"
+              class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white flex items-center gap-2">
+              @if (!modalLoading) {
+              <fa-icon [icon]="icons.check"></fa-icon>
+              <span>Submit</span>
+              } @else {
+              <span class="w-4 h-4 border-2 border-white/30 rounded-full border-t-white animate-spin"></span>
+              <span>Processing...</span>
+              }
             </button>
           </div>
-        </div>
+        </form>
+      </div>
+    </div>
+    }
+
+    <!-- TOASTS -->
+    <div class="fixed bottom-6 right-6 space-y-3 w-96 z-50">
+      @for (toast of toasts; track toast.id) {
+      <div class="p-3 rounded-lg shadow-md flex items-center gap-2 transition-all duration-500" [ngClass]="{
+        'bg-green-600 text-white': toast.type === 'success',
+        'bg-red-600 text-white': toast.type === 'error'
+      }">
+        <fa-icon [icon]="toast.type === 'success' ? icons.checkCircle : icons.timesCircle"></fa-icon>
+        <span>{{ toast.message }}</span>
+      </div>
       }
     </div>
 
-    @if (trainerRequests.length === 0) {
-      <p class="text-center text-gray-400 py-6">No trainer requests found.</p>
-    }
-
-    <button
-      class="mt-4 bg-orange-500 hover:bg-orange-600 py-2 rounded-xl text-white font-medium transition-all duration-300"
-      (click)="loadMoreTrainers()"
-    >
-      Load More
-    </button>
   </div>
-
-  <!-- === TRAINER ASSIGNMENT REQUESTS === -->
-  <div
-    class="bg-[#1e1e1e]/80 p-6 rounded-3xl border border-sky-500 shadow-md hover:shadow-sky-400/40 transition-all duration-500 flex flex-col"
-  >
-    <h2 class="text-xl font-semibold text-sky-400 mb-3">Trainer Assignment Requests</h2>
-    <p class="text-gray-400 mb-4 text-sm">Manage member requests for trainer assignments</p>
-
-    <div class="overflow-y-auto max-h-72 pr-2 space-y-3 custom-scrollbar">
-      @for (req of assignmentRequests; track req.id) {
-        <div
-          class="flex justify-between items-center bg-[#2a2a2a]/70 rounded-xl p-3 border border-gray-700 hover:border-sky-400 transition-all duration-300"
-        >
-          <div class="flex items-center gap-3">
-            <div
-              class="relative w-12 h-12 rounded-full border-2"
-              [ngClass]="req.active ? 'border-green-500' : 'border-gray-500'"
-            >
-              <img
-                [src]="req.image"
-                alt="member profile"
-                class="w-full h-full object-cover rounded-full"
-              />
-            </div>
-            <div>
-              <h4 class="font-semibold text-white">{{ req.member }}</h4>
-              <p class="text-sm text-gray-400">Requested: {{ req.trainer }}</p>
-            </div>
-          </div>
-
-          <div class="flex gap-2">
-            <button
-              class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg text-sm transition-all duration-300"
-              (click)="approveAssignment(req.id)"
-            >
-              Approve
-            </button>
-            <button
-              class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm transition-all duration-300"
-              (click)="rejectAssignment(req.id)"
-            >
-              Reject
-            </button>
-          </div>
-        </div>
-      }
-    </div>
-
-    @if (assignmentRequests.length === 0) {
-      <p class="text-center text-gray-400 py-6">No trainer assignment requests found.</p>
-    }
-
-    <button
-      class="mt-4 bg-sky-500 hover:bg-sky-600 py-2 rounded-xl text-white font-medium transition-all duration-300"
-      (click)="loadMoreAssignments()"
-    >
-      Load More
-    </button>
-  </div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 mt-10">
+  <app-manage-plans/>
+  <app-manage-products/>
+  <app-transactions/>
 </div>
-
 </div>
-
+ 
 <app-footer></app-footer>
