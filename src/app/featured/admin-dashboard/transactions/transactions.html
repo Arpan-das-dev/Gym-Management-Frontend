@@ -1,0 +1,29 @@
+<div
+  class="bg-[#1e1e1e]/80 p-6 rounded-3xl border border-purple-500 shadow-md hover:shadow-purple-400/40 transition-all duration-500 flex flex-col items-center text-center relative overflow-hidden"
+  [class.opacity-70]="loading">
+
+  <!-- Loading Overlay -->
+  @if (loading) {
+    <div class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center z-10 rounded-3xl">
+      <div class="w-10 h-10 border-4 border-purple-400 border-t-transparent rounded-full animate-spin mb-2"></div>
+      <p class="text-purple-300 text-sm font-medium">Loading recent transactions...</p>
+    </div>
+  }
+
+  <!-- Icon -->
+  <div
+    class="w-14 h-14 flex items-center justify-center bg-purple-500/20 rounded-full mb-4 border border-purple-400">
+    <fa-icon [icon]="icons.transactions" class="text-purple-400 text-2xl"></fa-icon>
+  </div>
+
+  <!-- Text -->
+  <h3 class="text-xl font-semibold text-white mb-2">Recent Transactions</h3>
+  <p class="text-gray-400 mb-4 text-sm">View and track all latest member payments</p>
+
+  <!-- Button -->
+  <button
+    (click)="handleNavigation()"
+    class="bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-6 rounded-xl transition-all duration-300">
+    View Transactions
+  </button>
+</div>
