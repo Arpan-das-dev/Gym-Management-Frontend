@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { signupModel } from '../Models/signupModel';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { genericResponseMessage, UserCreationResponseDto } from '../Models/genericResponseModels';
-import { PlanCreateRequestDto } from '../Models/planModel';
+import { PlanCreateRequestDto, PlanUpdateRequestDto, UpdateResponseDto } from '../Models/planModel';
+import { ApprovalRequestDto } from '../Models/adminServiceModels';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,7 @@ export class AdminService {
 
   createMember(data: signupModel): Observable<UserCreationResponseDto> {
     const url: string = `${this.userManageMentUrl}/addMember`;
-    return this.httpClient.post<UserCreationResponseDto>(url, data,{} ).pipe();
+    return this.httpClient.post<UserCreationResponseDto>(url, data, {}).pipe();
   }
   createTrainer(data: signupModel): Observable<UserCreationResponseDto> {
     const url: string = `${this.userManageMentUrl}/addTrainer`;
@@ -41,10 +42,58 @@ export class AdminService {
   }
 
   // managing plans via admin service
-  planManagementUrl="http://localhost:8080/fitStudio/admin/plans"
+  planManagementUrl = "http://localhost:8080/fitStudio/admin/plans"
 
-  createPlan(data: PlanCreateRequestDto) : Observable<genericResponseMessage>{
+  // 1. create plan
+  createPlan(data: PlanCreateRequestDto): Observable<genericResponseMessage> {
     const url = `${this.planManagementUrl}/createPlan`;
-    return this.httpClient.post<genericResponseMessage>(url,data);
+    return this.httpClient.post<genericResponseMessage>(url, data);
   }
+  // 2. update plan
+  updatePlan(planId: string, data: PlanUpdateRequestDto): Observable<UpdateResponseDto> {
+    const url = `${this.planManagementUrl}/updatePlan`;
+    const params = new HttpParams().set('planId', planId);
+    return this.httpClient.put<UpdateResponseDto>(url, data, { params });
+  }
+
+  // managing approval requests
+  // 1. for signup approval to continue the platform access
+
+  approvalUrl = "http://localhost:8080/fitStudio/admin/approve"
+
+  loadAllJoiningRequests(): Observable<any> {
+    const url = `${this.approvalUrl}/getList`;
+    return this.httpClient.get<any>(url);
+  }
+
+  approveUserRequest(data: ApprovalRequestDto): Observable<any> {
+    const url = `${this.approvalUrl}/approved`;
+    return this.httpClient.post<any>(url, data);
+  }
+
+  declienUserRequest(data: ApprovalRequestDto): Observable<any> {
+    const url = `${this.approvalUrl}/declined`;
+    return this.httpClient.post<any>(url, data);
+  }
+
+  // 2. for member's request to assign trainer for him/her
+
+  loadAllMemberRequestForTrainer(): Observable<any> {
+    const url = `${this.approvalUrl}/memberRequests`
+    return this.httpClient.get<any>(url);
+  }
+
+  approveMemberRequest(requestId: string, eligibleDate: string): Observable<any> {
+    const url = `${this.approvalUrl}/approve-memberRequest`;
+    const params = { requestId, eligibleDate }
+    return this.httpClient.post(url, null, { params })
+  }
+
+  declineMemberRequest(requestId: string): Observable<any> {
+    const url = `${this.approvalUrl}/delete-request`;
+    const params = { requestId };
+    return this.httpClient.delete(url, { params });
+  }
+
+
 }
