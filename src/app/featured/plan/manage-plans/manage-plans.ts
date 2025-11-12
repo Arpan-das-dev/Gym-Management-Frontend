@@ -8,6 +8,9 @@ import { faCheck, faCheckCircle, faCogs, faEdit, faExclamationCircle, faPlus, fa
 import { FormsModule } from '@angular/forms';
 import { CreateCuponCodeRequestDto } from '../../../core/Models/cuponCodeModels';
 import { NgClass } from '@angular/common';
+import { genericResponseMessage } from '../../../core/Models/genericResponseModels';
+import { erroResponseModel } from '../../../core/Models/errorResponseModel';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-manage-plans',
@@ -41,7 +44,7 @@ export class ManagePlans implements OnInit {
     setTimeout(() => {
       this.loading = false;
       callback();
-    }, 1200);
+    }, 5000);
   }
   // global massage showing methods
   showFullScreenMessage(type: 'success' | 'error', text: string) {
@@ -65,7 +68,10 @@ export class ManagePlans implements OnInit {
   cuponCode: CreateCuponCodeRequestDto = {
     cuponCode: '',
     offPercentage: 0.0,
-    validity: ''
+    validFrom:'',
+    validity: '',
+    access: '',
+    description: ''
   }
 
 
@@ -86,20 +92,23 @@ export class ManagePlans implements OnInit {
   }
 
 
-  // 2. update plans as per requirements
-  request: PlanUpdateRequestDto = {
-    id: '',
-    planName: '',
-    duration: 0,
-    features: [],
-    price: 0.00
-  }
-
   // ** remove feature during plan editon
   removeFeature(planId: string, index: number) {
     const plan = this.plans.find((p) => p.planId === planId);
     if (plan) plan.planFeatures.splice(index, 1);
   }
+
+  // ** add new feature in the plan
+  addFeature(planId: string) {
+  const plan = this.plans.find((p) => p.planId === planId);
+  if (plan && plan.editMode) {
+    if (plan.planFeatures.length === 0 || plan.planFeatures[plan.planFeatures.length - 1].trim() !== '') {
+      plan.planFeatures.push('');
+    } else {
+      this.showFullScreenMessage('error', 'Please fill the previous feature first!');
+    }
+  }
+}
 
   // ** toggle edit for  allow admin to actually edit plans
   toggleEdit(plan: any) {
@@ -111,6 +120,7 @@ export class ManagePlans implements OnInit {
     plan.editMode = false;
   }
   savePlan(plan: plansResponseModel) {
+    this.loading = true;
   const dto: PlanUpdateRequestDto = {
     id: plan.planId,
     planName: plan.planName,
@@ -118,25 +128,50 @@ export class ManagePlans implements OnInit {
     duration: plan.duration,
     features: plan.planFeatures,
   };
-  this.showFakeLoading(() => {
-    this.adminService.updatePlan(plan.planId, dto).subscribe({
-      next: () => {
-        this.showFullScreenMessage('success', 'Plan updated successfully!');
+
+  this.adminService.updatePlan(plan.planId, dto).subscribe({
+    next: (res:genericResponseMessage) => {
+      // When response arrives, show fake loading first
+      
+        // After loading finishes, show success message and load plans
+        console.log(res);
+        this.loading = false;
+        this.showFullScreenMessage('success',res.message ||'Plan updated successfully!');
         this.loadAllPlans();
-      },
-      error: () => this.showFullScreenMessage('error', 'Failed to update plan.'),
-    });
+      
+    },
+    error: (err:erroResponseModel) => {
+      console.log(err);
+      // On error, optionally show fake loading or directly show error message
+      this.loading = false;
+        this.showFullScreenMessage('error', err.message ||'Failed to update plan.');
+    },
   });
 }
-  // delete plan
-  confirmDelete() {
-    if (this.selectedPlanId) {
-      this.showFakeLoading(() => {
-        this.adminService.deletePlan(this.selectedPlanId!).subscribe(() => this.loadAllPlans());
+// delete plan
+confirmDelete() {
+  if (this.selectedPlanId) {
+    // Send request to backend
+    this.loading = true;
+    this.adminService.deletePlan(this.selectedPlanId!).subscribe({
+      next: (res: genericResponseMessage) => {
+        // On success, show success message and close popup
+        console.log(res);
+        this.loading = false;
+        this.showFullScreenMessage('success', res.message || 'Plan deleted successfully!');
         this.closeDeletePopup();
-      });
-    }
+        this.loadAllPlans()
+      },
+      error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
+        this.loading = false;
+        const message = error.error?.message || 'Failed to delete plan';
+        this.showFullScreenMessage('error', message);
+        this.closeDeletePopup();
+      }
+    });
   }
+}
+
 
   // cupon code ui and mangement
 

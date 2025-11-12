@@ -84,4 +84,36 @@
 }
 
 .animate-fadeIn { animation: fadeIn 0.3s ease-in-out; }
-.animate-scaleIn { animation: scaleIn 0.3s ease-in-out; }
+.animate-scaleIn { animation: scaleIn 0.3s ease-in-out; } 
+/* BG BLUR: draw a blurred copy of the element's background behind its content */
+.bg-blur {
+  position: relative; 
+  overflow: visible; 
+}
+
+/* blurred background layer */
+.bg-blur::before {
+  content: "";
+  position: absolute;
+  inset: 0;                    
+  background: inherit;         
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  filter: blur(6px) brightness(0.85); 
+  transform: scale(1.03);     
+  z-index: 0;                 
+  pointer-events: none;       
+}
+
+/* ensure page content (cards etc.) sits above the blurred pseudo-element */
+.bg-blur > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* optional: slightly stronger blur on smaller screens */
+@media (max-width: 768px) {
+  .bg-blur::before { filter: blur(12px) brightness(0.85); transform: scale(1.05); }
+}
+
