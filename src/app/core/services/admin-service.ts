@@ -56,6 +56,13 @@ export class AdminService {
     return this.httpClient.put<UpdateResponseDto>(url, data, { params });
   }
 
+  // 3. delete plan
+  deletePlan(id: string) : Observable<any> {
+    const url = `${this.planManagementUrl}/deletePlan`;
+    const params = new HttpParams().set('id',id);
+    return this.httpClient.delete<any>(url,{params});
+  }
+
   // managing approval requests
   // 1. for signup approval to continue the platform access
 
@@ -95,5 +102,6 @@ export class AdminService {
     return this.httpClient.delete(url, { params });
   }
 
+  // plan m
 
 }
