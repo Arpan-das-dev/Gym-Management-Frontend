@@ -5,6 +5,8 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } fr
 import { PlanCreateRequestDto } from '../../../core/Models/planModel';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCheckCircle, faClipboardList, faDumbbell, faExclamationCircle, faPlus, faWarning, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { genericResponseMessage } from '../../../core/Models/genericResponseModels';
+import { erroResponseModel } from '../../../core/Models/errorResponseModel';
 
 @Component({
   selector: 'app-create-plans',
@@ -81,16 +83,18 @@ createPlan() {
   console.log("============");
   
     this.adminService.createPlan(data).subscribe({
-      next: (res) => {
+      next: (res:genericResponseMessage) => {
+        console.log(res.message);
+        console.log("+++++++++++");
         console.log(res);
-        this.successMessage = 'Plan created successfully!';
+        this.successMessage = res.message ||'Plan created successfully!';
         this.loading = false;
         this.planForm.reset();
         this.features.clear();
       },
-      error: (err) => {
+      error: (err:erroResponseModel) => {
         console.log(err);
-        this.errorMessage = err.err?.message || 'Something went wrong. Please try again.';
+        this.errorMessage = err.message || 'Something went wrong. Please try again.';
         this.loading = false;
       }
     })
