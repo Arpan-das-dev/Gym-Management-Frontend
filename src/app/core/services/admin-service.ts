@@ -45,20 +45,22 @@ export class AdminService {
   planManagementUrl = "http://localhost:8080/fitStudio/admin/plans"
 
   // 1. create plan
-  createPlan(data: PlanCreateRequestDto): Observable<genericResponseMessage> {
+  createPlan(data: PlanCreateRequestDto): Observable<any> {
     const url = `${this.planManagementUrl}/createPlan`;
-    return this.httpClient.post<genericResponseMessage>(url, data);
+    return this.httpClient.post<any>(url, data);
   }
   // 2. update plan
-  updatePlan(planId: string, data: PlanUpdateRequestDto): Observable<UpdateResponseDto> {
+  updatePlan(planId: string, data: PlanUpdateRequestDto): Observable<any> {
     const url = `${this.planManagementUrl}/updatePlan`;
-    const params = new HttpParams().set('planId', planId);
-    return this.httpClient.put<UpdateResponseDto>(url, data, { params });
+    const params = new HttpParams().set('id', planId);
+    return this.httpClient.put<any>(url, data, { params }).pipe(
+      tap()
+    );
   }
 
   // 3. delete plan
   deletePlan(id: string) : Observable<any> {
-    const url = `${this.planManagementUrl}/deletePlan`;
+    const url = `${this.planManagementUrl}/delete`;
     const params = new HttpParams().set('id',id);
     return this.httpClient.delete<any>(url,{params});
   }
