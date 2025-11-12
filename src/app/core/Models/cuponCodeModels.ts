@@ -4,6 +4,9 @@ export interface CuponValidationResponse{
 }
 export interface CreateCuponCodeRequestDto {
   cuponCode: string;
+  validFrom: string;
   validity: string;
   offPercentage: number;
+  access: string;
+  description : string
 }
