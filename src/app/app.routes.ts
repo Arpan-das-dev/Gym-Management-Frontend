@@ -55,7 +55,7 @@ export const routes: Routes = [
     },
     {
         path: 'dashboard',
-        canActivate: [roleGuard],
+        canActivate: [roleGuard,authGuard],
         data: { roles: ['ADMIN'] },
         loadComponent: () =>
             import('./featured/admin-dashboard/admin-dashboard').then(
@@ -94,6 +94,17 @@ export const routes: Routes = [
             import('./featured/plan/manage-plans/manage-plans').then(
                 m => (m.ManagePlans)
             ),
+
+    },
+
+    {
+        path: 'manageCuponCodes', canActivate: [roleGuard, authGuard],
+        data: { roles: ['ADMIN'] },
+        loadComponent: () =>
+            import('./featured/plan/cupcode-management/cupcode-management').then(
+                m => (m.CupcodeManagement)
+            ),
+
 
     },
 
