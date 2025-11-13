@@ -4,7 +4,7 @@ import { plansResponseModel, PlanUpdateRequestDto } from '../../../core/Models/p
 import { AdminService } from '../../../core/services/admin-service';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCheck, faCheckCircle, faCogs, faEdit, faExclamationCircle, faPlus, faPlusCircle, faTicket, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCheckCircle, faCogs, faEdit, faExclamationCircle, faPlus, faPlusCircle, faRocket, faTicket, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FormsModule } from '@angular/forms';
 import { CreateCuponCodeRequestDto } from '../../../core/Models/cuponCodeModels';
 import { NgClass } from '@angular/common';
@@ -35,7 +35,8 @@ export class ManagePlans implements OnInit {
     plusCircle: faPlusCircle,
     cogs: faCogs,
     checkCircle: faCheckCircle,
-    exclamationCircle: faExclamationCircle
+    exclamationCircle: faExclamationCircle,
+    launch: faRocket
   }
 
   // global fake loading ts 
@@ -153,6 +154,8 @@ confirmDelete() {
   if (this.selectedPlanId) {
     // Send request to backend
     this.loading = true;
+    console.log(this.cuponCode);
+    
     this.adminService.deletePlan(this.selectedPlanId!).subscribe({
       next: (res: genericResponseMessage) => {
         // On success, show success message and close popup
@@ -190,13 +193,23 @@ confirmDelete() {
   }
 
   launchCoupon() {
-    // if (this.selectedPlanId) {
-    //   this.showFakeLoading(() => {
-    //     console.log('Launching coupon', this.coupon);
-    //     this.adminService.launchCoupon(this.selectedPlanId!, this.coupon).subscribe();
-    //     this.closeCouponPopup();
-    //   });
-    // }
+    if (this.selectedPlanId) {
+      console.log(this.selectedPlanId);
+      this.loading = true;
+      this.adminService.launchCuponCode(this.cuponCode,this.selectedPlanId).subscribe({
+        next:(res) =>{
+          console.log(res);
+          this.closeCouponPopup()
+          console.log(this.cuponCode);
+          this.loading = false;
+          this.showFullScreenMessage('success', `a new cupon code ${this.cuponCode.cuponCode} is created`)
+        }, error: (error: HttpErrorResponse & { error: erroResponseModel }) =>{
+          console.log(error);
+          this.loading = false;
+          this.showFullScreenMessage('error', error.error?.message || 'Failded to launch cupon code please try again later')
+        }
+      })
+    }
   }
 
   // 2. delete popups
