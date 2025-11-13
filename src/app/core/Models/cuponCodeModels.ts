@@ -1,6 +1,6 @@
-export interface CuponValidationResponse{
-    valid:boolean;
-    offPercentage: number;
+export interface CuponValidationResponse {
+  valid: boolean;
+  offPercentage: number;
 }
 export interface CreateCuponCodeRequestDto {
   cuponCode: string;
@@ -8,5 +8,14 @@ export interface CreateCuponCodeRequestDto {
   validity: string;
   offPercentage: number;
   access: string;
-  description : string
+  description: string;
+}
+
+export interface UpdateCuponRequestDto {
+  planId: string;
+  validFrom: string;
+  validity: string;
+  offPercentage: number;
+  access: string;
+  description: string;
 }
