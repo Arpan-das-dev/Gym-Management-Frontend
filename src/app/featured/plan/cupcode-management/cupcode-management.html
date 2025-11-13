@@ -1,0 +1,83 @@
+<form [formGroup]="createCupon" (ngSubmit)="onSubmit()">
+    <label for="planId">select a plan</label>
+    <select id="planId" formControlName="planId">
+        @for (plan of plans; track $index) {
+        <option value={{plan.planId}}>
+            {{plan.planName}} :: {{plan.planId}}
+        </option>
+        }
+    </select>
+    @if (createCupon.get('planId')?.touched && createCupon.get('planId')?.invalid){
+    @if (createCupon.get('planId')?.errors?.['required']) {
+    <small>Plan selection is required.</small>
+    }
+    @if (createCupon.get('planId')?.errors?.['minlength']) {
+    <small>Plan ID must be at least 6 characters.</small>
+    }
+
+    }
+
+    <label for="cuponCode">create a cupon code</label>
+    <input id="cuponCode" formControlName="cuponCode" placeholder="EXAMPLE@123" />
+    @if (createCupon.get('cuponCode')?.touched && createCupon.get('cuponCode')?.invalid){
+    @if (createCupon.get('cuponCode')?.errors?.['required']) {
+    <small>Coupon code cannot be empty.</small>
+    }
+    @if (createCupon.get('cuponCode')?.errors?.['minlength']) {
+    <small>Coupon code must be at least 4 characters.</small>
+    }
+    @if (createCupon.get('cuponCode')?.errors?.['maxlength']) {
+    <small>Coupon code must be at most 20 characters.</small>
+    }
+    @if (createCupon.get('cuponCode')?.errors?.['pattern']) {
+    <small>Coupon code must contain only uppercase letters, digits, or underscores.</small>
+    }
+
+    }
+    <label for="discount">create discount</label>
+    <input type="number" id="discount" step="0.1" formControlName="discount" />
+    @if (createCupon.get('discount')?.touched && createCupon.get('discount')?.invalid){
+    @if (createCupon.get('discount')?.errors?.['required']) {
+    <small>Discount is required.</small>
+    }
+    @if (createCupon.get('discount')?.errors?.['min']) {
+    <small>Discount must be at least 0.1%.</small>
+    }
+    @if (createCupon.get('discount')?.errors?.['max']) {
+    <small>Discount cannot exceed 100%.</small>
+    }
+
+    }
+
+
+    <label for="validFrom">Valid From</label>
+    <input type="date" id="validFrom" formControlName="validFrom" />
+    @if (createCupon.get('validFrom')?.touched && createCupon.get('validFrom')?.invalid){
+    @if (createCupon.get('validFrom')?.errors?.['required']) {
+    <small>Coupon validity From is required.</small>
+    }
+
+
+    }
+    <label for="validTill">valid Till</label>
+    <input type="date" id="validTill" formControlName="validTill" />
+    @if (createCupon.get('validTill')?.touched && createCupon.get('validTill')?.invalid){
+    @if (createCupon.get('validTill')?.errors?.['required']) {
+    <small>Coupon validity date is required.</small>
+    }
+
+
+    }
+    <select id="access" formControlName="access">
+        <option value="PUBLIC">Public</option>
+        <option value="PRIVATE">Private</option>
+    </select>
+    @if (createCupon.get('access')?.touched && createCupon.get('access')?.invalid){
+    <small>Can not create a coupon code without setting its access</small>
+
+    }
+    <label for="description">Write description about the coupon code</label>
+    <textarea id="description" formControlName="description"></textarea>
+
+    <button type="submit" [disabled]="createCupon.invalid">Submit</button>
+</form>
