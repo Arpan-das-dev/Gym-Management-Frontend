@@ -5,6 +5,7 @@ import { Observable, tap } from 'rxjs';
 import { genericResponseMessage, UserCreationResponseDto } from '../Models/genericResponseModels';
 import { PlanCreateRequestDto, PlanUpdateRequestDto, UpdateResponseDto } from '../Models/planModel';
 import { ApprovalRequestDto } from '../Models/adminServiceModels';
+import { CreateCuponCodeRequestDto, UpdateCuponRequestDto } from '../Models/cuponCodeModels';
 
 @Injectable({
   providedIn: 'root'
@@ -59,11 +60,43 @@ export class AdminService {
   }
 
   // 3. delete plan
-  deletePlan(id: string) : Observable<any> {
+  deletePlan(id: string): Observable<any> {
     const url = `${this.planManagementUrl}/delete`;
-    const params = new HttpParams().set('id',id);
-    return this.httpClient.delete<any>(url,{params});
+    const params = new HttpParams().set('id', id);
+    return this.httpClient.delete<any>(url, { params });
   }
+
+  // manage cupon codes via planservice's admin's endpoint
+  // cupon code controller's base url
+  cuponCodeManagementUrl = `http://localhost:8080/fitStudio/plan-service/cupon`;
+
+  // 1. create cupon code
+  launchCuponCode(data: CreateCuponCodeRequestDto, planId:string): Observable<any> {
+    const url = `${this.cuponCodeManagementUrl}/admin/addCupon`;
+    const params = new HttpParams().set('planId', planId);
+    return this.httpClient.post(url, data, { params });
+  }
+
+  // 2. get all cupon codes
+  getAllCuponCodes(): Observable<any> {
+    const url = `${this.cuponCodeManagementUrl}/admin/getAll`;
+    return this.httpClient.get<any>(url);
+  }
+  // 3. update cupon code
+
+  editCuponCode(data: UpdateCuponRequestDto, cuponCode: string): Observable<any> {
+    const url = `${this.cuponCodeManagementUrl}/admin/updateCupon`;
+    const params = new HttpParams().set('cuponCode', cuponCode);
+    return this.httpClient.put<any>(url, data, { params })
+  }
+
+  // 4. delete cupon codes
+  deleteCuponCode(planId: string, cuponCode: string): Observable<any> {
+    const url = `${this.cuponCodeManagementUrl}/admin/deleteCuponCode`;
+    const params = new HttpParams().set('cuponCode', cuponCode).set('planId', planId);
+    return this.httpClient.delete(url, { params });
+  }
+
 
   // managing approval requests
   // 1. for signup approval to continue the platform access
