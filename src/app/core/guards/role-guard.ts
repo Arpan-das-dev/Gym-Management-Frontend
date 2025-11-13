@@ -11,11 +11,11 @@ export const roleGuard: CanActivateFn = (route, state) => {
   }
 
   const allowedRoles = route.data['roles'] as string[];
-  const userRole: string | null = authservice.getUserRole();
+  const userRole: string | null = authservice.getRole() ;
   
   if(allowedRoles.includes(userRole as string) && !authservice.isTokenExpired()) {
     return true;
   }
-   router.navigate(['/unauthorized']); // or '/login'
+  //  router.navigate(['/unauthorized']); // or '/login'
   return false;
 };
