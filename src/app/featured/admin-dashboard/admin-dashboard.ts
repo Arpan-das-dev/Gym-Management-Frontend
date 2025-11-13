@@ -18,10 +18,11 @@ import { FormsModule } from '@angular/forms';
 import { ManagePlans } from "./manage-plans/manage-plans";
 import { ManageProducts } from "./manage-products/manage-products";
 import { Transactions } from "./transactions/transactions";
+import { ManageCuponCode } from "./manage-cupon-code/manage-cupon-code";
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [Navbar, FontAwesomeModule, NgStyle, Footer, NgClass, FormsModule, DatePipe, ManagePlans, ManageProducts, Transactions],
+  imports: [Navbar, FontAwesomeModule, NgStyle, Footer, NgClass, FormsModule, DatePipe, ManagePlans, ManageProducts, Transactions, ManageCuponCode],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css',
 })
