@@ -26,33 +26,140 @@
 
 <!-- ========================================================= -->
 <!-- 🎟️  COUPON POPUP SECTION -->
-<!-- ========================================================= -->
 @if (showCouponPopup) {
 <div class="fixed inset-0 flex items-center justify-center bg-black/50 z-40">
-    <div class="bg-white p-6 rounded-2xl shadow-xl w-96">
-        <h3 class="text-xl font-bold mb-4 text-gray-800">Launch Coupon</h3>
-        <div class="space-y-3">
-            <input type="text" placeholder="Coupon Code (e.g., FIT50)" [(ngModel)]="cuponCode.cuponCode"
-                class="w-full border px-3 py-2 rounded-lg uppercase" />
-            <input type="number" placeholder="Offer %" [(ngModel)]="cuponCode.offPercentage"
-                class="w-full border px-3 py-2 rounded-lg" />
-            <input type="date"  [(ngModel)] = "cuponCode.validFrom" class="w-full border px-3 py-2 rounded-lg">
-            <input type="date" [(ngModel)]="cuponCode.validity" class="w-full border px-3 py-2 rounded-lg" />
-            <select name="" id="" [(ngModel)] = "cuponCode.access" >
-                <option value="PUBLIC">Public</option>
-                <option value="PRIVATE">Private</option>
-            </select>
-            <textarea name="description" id="" [(ngModel)] = "cuponCode.description" ></textarea>
+  <div class="bg-white p-6 rounded-2xl shadow-xl w-160 relative">
+    <!-- Header -->
+    <h3
+      class="text-2xl font-extrabold mb-6 text-orange-500 text-center flex items-center justify-center gap-2 drop-shadow-md"
+    >
+      <i class="fa-solid fa-rocket"></i>
+      Launch Coupon
+    </h3>
+
+    <!-- Coupon Form -->
+    <div class="space-y-5">
+      <!-- Coupon Code + Offer % -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <input
+            type="text"
+            placeholder="Coupon Code (e.g., FIT50)"
+            [(ngModel)]="cuponCode.cuponCode"
+            class="w-full border px-3 py-2 rounded-lg uppercase focus:ring-2 focus:ring-orange-400 outline-none placeholder:text-gray-400"
+            required
+            minlength="4"
+            maxlength="20"
+            pattern="^[A-Z0-9_]+$"
+          />
+          <small class="text-orange-400 text-xs">
+            * Must contain 4–20 characters (A–Z, 0–9, _)
+          </small>
         </div>
-        <div class="flex justify-end gap-3 mt-4">
-            <button class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
-                (click)="closeCouponPopup()">Cancel</button>
-            <button class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
-                (click)="launchCoupon()">Launch</button>
+
+        <div>
+          <input
+            type="number"
+            placeholder="Offer % (1–100)"
+            [(ngModel)]="cuponCode.offPercentage"
+            class="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-orange-400 outline-none placeholder:text-gray-400"
+            required
+            min="1"
+            max="100"
+            step="0.1"
+          />
+          <small class="text-orange-400 text-xs">
+            * Enter valid % between 1–100
+          </small>
         </div>
+      </div>
+
+      <!-- Valid From + Valid Till -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm text-gray-700">Valid From</label>
+          <input
+            type="date"
+            [(ngModel)]="cuponCode.validFrom"
+            class="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-orange-400 outline-none"
+            required
+          />
+          <small class="text-orange-400 text-xs">
+            * Enter valid date apart from past 
+          </small>
+        </div>
+
+        <div>
+          <label class="text-sm text-gray-700">Valid Till</label>
+          <input
+            type="date"
+            [(ngModel)]="cuponCode.validity"
+            class="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-orange-400 outline-none"
+            required
+          />
+          <small class="text-orange-400 text-xs">
+            * Auto-deletes after this date
+          </small>
+        </div>
+      </div>
+
+      <!-- Access -->
+      <div>
+        <label
+          for="access"
+          class="block text-sm text-gray-700 font-medium mb-1"
+          >Choose Access</label
+        >
+        <select
+          id="access"
+          [(ngModel)]="cuponCode.access"
+          class="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-orange-400 outline-none"
+          required
+        >
+          <option value="">Select Access Type</option>
+          <option value="PUBLIC">Public</option>
+          <option value="PRIVATE">Private</option>
+        </select>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label
+          for="description"
+          class="block text-sm text-gray-700 font-medium mb-1"
+          >Description</label
+        >
+        <textarea
+          id="description"
+          [(ngModel)]="cuponCode.description"
+          placeholder="Write a short description for the coupon code (optional)"
+          rows="3"
+          class="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-orange-400 outline-none placeholder:text-gray-400"
+        ></textarea>
+        <small class="text-orange-400 text-xs">* Optional</small>
+      </div>
     </div>
+
+    <!-- Buttons -->
+    <div class="flex justify-end gap-3 mt-6">
+      <button
+        class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition-all"
+        (click)="closeCouponPopup()"
+      >
+        Cancel
+      </button>
+      <button
+        class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 flex items-center gap-2 shadow-lg transition-all"
+        (click)="launchCoupon()"
+      >
+        <fa-icon [icon]="icons.launch"/>
+        Launch
+      </button>
+    </div>
+  </div>
 </div>
 }
+
 
 <!-- ========================================================= -->
 <!-- 🗑️  DELETE CONFIRMATION POPUP SECTION -->
