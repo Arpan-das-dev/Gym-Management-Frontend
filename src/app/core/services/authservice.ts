@@ -21,6 +21,14 @@ export class Authservice {
   login(data: loginModel): Observable<loginResponse> {
     return this.http.post<loginResponse>(`${this.authServiceLoginUrl}/login`, data).pipe(
       tap(response => {
+          this.loadUserInfo(data.identifier).subscribe({
+            next:(res) =>{
+              console.log("+++++++++__________________");
+              
+              console.log(res);
+              
+            } 
+          })
         localStorage.setItem('token', response.token);
       }), catchError(error => {
         console.error("Login error:", error);
@@ -218,6 +226,7 @@ export class Authservice {
         this.cookies.set('userId',user.id,{path: '/', sameSite: 'Strict'})
         this.cookies.set('userMail',user.email,{path:'/',sameSite:'Strict'})
         this.cookies.set('userName',`${user.firstName} ${user.lastName}`,{path:'/', sameSite:'Strict'})
+        this.cookies.set('role',user.role,{path:'/', sameSite:'Strict'})
       })
     );
   }
@@ -232,5 +241,8 @@ export class Authservice {
 
   getUserName(){
     return this.cookies.get('userName')
+  }
+  getRole(){
+    return this.cookies.get('role')
   }
 }
