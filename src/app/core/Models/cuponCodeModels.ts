@@ -19,3 +19,17 @@ export interface UpdateCuponRequestDto {
   access: string;
   description: string;
 }
+
+export interface CuponCodeResponseDto {
+  cuponCode: string;
+  planId: string;
+  access: string;
+  validFrom: string;
+  validityDate: string;
+  users: number;
+  offPercentage: number;
+  description: string;
+}
+
+
+
