@@ -1,1 +1,81 @@
-<p>product-managements works!</p>
+<div class="min-h-screen w-full flex items-center justify-center bg-gradient-to-b from-gray-50 to-white py-10 px-4">
+
+  <!-- MAIN CARD -->
+  <div class="bg-white shadow-xl rounded-2xl p-10 max-w-3xl w-full animate-fade">
+
+    <!-- ICON -->
+    <div class="flex justify-center mb-6">
+      <div class="bg-orange-100 text-orange-600 p-4 rounded-full text-3xl">
+        <fa-icon [icon]="icons.cogs"></fa-icon>
+      </div>
+    </div>
+
+    <!-- TITLE -->
+    <h1 class="text-3xl font-bold text-center text-gray-900">
+      Product Management Coming Soon
+    </h1>
+
+    <!-- SUBTITLE -->
+    <p class="text-center text-gray-500 mt-2">
+      We're building something amazing for you
+    </p>
+
+    <!-- DESCRIPTION -->
+    <p class="text-gray-600 mt-6 leading-relaxed text-center">
+      We sincerely appreciate your interest in our product management features.
+      Our team is working diligently to deliver a comprehensive and intuitive
+      product management experience that meets the highest standards of excellence.
+    </p>
+
+    <!-- FEATURE BOX -->
+    <div class="border rounded-xl p-5 mt-6 bg-gray-50">
+      <p class="flex items-center gap-2 font-semibold text-gray-800 text-lg">
+        <span class="text-orange-600 text-xl">
+          <fa-icon [icon]="icons.sparkles"></fa-icon>
+        </span>
+        Coming in Version 3.0
+      </p>
+
+      <p class="text-gray-600 mt-2 leading-relaxed">
+        The Product Management module will be included in our upcoming Version 3.0
+        release. This powerful feature will enable you to efficiently manage your
+        product catalog, inventory, pricing, and more—all from a centralized dashboard.
+      </p>
+    </div>
+
+    <!-- ADDITIONAL INFO -->
+    <p class="text-gray-600 mt-6 leading-relaxed text-center">
+      In the meantime, we encourage you to explore our other powerful features
+      and services. If you need immediate product management capabilities,
+      please consider using alternative solutions or reach out to our support team
+      for personalized recommendations.
+    </p>
+
+    <!-- BUTTONS -->
+    <div class="flex flex-wrap justify-center gap-4 mt-8">
+
+      <!-- RETURN HOME -->
+      <button
+        class="px-6 py-3 bg-orange-600 text-white rounded-lg font-semibold shadow hover:bg-orange-700 transition flex items-center gap-2"
+        (click)="returnHome()">
+        <fa-icon [icon]="icons.home"></fa-icon>
+        Return Home
+      </button>
+
+      <!-- EXPLORE PLANS -->
+      <button
+        class="px-6 py-3 bg-white border rounded-lg font-semibold shadow hover:bg-gray-100 transition flex items-center gap-2"
+        (click)="explorePlans()">
+        Explore Our Plans
+        <fa-icon [icon]="icons.arrowRight"></fa-icon>
+      </button>
+
+    </div>
+
+    <!-- FOOTNOTE -->
+    <p class="text-center text-gray-400 text-sm mt-10">
+      Have questions? Contact our support team for assistance with your specific needs.
+    </p>
+
+  </div>
+</div>
