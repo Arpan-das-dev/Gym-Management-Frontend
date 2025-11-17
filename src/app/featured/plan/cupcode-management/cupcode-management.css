@@ -1,0 +1,76 @@
+.animate-fade {
+  animation: fadeIn 0.45s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0 }
+  to { opacity: 1 }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.35s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px) }
+  to { opacity: 1; transform: translateY(0) }
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  width: 100%;
+  position: relative; /* for positioning the pseudo-element */
+  display: flex;
+  flex-direction: column;
+}
+
+body::before {
+  content: "";
+  position: fixed; /* fixed so it stays on full viewport */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/cuponcodeBG.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(2px);
+  z-index: -1; 
+}
+
+
+body > * {
+  position: relative;
+  z-index: 0;
+}
+
+/* Card Hover Lift */
+.card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+}
+
+/* Orange Badge for Section Titles */
+.orange-badge {
+  background: linear-gradient(135deg, #ff7a18, #ffb347);
+  padding: 4px 14px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Transparent Glass Card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}

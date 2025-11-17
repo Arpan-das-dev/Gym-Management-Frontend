@@ -1,83 +1,260 @@
-<form [formGroup]="createCupon" (ngSubmit)="onSubmit()">
-    <label for="planId">select a plan</label>
-    <select id="planId" formControlName="planId">
-        @for (plan of plans; track $index) {
-        <option value={{plan.planId}}>
-            {{plan.planName}} :: {{plan.planId}}
-        </option>
-        }
-    </select>
-    @if (createCupon.get('planId')?.touched && createCupon.get('planId')?.invalid){
-    @if (createCupon.get('planId')?.errors?.['required']) {
-    <small>Plan selection is required.</small>
-    }
-    @if (createCupon.get('planId')?.errors?.['minlength']) {
-    <small>Plan ID must be at least 6 characters.</small>
-    }
+<app-navbar/>
+<body>
 
-    }
+  <!-- ========================================================= -->
+  <!-- GLOBAL LOADER -->
+  <!-- ========================================================= -->
+  @if (loading) {
+  <div class="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-50">
+    <div class="text-center text-white animate-pulse">
+      <fa-icon [icon]="icons.cogs" class="text-5xl mb-2"></fa-icon>
+      <p class="text-base font-semibold">Processing...</p>
+    </div>
+  </div>
+  }
 
-    <label for="cuponCode">create a cupon code</label>
-    <input id="cuponCode" formControlName="cuponCode" placeholder="EXAMPLE@123" />
-    @if (createCupon.get('cuponCode')?.touched && createCupon.get('cuponCode')?.invalid){
-    @if (createCupon.get('cuponCode')?.errors?.['required']) {
-    <small>Coupon code cannot be empty.</small>
-    }
-    @if (createCupon.get('cuponCode')?.errors?.['minlength']) {
-    <small>Coupon code must be at least 4 characters.</small>
-    }
-    @if (createCupon.get('cuponCode')?.errors?.['maxlength']) {
-    <small>Coupon code must be at most 20 characters.</small>
-    }
-    @if (createCupon.get('cuponCode')?.errors?.['pattern']) {
-    <small>Coupon code must contain only uppercase letters, digits, or underscores.</small>
-    }
+  <!-- ========================================================= -->
+  <!-- SUCCESS / ERROR MESSAGE -->
+  <!-- ========================================================= -->
+  @if (showMessage) {
+  <div
+    class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-5 py-2.5 rounded-lg shadow text-white animate-fade"
+    [ngClass]="{
+        'bg-green-600': messageType === 'success',
+        'bg-red-600': messageType === 'error'
+      }">
+    <fa-icon [icon]="messageType === 'success' ? icons.checkCircle : icons.exclamationCircle"></fa-icon>
+    <span class="text-sm font-medium">{{ messageText }}</span>
+  </div>
+  }
 
-    }
-    <label for="discount">create discount</label>
-    <input type="number" id="discount" step="0.1" formControlName="discount" />
-    @if (createCupon.get('discount')?.touched && createCupon.get('discount')?.invalid){
-    @if (createCupon.get('discount')?.errors?.['required']) {
-    <small>Discount is required.</small>
-    }
-    @if (createCupon.get('discount')?.errors?.['min']) {
-    <small>Discount must be at least 0.1%.</small>
-    }
-    @if (createCupon.get('discount')?.errors?.['max']) {
-    <small>Discount cannot exceed 100%.</small>
-    }
+  <!-- ========================================================= -->
+  <!-- MAIN LAYOUT -->
+  <!-- ========================================================= -->
+  <div class="w-full flex justify-center py-10 px-4">
+    <div class="w-full max-w-7xl grid md:grid-cols-2 gap-8">
 
-    }
+      <!-- ========================================================= -->
+      <!-- LEFT: CREATE COUPON CARD -->
+      <!-- ========================================================= -->
+      <form
+        [formGroup]="createCupon"
+        (ngSubmit)="onSubmit()"
+        class="glass-card card-hover rounded-xl shadow p-6 border hover:border-orange-400 hover:shadow-orange-300/40 animate-slide-up transition">
 
+        <h2 class="text-xl font-bold flex items-center gap-3 text-blue-700 mb-4">
+          <span class="orange-badge">🚀 Launch Coupon</span>
+          {{ isEditMode ? "Edit Coupon" : "" }}
+        </h2>
 
-    <label for="validFrom">Valid From</label>
-    <input type="date" id="validFrom" formControlName="validFrom" />
-    @if (createCupon.get('validFrom')?.touched && createCupon.get('validFrom')?.invalid){
-    @if (createCupon.get('validFrom')?.errors?.['required']) {
-    <small>Coupon validity From is required.</small>
-    }
+        <div class="space-y-4">
 
+          <!-- PLAN -->
+          <div>
+            <label class="font-semibold text-sm flex items-center gap-2">
+              <fa-icon [icon]="icons.tag" class="text-orange-500"></fa-icon> Select Plan *
+            </label>
+            <select formControlName="planId"
+              class="w-full border rounded-md p-2 text-sm bg-gray-50 focus:ring-2 focus:ring-blue-600">
+              @for (plan of plans; track plan.planId) {
+              <option value="{{ plan.planId }}">{{ plan.planName }}</option>
+              }
+            </select>
+          </div>
 
-    }
-    <label for="validTill">valid Till</label>
-    <input type="date" id="validTill" formControlName="validTill" />
-    @if (createCupon.get('validTill')?.touched && createCupon.get('validTill')?.invalid){
-    @if (createCupon.get('validTill')?.errors?.['required']) {
-    <small>Coupon validity date is required.</small>
-    }
+          <!-- COUPON CODE -->
+          <div>
+            <label class="font-semibold text-sm flex items-center gap-2">
+              <fa-icon [icon]="icons.code" class="text-blue-500"></fa-icon> Coupon Code *
+            </label>
+            <input formControlName="cuponCode"
+              class="w-full border p-2 rounded-md text-sm bg-gray-50 placeholder:text-gray-400 focus:ring-2 focus:ring-orange-500"
+              placeholder="e.g. NEWYEAR2025" />
+          </div>
 
+          <!-- DISCOUNT -->
+          <div>
+            <label class="font-semibold text-sm flex items-center gap-2">
+              <fa-icon [icon]="icons.percent" class="text-yellow-600"></fa-icon> Discount (%)
+            </label>
+            <input type="number" formControlName="discount"
+              class="w-full border p-2 rounded-md text-sm bg-gray-50 focus:ring-2 focus:ring-blue-600"
+              placeholder="10, 20 etc." />
+          </div>
 
-    }
-    <select id="access" formControlName="access">
-        <option value="PUBLIC">Public</option>
-        <option value="PRIVATE">Private</option>
-    </select>
-    @if (createCupon.get('access')?.touched && createCupon.get('access')?.invalid){
-    <small>Can not create a coupon code without setting its access</small>
+          <!-- DATES -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="font-semibold text-sm flex items-center gap-2">
+                <fa-icon [icon]="icons.calendar" class="text-orange-500"></fa-icon> Valid From
+              </label>
+              <input type="date" formControlName="validFrom"
+                class="w-full border p-2 rounded-md text-sm bg-gray-50 focus:ring-2 focus:ring-blue-600" />
+            </div>
 
-    }
-    <label for="description">Write description about the coupon code</label>
-    <textarea id="description" formControlName="description"></textarea>
+            <div>
+              <label class="font-semibold text-sm flex items-center gap-2">
+                <fa-icon [icon]="icons.calendar" class="text-blue-500"></fa-icon> Valid Till
+              </label>
+              <input type="date" formControlName="validTill"
+                class="w-full border p-2 rounded-md text-sm bg-gray-50 focus:ring-2 focus:ring-orange-500" />
+            </div>
+          </div>
 
-    <button type="submit" [disabled]="createCupon.invalid">Submit</button>
-</form>
+          <!-- ACCESS -->
+          <div>
+            <label class="font-semibold text-sm flex items-center gap-2">
+              <fa-icon [icon]="icons.lock" class="text-blue-500"></fa-icon> Access
+            </label>
+            <select formControlName="access"
+              class="w-full border p-2 rounded-md text-sm bg-gray-50 focus:ring-2 focus:ring-blue-600">
+              <option value="PUBLIC">Public</option>
+              <option value="PRIVATE">Private</option>
+            </select>
+          </div>
+
+          <!-- DESCRIPTION -->
+          <div>
+            <label class="font-semibold text-sm flex items-center gap-2">
+              <fa-icon [icon]="icons.infoCircle" class="text-orange-500"></fa-icon> Description
+            </label>
+            <textarea formControlName="description"
+              class="w-full border p-2 rounded-md text-sm bg-gray-50 h-20 focus:ring-2 focus:ring-orange-500"
+              placeholder="Short details..."></textarea>
+          </div>
+
+        </div>
+
+        <button type="submit" [disabled]="createCupon.invalid"
+          class="w-full py-2.5 mt-3 rounded-lg bg-linear-to-r from-blue-600 to-orange-500 text-white font-semibold shadow hover:opacity-90 transition">
+          <fa-icon [icon]="icons.lauch"></fa-icon>
+          {{ isEditMode ? "Update Coupon" : "Launch Coupon" }}
+        </button>
+      </form>
+
+      <!-- ========================================================= -->
+      <!-- RIGHT: COUPON LIST -->
+      <!-- ========================================================= -->
+      <div
+        class="glass-card card-hover shadow rounded-xl p-6 border hover:border-blue-500 hover:shadow-blue-300/40 animate-slide-up transition">
+
+        <h2 class="text-xl font-bold mb-5 text-orange-600 flex items-center gap-2">
+          <fa-icon [icon]="icons.list"></fa-icon> All Coupon Codes
+        </h2>
+
+        <!-- FILTER BAR -->
+        <div class="flex flex-wrap items-center gap-3 mb-5">
+          <div class="flex items-center border rounded-md bg-gray-50 px-2">
+            <fa-icon [icon]="icons.search" class="text-gray-400 mr-1"></fa-icon>
+            <input type="text" [(ngModel)]="searchText"
+              placeholder="Search" class="p-2 bg-transparent text-sm outline-none placeholder:text-gray-400" />
+          </div>
+
+          <div class="flex items-center border rounded-md bg-gray-50 px-2">
+            <fa-icon [icon]="icons.sort" class="text-gray-400 mr-1"></fa-icon>
+            <select [(ngModel)]="sortField" class="p-2 bg-transparent text-sm outline-none">
+              <option value="">Sort</option>
+              <option value="users">Users</option>
+              <option value="validTill">Valid Till</option>
+              <option value="offPercentage">Discount</option>
+            </select>
+          </div>
+
+          <div class="flex items-center border rounded-md bg-gray-50 px-2">
+            <fa-icon [icon]="icons.user" class="text-gray-400 mr-1"></fa-icon>
+            <input type="number" [(ngModel)]="filterUsers" placeholder="Users >"
+              class="p-2 bg-transparent text-sm outline-none" />
+          </div>
+
+          <div class="flex items-center border rounded-md bg-gray-50 px-2">
+            <fa-icon [icon]="icons.calendar" class="text-gray-400 mr-1"></fa-icon>
+            <input type="date" [(ngModel)]="filterDate" class="p-2 bg-transparent text-sm outline-none" />
+          </div>
+
+          <div class="flex items-center border rounded-md bg-gray-50 px-2">
+            <fa-icon [icon]="icons.percent" class="text-gray-400 mr-1"></fa-icon>
+            <input type="number" [(ngModel)]="filterDiscount" placeholder="Discount >"
+              class="p-2 bg-transparent text-sm outline-none" />
+          </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="overflow-x-auto rounded-lg border border-gray-300">
+          <table class="w-full text-xs md:text-sm">
+            <thead>
+              <tr class="bg-black text-white text-xs">
+                <th class="p-3">Code</th>
+                <th class="p-3">Plan</th>
+                <th class="p-3">Users</th>
+                <th class="p-3">From</th>
+                <th class="p-3">Till</th>
+                <th class="p-3">Discount</th>
+                <th class="p-3">Access</th>
+                <th class="p-3">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (c of cuponCodes 
+              | cuponSearhPipe: searchText
+              | cuponsSortPipe: sortField
+              | cuponUsersFilterPipe: filterUsers
+              | couponDateFilterPipe: filterDate
+              | couponDiscountFilterPipe: filterDiscount; 
+              track c.cuponCode) {
+
+              <tr class="animate-fade hover:bg-orange-200 transition"
+                [ngClass]="($index % 2 === 0) ? 'bg-orange-100' : 'bg-gray-50'">
+
+                <td class="p-3 font-semibold">{{ c.cuponCode }}</td>
+                <td class="p-3">{{ c.planId }}</td>
+                <td class="p-3">{{ c.users }}</td>
+                <td class="p-3">{{ c.validFrom }}</td>
+                <td class="p-3">{{ c.validityDate }}</td>
+                <td class="p-3 text-blue-700 font-bold">{{ c.offPercentage }}%</td>
+
+                <td class="p-3">
+                  <span class="px-2 py-1 text-xs font-bold rounded-full"
+                    [ngClass]="{
+                      'bg-green-100 text-green-700': c.access === 'PUBLIC',
+                      'bg-red-100 text-red-700': c.access === 'PRIVATE'
+                    }">
+                    {{ c.access }}
+                  </span>
+                </td>
+
+                <td class="p-3 flex gap-3">
+                  <button (click)="editCoupon(c)" class="text-blue-600 font-medium hover:underline">Edit</button>
+                  <button (click)="confirmDelete(c)"
+                    class="text-red-600 font-medium hover:underline">Delete</button>
+                </td>
+
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- DELETE POPUP -->
+  <!-- ========================================================= -->
+  @if (showDeletePopup) {
+  <div class="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+    <div class="bg-white p-6 rounded-xl shadow-xl w-80 text-center">
+      <p class="font-semibold text-lg">Are you sure?</p>
+
+      <div class="flex justify-center gap-4 mt-5">
+        <button (click)="deleteConfirmed()" class="px-4 py-2 bg-red-600 text-white rounded-md">Yes</button>
+        <button (click)="showDeletePopup=false" class="px-4 py-2 bg-gray-300 rounded-md">Cancel</button>
+      </div>
+    </div>
+  </div>
+  }
+
+</body>
+<app-footer/>
