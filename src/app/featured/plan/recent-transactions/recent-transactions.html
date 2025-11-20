@@ -1,1 +1,165 @@
-<p>recent-transactions works!</p>
+<app-navbar></app-navbar>
+
+<body class="min-h-screen text-white">
+
+  <!-- ========================================================= -->
+  <!-- GLOBAL LOADER -->
+  <!-- ========================================================= -->
+  @if (loading) {
+  <div class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
+    <div class="text-center animate-pulse">
+      <fa-icon [icon]="icons.cogs" class="text-5xl mb-2"></fa-icon>
+      <p class="text-base font-semibold">Processing...</p>
+    </div>
+  </div>
+  }
+
+  <!-- ========================================================= -->
+  <!-- SUCCESS / ERROR MESSAGE -->
+  <!-- ========================================================= -->
+  @if (showMessage) {
+  <div
+    class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-5 py-2.5 rounded-lg shadow text-white animate-fade"
+    [ngClass]="{
+        'bg-green-600': messageType === 'success',
+        'bg-red-600': messageType === 'error'
+      }">
+    <fa-icon [icon]="messageType === 'success' ? icons.checkCircle : icons.exclamationCircle"></fa-icon>
+    <span class="text-sm font-medium">{{ messageText }}</span>
+  </div>
+  }
+
+  <!-- ========================================================= -->
+  <!-- MAIN CONTENT -->
+  <!-- ========================================================= -->
+  <div class="p-6 min-h-screen">
+
+    <!-- Search + Sort -->
+    <div class="flex flex-col md:flex-row gap-4 mb-6">
+
+      <!-- Search -->
+      <div class="relative w-full md:w-1/2 flex">
+        <input type="text" class="glass-input w-full pl-10 pr-12" placeholder="Search by User ID, Plan ID, User Name..."
+          [(ngModel)]="searchTerm" />
+        <button (click)="onSearch()"
+          class="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-600 px-3 py-1 rounded hover:bg-blue-700 flex items-center gap-1">
+          <fa-icon [icon]="icons.search"></fa-icon> Search
+        </button>
+      </div>
+
+      <!-- Sort -->
+      <div class="relative w-full md:w-1/4">
+        <select class="glass-input w-full pr-10 bg-white/10 text-white" [(ngModel)]="sortOption" (change)="onSort()">
+          <option value="date_desc">Payment Date (Newest → Oldest)</option>
+          <option value="date_asc">Payment Date (Oldest → Newest)</option>
+          <option value="amount_desc">Amount (High → Low)</option>
+          <option value="amount_asc">Amount (Low → High)</option>
+          <option value="name_asc">User Name (A → Z)</option>
+          <option value="name_desc">User Name (Z → A)</option>
+          <option value="time_desc">Transaction Time (Newest)</option>
+          <option value="time_asc">Transaction Time (Oldest)</option>
+          <option value="method_asc">Payment Method (A → Z)</option>
+          <option value="method_desc">Payment Method (Z → A)</option>
+          <option value="status_asc">Status (A → Z)</option>
+          <option value="status_desc">Status (Z → A)</option>
+        </select>
+      </div>
+
+    </div>
+
+    <!-- Table -->
+    <div class="glass-card rounded-xl overflow-hidden">
+      <table class="w-full text-white">
+        <thead>
+          <tr class="glass-header">
+            <th class="p-4 text-left">User Name</th>
+            <th class="p-4 text-left">Payment Date</th>
+            <th class="p-4 text-left text-orange-400">Amount</th>
+            <th class="p-4 text-center">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (t of transactions; track t.paymentId) {
+          <tr class="border-b border-white/20">
+            <td class="p-4 font-semibold">{{ t.userName }}</td>
+            <td class="p-4 text-gray-300">{{ t.paymentDate | date:'mediumDate' }}</td>
+            <td class="p-4 font-bold text-blue-400">₹{{ t.paidPrice }}</td>
+            <td class="p-4 text-center">
+              <button class="glass-btn flex items-center gap-2 mx-auto" (click)="t.show = !t.show">
+                <span>{{ t.show ? 'Hide' : 'Details' }}</span>
+                <fa-icon [icon]="t.show ? icons.up : icons.down" class="text-gray-200"></fa-icon>
+              </button>
+            </td>
+          </tr>
+
+          @if (t.show) {
+          <tr class="glass-expand-row">
+            <td colspan="4" class="p-5">
+              <div class="grid md:grid-cols-3 gap-4">
+                <div>
+                  <h4 class="detail-title text-orange-400">Order ID</h4>
+                  <p>{{ t.orderId }}</p>
+                </div>
+                <div>
+                  <h4 class="detail-title">Payment ID</h4>
+                  <p>{{ t.paymentId }}</p>
+                </div>
+                <div>
+                  <h4 class="detail-title">Plan ID</h4>
+                  <p>{{ t.planId }}</p>
+                </div>
+                <div>
+                  <h4 class="detail-title">Plan Name</h4>
+                  <p>{{ t.planName }}</p>
+                </div>
+                <div>
+                  <h4 class="detail-title">Payment Method</h4>
+                  <p>{{ t.paymentMethod }}</p>
+                </div>
+                <div>
+                  <h4 class="detail-title">Transaction Time</h4>
+                  <p>{{ t.paymentTime | date:'medium' }}</p>
+                </div>
+                <div>
+                  <h4 class="detail-title">User ID</h4>
+                  <p>{{ t.userId }}</p>
+                </div>
+                <div>
+                  <h4 class="detail-title">Status</h4>
+                  <p [ngClass]="{
+                    'text-green-500' : t.paymentStatus === 'SUCCESS',
+                    'text-red-500' : t.paymentStatus === 'FAILED',
+                    'text-yellow-500' : t.paymentStatus === 'PENDING'
+                  }" >{{ t.paymentStatus }}</p>
+                </div>
+                @if(t.receiptUrl.includes("http")) {
+                <div class="detail-title">
+                  <a href="{{ t.receiptUrl }}" target="_blank"
+                    class="flex items-center gap-1 underline hover:text-blue-300">
+                    <fa-icon [icon]="icons.eye"></fa-icon> View Receipt
+                  </a>
+                </div>
+                }
+              </div>
+            </td>
+          </tr>
+          }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex items-center justify-between mt-6 px-2"> <!-- Prev --> <button
+        class="glass-btn px-5 py-2 disabled:opacity-40" [disabled]="pageNo === 0"
+        (click)="pageNo = pageNo - 1; fetchTransactions()"> Prev </button> <!-- Page Indicator -->
+      <p class="text-gray-300"> Page <span class="font-semibold text-white">{{ pageNo + 1 }}</span> of <span
+          class="font-semibold text-white">{{ totalPages }}</span> </p> <!-- Next --> <button
+        class="glass-btn px-5 py-2 disabled:opacity-40" [disabled]="pageNo >= totalPages - 1"
+        (click)="pageNo = pageNo + 1; fetchTransactions()"> Next </button>
+    </div>
+
+  </div>
+
+</body>
