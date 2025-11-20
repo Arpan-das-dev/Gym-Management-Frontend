@@ -3,7 +3,7 @@ import { signupModel } from '../Models/signupModel';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { genericResponseMessage, UserCreationResponseDto } from '../Models/genericResponseModels';
-import { PlanCreateRequestDto, PlanUpdateRequestDto, UpdateResponseDto } from '../Models/planModel';
+import { AllRecentTransactionsResponseWrapperDto, PlanCreateRequestDto, PlanUpdateRequestDto, UpdateResponseDto } from '../Models/planModel';
 import { ApprovalRequestDto } from '../Models/adminServiceModels';
 import { CreateCuponCodeRequestDto, UpdateCuponRequestDto } from '../Models/cuponCodeModels';
 
@@ -96,7 +96,14 @@ export class AdminService {
     const params = new HttpParams().set('cuponCode', cuponCode).set('planId', planId);
     return this.httpClient.delete(url, { params });
   }
-
+ 
+  // get all paginated transactions via admin service
+  paymentAdminUrl = "http://localhost:8080/fitStudio/payment-service/admin/getAllTransaction"
+  getRecentTransactions(searchBy:string,sortBy:string,sortDirection:string,pageNo:number,pageSize:number) : Observable<any> {
+    const params = new HttpParams().set('searchBy',searchBy).set('sortBy',sortBy).set('sortDirection',sortDirection)
+    .set('pageNo',pageNo.toString()).set('pageSize',pageSize.toString());
+    return this.httpClient.get<any>(this.paymentAdminUrl,{params})
+  }
 
   // managing approval requests
   // 1. for signup approval to continue the platform access
