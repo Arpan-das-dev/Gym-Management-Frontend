@@ -74,3 +74,27 @@ export interface UpdateResponseDto {
   duration: number;
   features: string[];
 }
+
+export interface AllRecentTransactionsResponseWrapperDto {
+  responseDtoList: RecentTransactionsResponseDto[];
+  pageNo: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  lastPage: boolean;
+}
+
+export interface RecentTransactionsResponseDto {
+  paymentId: string;
+  orderId: string;
+  userName: string;
+  userId: string;
+  planName: string;
+  planId: string;
+  paidPrice: number;
+  paymentStatus: string;
+  paymentMethod: string;
+  paymentTime: string; 
+  paymentDate: string;
+  receiptUrl: string;
+}
