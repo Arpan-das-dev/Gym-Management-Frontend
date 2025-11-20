@@ -63,6 +63,14 @@ export const routes: Routes = [
             ),
     },
     {
+        path:'allMembers', canActivate:[roleGuard,authGuard],
+        data: { roles: ['ADMIN'] },
+        loadComponent: () =>
+            import('./featured/admin-dashboard/view-all-members/view-all-members').then(
+                (m) => m.ViewAllMembers
+            ),
+    },
+    {
         path: 'createUser',
         canActivate: [roleGuard, authGuard],
         data: { roles: ['ADMIN'] },
@@ -118,7 +126,7 @@ export const routes: Routes = [
     },
 
     {
-        path: 'recentTransactions', canActivate: [authGuard, roleGuard],
+        path: 'recentTransactions', canActivate:[roleGuard, authGuard],
         data: { roles: ['ADMIN'] },
         loadComponent: () =>
             import('./featured/plan/recent-transactions/recent-transactions').then(
