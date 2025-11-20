@@ -2,12 +2,14 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { emailVerificationModel, loginModel, loginResponse } from '../Models/loginModels';
 import { throwError } from 'rxjs/internal/observable/throwError';
-import { catchError, tap, Observable } from 'rxjs';
+import { catchError, tap, Observable, count } from 'rxjs';
 import { signupModel, userDetailModel } from '../Models/signupModel';
 import { Router } from '@angular/router';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
 import { jwtPayload } from '../Models/jwtModel';
 import { CookieService } from 'ngx-cookie-service';
+import { WebSocketService } from './web-socket-service';
+import { ActiveCountService } from './active-count-service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +17,7 @@ import { CookieService } from 'ngx-cookie-service';
 export class Authservice {
   authServiceLoginUrl = "http://localhost:8080/fitStudio/auth"
   constructor(private http: HttpClient,
-    private router: Router, private cookies: CookieService
+    private router: Router, private cookies: CookieService,  private activeCount: ActiveCountService
   ) { }
 
   login(data: loginModel): Observable<loginResponse> {
@@ -24,9 +26,17 @@ export class Authservice {
           this.loadUserInfo(data.identifier).subscribe({
             next:(res) =>{
               console.log("+++++++++__________________");
-              
-              console.log(res);
-              
+              switch(res.role){
+                case 'MEMBER':
+                this.activeCount.memberIncrement(res.id).subscribe();
+                break;
+                case 'TRAINER':
+                  this.activeCount.trainerIncrement(res.id).subscribe();
+                  break;
+                case 'ADMIN':
+                  this.activeCount.adminIncrement(res.id).subscribe();
+                  break;
+              }
             } 
           })
         localStorage.setItem('token', response.token);
@@ -38,6 +48,19 @@ export class Authservice {
   }
 
   logout(): void {
+    const role = this.getUserRole();
+    const userId = this.getUserId();
+    switch(role){
+      case 'MEMBER':
+        this.activeCount.memberDecrement(userId).subscribe();
+        break;
+      case 'TRAINER':
+        this.activeCount.trainerDecrement(userId).subscribe();
+        break;
+      case 'ADMIN':
+        this.activeCount.adminDecrement(userId).subscribe();
+        break;
+    }
     localStorage.removeItem('token');
     this.router.navigate(['/login'])
   }
@@ -46,9 +69,22 @@ export class Authservice {
   }
   // utility methods
   isLoggedIn(): boolean {
-    const token = this.getToken();
-    return !!token && !this.isTokenExpired();
+  const token = this.getToken();
+  const role = this.getUserRole();
+
+  // If no token or token expired, user is not logged in
+  if (!token || this.isTokenExpired()) {
+    return false;
   }
+
+  // If role is missing, consider user not logged in
+  if (!role) {
+    return false;
+  }
+
+  return true;
+}
+
 
   getUserRole(): string | null {
     const jwtToken = this.getToken();
@@ -111,7 +147,7 @@ export class Authservice {
   // send otp  through email
   sendOtpEmail(email: string, name: string): Observable<string> {
     const url = `${this.authServiceLoginUrl}/emailVerification/${email}/${name}`;
-    return this.http.get<string>(url).pipe(
+    return this.http.post<string>(url,null).pipe(
       tap(response => {
         console.log(response);
       }), catchError(error => {
@@ -123,20 +159,23 @@ export class Authservice {
 
   // verify account through email otp
   verifyEmailOtp(email: string, otp: string): Observable<string> {
-    const url = this.authServiceLoginUrl + "/verifyEmail";
-    const body: emailVerificationModel = {
-      email: email,
-      otp: otp
-    }
-    return this.http.post<string>(url, body).pipe(
-      tap(response => {
-        console.log(response);
-      }), catchError(error => {
-        console.error("Email OTP verification error:", error);
-        return throwError(() => new Error("Email OTP verification failed"));
-      })
-    );
-  }
+  const url = this.authServiceLoginUrl + "/verifyEmail";
+  const body: emailVerificationModel = {
+    email: email,
+    otp: otp
+  };
+
+  return this.http.post(url, body, { responseType: 'text' }).pipe(
+    tap(response => {
+      console.log("Backend response:", response); // will log "Email verified successfully"
+    }),
+    catchError(error => {
+      console.error("Email OTP verification error:", error);
+      return throwError(() => new Error("Email OTP verification failed"));
+    })
+  );
+}
+
   // send otp through phone
   sendOtpPhone(phone: string, name: string): Observable<string> {
     const url = `${this.authServiceLoginUrl}/phoneVerification/${phone}/${name}`;
