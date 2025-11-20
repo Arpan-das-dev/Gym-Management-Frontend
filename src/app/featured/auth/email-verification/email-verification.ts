@@ -21,6 +21,8 @@ resendCode(){
   this.sendOtpThroughEmailForUserVerification();
 }
 verifyCode(){
+  console.log(this.otp);
+  
   this.authservice.verifyEmailOtp(this.email || '', this.otp).subscribe(
     {
       next: (response) => {
