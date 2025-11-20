@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AdminService } from '../../core/services/admin-service';
 import { Authservice } from '../../core/services/authservice';
@@ -19,6 +19,8 @@ import { ManagePlans } from "./manage-plans/manage-plans";
 import { ManageProducts } from "./manage-products/manage-products";
 import { Transactions } from "./transactions/transactions";
 import { ManageCuponCode } from "./manage-cupon-code/manage-cupon-code";
+import { ActiveCountService } from '../../core/services/active-count-service';
+import { WebSocketService } from '../../core/services/web-socket-service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -26,7 +28,7 @@ import { ManageCuponCode } from "./manage-cupon-code/manage-cupon-code";
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css',
 })
-export class AdminDashboard implements OnInit {
+export class AdminDashboard implements OnInit,OnDestroy {
   icons = {
     member: faUser,
     trainer: faDumbbell,
@@ -52,7 +54,9 @@ export class AdminDashboard implements OnInit {
     private router: Router,
     private adminservice: AdminService,
     private authservice: Authservice,
-    private planService: PlanService
+    private planService: PlanService,
+    private activeCountService: ActiveCountService,
+    private webSocket: WebSocketService
   ) {}
 
   admin: userDetailModel = {
@@ -68,6 +72,9 @@ export class AdminDashboard implements OnInit {
     phoneVerified: false,
     isApproved: false,
   };
+  liveMemberCount = 0;
+  liveTrainerCount = 0;
+  liveAdminCount = 0;
   ngOnInit(): void {
     this.loadUserInfo();
     this.getTotalUsers();
@@ -75,6 +82,10 @@ export class AdminDashboard implements OnInit {
     this.getSubScriptionsDetails();
     this.loadAllRequests();
     this.loadAllMemberRequests();
+    this.loadAllUsersCount();
+  }
+  ngOnDestroy(): void {
+      this.webSocket.disconnect()
   }
   loadUserInfo() {
     const identifer = localStorage.getItem('identifer');
@@ -109,7 +120,7 @@ export class AdminDashboard implements OnInit {
     });
   }
   viewAllUsers() {
-    this.router.navigate(['']); // navigate to view all users page
+    this.router.navigate(['allMembers']); // navigate to view all users page
   }
 
   // total revenue section
@@ -117,6 +128,9 @@ export class AdminDashboard implements OnInit {
   revenueGrowth = 0;
   viewRevenueDetails() {
     this.router.navigate(['']); // navigate to view all revenue details page
+  }
+  managePlans() {
+    this.router.navigate(['managePlans']);
   }
   getRevenue() {
     this.planService.getMonthlyRevenue().subscribe({
@@ -363,5 +377,22 @@ export class AdminDashboard implements OnInit {
     setTimeout(() => {
       this.toasts = this.toasts.filter((t) => t.id !== id);
     }, 5000);
+  }
+
+  loadAllUsersCount(){
+      this.webSocket.connect("ws://localhost:8080/ws");
+
+  this.webSocket.subscribe("/topic/activeMembers", count => {
+    this.liveMemberCount = count;
+  });
+
+  // this.webSocket.subscribe("/topic/activeTrainers", count => {
+  //   this.liveTrainerCount = count;
+  // });
+
+  // this.webSocket.subscribe("/topic/activeAdmins", count => {
+  //   this.liveAdminCount = count;
+  // });
+
   }
 }
