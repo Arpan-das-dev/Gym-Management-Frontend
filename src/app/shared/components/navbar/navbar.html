@@ -1,9 +1,9 @@
 <header
-  class="sticky top-0 z-50 bg-gradient-to-r from-blue-500 via-yellow-300 to-gray-900 shadow-md border-b border-gray-200"
+  class="sticky top-0 z-50 bg-linear-to-r from-blue-500 via-yellow-300 to-gray-900 shadow-md border-b border-gray-200"
 >
   <nav class="flex items-center justify-between px-6 py-3 md:px-10 relative">
     <!-- ===== LOGO ===== -->
-    <div class="flex items-center justify-center flex-shrink-0">
+    <div class="flex items-center justify-center shrink-0">
       <img src="gymlogo.png" alt="Left Arm" class="h-8 w-8 sm:h-10 sm:w-10 object-contain -mr-1 " />
       <h2 class="text-xl sm:text-2xl font-bold text-white mx-1 leading-none">
         Fit<span class="text-orange-500">Studio</span>
@@ -138,7 +138,7 @@
       <a
         routerLink="/dashboard"
         class="hover:text-orange-500 transition-colors duration-300"
-        (click)="isMenuOpen = false"
+        (click)="hadleNavigation()"
         >Dashboard</a
       >
       <button

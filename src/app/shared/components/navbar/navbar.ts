@@ -25,6 +25,10 @@ export class Navbar implements OnInit {
   }
   ngOnInit(): void {
       this.isLoggedIn = this.authservice.isLoggedIn();
+      console.log("hello the out put is "+this.authservice.isLoggedIn());
       this.userRole = this.authservice.getUserRole();
+  }
+  hadleNavigation(){
+    this.router.navigate(['/dashboard']);
   }
 }
