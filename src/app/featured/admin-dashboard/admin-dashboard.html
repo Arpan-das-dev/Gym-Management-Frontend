@@ -48,21 +48,21 @@
                flex flex-col items-center justify-center transition-all duration-300">
         <fa-icon [icon]="icons.member" class="text-3xl mb-2"></fa-icon>
         <span class="font-semibold">Active Members</span>
-        <span class="text-lg font-bold">128</span>
+        <span class="text-lg font-bold"> {{ liveMemberCount }}</span>
       </div>
 
       <div class="bg-linear-to-r from-blue-500 to-blue-700 p-5 rounded-xl shadow-lg hover:scale-105 hover:shadow-blue-400/40
                flex flex-col items-center justify-center transition-all duration-300">
         <fa-icon [icon]="icons.trainer" class="text-3xl mb-2"></fa-icon>
         <span class="font-semibold">Active Trainers</span>
-        <span class="text-lg font-bold">12</span>
+        <span class="text-lg font-bold"> {{ liveTrainerCount }}</span>
       </div>
 
       <div class="bg-linear-to-r from-gray-900 to-gray-800 p-5 rounded-xl shadow-lg hover:scale-105 hover:shadow-gray-500/40
                flex flex-col items-center justify-center transition-all duration-300 text-yellow-300">
         <fa-icon [icon]="icons.admined" class="text-3xl mb-2"></fa-icon>
         <span class="font-semibold">Active Admins</span>
-        <span class="text-lg font-bold">3</span>
+        <span class="text-lg font-bold"> {{ liveAdminCount }}</span>
       </div>
     </div>
   </div>
@@ -73,7 +73,7 @@
     <div
       class="bg-[#1e1e1e] border border-orange-500 rounded-2xl p-6 shadow-md hover:shadow-orange-400/40 transition-all duration-300 flex flex-col justify-between text-white">
       <div>
-        <h3 class="font-semibold text-orange-400">Total Users</h3>
+        <h3 class="font-semibold text-orange-400">Total Active Members</h3>
         <p class="text-3xl font-bold mt-2">{{ totalUsers }}</p>
         <p [ngClass]="{'text-green-500':userChange>=0,'text-red-500':userChange<0}" class="text-sm mt-1"> {{sign}}
           {{userChange}} % from last month
@@ -82,7 +82,7 @@
       <button
         class="mt-4 bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 rounded-xl transition-colors duration-300"
         (click)="viewAllUsers()">
-        View All Users
+        View All Members
       </button>
     </div>
 
@@ -110,7 +110,8 @@
         <p class="text-green-400 text-sm mt-1">+{{ subscriptionGrowth }}% from last month</p>
       </div>
       <button
-        class="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 rounded-xl transition-colors duration-300">
+        class="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 rounded-xl transition-colors duration-300"
+        (click)="managePlans()">
         Manage Plans
       </button>
     </div>
@@ -382,6 +383,9 @@
     </div>
 
   </div>
+
+
+  
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-6 mt-10">
   <app-manage-plans/>
   <app-manage-products/>
