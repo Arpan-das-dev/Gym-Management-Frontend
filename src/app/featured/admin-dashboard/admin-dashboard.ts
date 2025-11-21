@@ -384,6 +384,8 @@ export class AdminDashboard implements OnInit,OnDestroy {
 
   this.webSocket.subscribe("/topic/activeMembers", count => {
     this.liveMemberCount = count;
+    console.log("count is"+ count);
+    
   });
 
   // this.webSocket.subscribe("/topic/activeTrainers", count => {
