@@ -9,6 +9,7 @@ import { CreatePlans } from './featured/plan/create-plans/create-plans';
 import { authGuard } from './core/guards/auth-guard';
 import { Component } from '@angular/core';
 import { BuyPlan } from './featured/plan/buy-plan/buy-plan';
+import { ViewAllMembers } from './featured/admin-dashboard/view-all-members/view-all-members';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -55,7 +56,7 @@ export const routes: Routes = [
     },
     {
         path: 'dashboard',
-        canActivate: [roleGuard,authGuard],
+        canActivate: [roleGuard, authGuard],
         data: { roles: ['ADMIN'] },
         loadComponent: () =>
             import('./featured/admin-dashboard/admin-dashboard').then(
@@ -63,7 +64,7 @@ export const routes: Routes = [
             ),
     },
     {
-        path:'allMembers', canActivate:[roleGuard,authGuard],
+        path: 'allMembers', canActivate: [roleGuard, authGuard],
         data: { roles: ['ADMIN'] },
         loadComponent: () =>
             import('./featured/admin-dashboard/view-all-members/view-all-members').then(
@@ -126,7 +127,7 @@ export const routes: Routes = [
     },
 
     {
-        path: 'recentTransactions', canActivate:[roleGuard, authGuard],
+        path: 'recentTransactions', canActivate: [roleGuard, authGuard],
         data: { roles: ['ADMIN'] },
         loadComponent: () =>
             import('./featured/plan/recent-transactions/recent-transactions').then(
