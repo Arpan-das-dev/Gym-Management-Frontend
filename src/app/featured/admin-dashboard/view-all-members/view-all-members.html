@@ -1,1 +1,168 @@
-<p>view-all-members works!</p>
+<app-navbar/>
+
+<!-- BACKGROUND (uses uploaded file) -->
+<div class="fixed inset-0 -z-10">
+  <img
+    src="allMembersBg.jpg"
+    alt="background"
+    class="w-full h-full object-cover brightness-90"
+  />
+  <!-- subtle overlay so glass cards pop -->
+  <div class="absolute inset-0 bg-black/20 pointer-events-none"></div>
+</div>
+
+<section class="page-container py-10">
+  <!-- GLOBAL LOADER -->
+  @if (loading) {
+    <div class="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+      <div class="text-center animate-pulse">
+        <fa-icon [icon]="icons.cogs" class="text-5xl mb-2"></fa-icon>
+        <p class="text-base font-semibold">Processing...</p>
+      </div>
+    </div>
+  }
+
+  <!-- TOAST -->
+  @if (showMessage) {
+    <div
+      class="toast"
+      [ngClass]="{
+        'toast-success': messageType === 'success',
+        'toast-error': messageType === 'error'
+      }"
+    >
+      <fa-icon [icon]="messageType === 'success' ? icons.checkCircle : icons.exclamationCircle"></fa-icon>
+      <span class="ml-2">{{ messageText }}</span>
+    </div>
+  }
+
+  <!-- FILTERS -->
+  <div class="filters glass-input p-4 rounded-2xl mb-6 flex flex-wrap gap-3 items-center">
+    <input
+      type="text"
+      class="flex-1 min-w-[200px] px-4 py-2 rounded-lg border"
+      placeholder="Search by User Name, User Id, Plan Name..."
+      [(ngModel)]="searchText"
+    />
+
+    <!-- here i am removing (input)="onSearch()" to avoid backend over load 
+     because my deployment environment may have limited resources(as it is free tier) -->
+     <!-- if some one using strong backend machine(deployment server) or local or dev case
+      freely use (input)="onSearch()" -->
+
+    <button class="px-3 py-2 rounded-lg .glass-button border " (click)="onSearch()"> <fa-icon [icon]="icons.search"/> Search</button>
+    <select class="px-3 py-2 rounded-lg" [(ngModel)]="gender" (change)="applyFilters()">
+      <option value="">All Genders</option>
+      <option value="MALE">Male</option>
+      <option value="FEMALE">Female</option>
+      <option value="OTHER">Other</option>
+    </select>
+
+    <select class="px-3 py-2 rounded-lg" [(ngModel)]="status" (change)="applyFilters()">
+      <option value="">All Status</option>
+      <option value="ACTIVE">UnFrozen</option>
+      <option value="FROZEN">Frozen</option>
+      <option value= "expired">Plan Expired</option>
+    </select>
+
+    <select class="px-3 py-2 rounded-lg" [(ngModel)]="sortOption" (change)="applyFilters()">
+      <option value="planExpiration">Plan Expiration</option>
+      <option value="durationleft">Plan Duration Left</option>
+      <option value="date">Last Login</option>
+    </select>
+
+    <div class="sort-arrows ml-2 flex items-center gap-1">
+      <fa-icon
+        [icon]="icons.arrowUp"
+        class="cursor-pointer"
+        [ngClass]="sortDirection === 'asc' ? 'arrow-active' : 'arrow-inactive'"
+        (click)="sortDirection='asc'; applyFilters()"
+      ></fa-icon>
+
+      <fa-icon
+        [icon]="icons.arrowDown"
+        class="cursor-pointer"
+        [ngClass]="sortDirection === 'desc' ? 'arrow-active' : 'arrow-inactive'"
+        (click)="sortDirection='desc'; applyFilters()"
+      ></fa-icon>
+    </div>
+  </div>
+
+  <!-- MAIN CARDS GRID (centered container, responsive columns) -->
+  <main class="cards-wrapper">
+    <div class="">
+      @for (m of members; track m.id) {
+        <article class="glass-card group">
+          <div class="card-top flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <span class="status-dot" [ngClass]="m.isActive ? 'status-dot status-dot-online' : 'status-dot status-dot-offline'"></span>
+
+              <img [src]="m.profileImageUrl" alt="avatar" class="avatar"/>
+
+              <div>
+                <h3 class="name">{{ m.firstName }} {{ m.lastName }}</h3>
+                <p class="sub text-sm text-slate-200/70">Plan: {{ m.planName }}</p>
+                <p class="sub text-xs text-slate-200/60">Exp: {{ m.planExpiration | date:'dd MMM yyyy' }}</p>
+              </div>
+            </div>
+
+            <div class="relative">
+              <button class="action-btn" (click)="toggleDropdown(m.id)">
+                <fa-icon [icon]="icons.menu"></fa-icon>
+              </button>
+
+              @if (dropdownOpen === m.id) {
+                <div class="dropdown">
+                  <button (click)="toggleViewDetails(m.id)"><fa-icon [icon]="icons.eye"></fa-icon> View</button>
+                  <button (click)="toggleFreeze(m)"><fa-icon [icon]="m.frozen ? icons.lockOpen : icons.lock"></fa-icon> {{ m.frozen ? 'Unfreeze' : 'Freeze' }}</button>
+                  <button (click)="openMailPopup(m)"><fa-icon [icon]="icons.mail"></fa-icon> Mail</button>
+                  <button class="danger" (click)="deleteMember(m.id)"><fa-icon [icon]="icons.trash"></fa-icon> Delete</button>
+                </div>
+              }
+            </div>
+          </div>
+
+          @if (expandedMember === m.id) {
+            <div class="card-body">
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div><span class="label">Email:</span> {{ m.email }}</div>
+                <div><span class="label">Phone:</span> {{ m.phone }}</div>
+                <div><span class="label">Gender:</span> {{ m.gender }}</div>
+                <div><span class="label">Duration Left:</span> {{ m.planDurationLeft }} days</div>
+                <div><span class="label">User ID:</span> {{ m.id }}</div>
+                <div><span class="label">Plan ID:</span> {{ m.planId }}</div>
+              </div>
+            </div>
+          }
+        </article>
+      }
+    </div>
+
+    <!-- pagination (centered) -->
+    <div class="pagination mt-8">
+      <button class="glass-button" [disabled]="pageNo === 0" (click)="prev()">← Previous</button>
+      <span class="page-indicator">Page {{ pageNo + 1 }} of {{ totalPages }}</span>
+      <button class="glass-button" [disabled]="isLastPage " (click)="next()">Next →</button>
+    </div>
+  </main>
+
+  <!-- MAIL POPUP (unchanged) -->
+  @if (mailPopupOpen) {
+    <div class="modal-backdrop">
+      <div class="modal glass-input">
+        <h2 class="text-lg font-semibold">Send Mail</h2>
+        <p class="text-sm opacity-70">To: {{ selectedMember.firstName }} {{ selectedMember.lastName }} — {{ selectedMember.email }}</p>
+
+        <input type="text" class="w-full px-3 py-2 rounded-lg" placeholder="Subject" [(ngModel)]="mailSubject" />
+        <textarea class="w-full px-3 py-2 rounded-lg h-28" placeholder="Message" [(ngModel)]="mailMessage"></textarea>
+
+        <div class="flex justify-end gap-3 mt-3">
+          <button class="glass-button-secondary" (click)="closeMailPopup()">Cancel</button>
+          <button class="glass-button" (click)="sendMail()">Send</button>
+        </div>
+      </div>
+    </div>
+  }
+</section>
+
+<app-footer/>
