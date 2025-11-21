@@ -20,7 +20,7 @@ export class ActiveCountService {
   }
 
   memberGetActiveCount(): Observable<number> {
-    return this.httpClient.get<number>(`${this.memberCountUrl}/active-count`);
+    return this.httpClient.get<number>(`${this.memberCountUrl}/all/active-count`);
   }
 
   // Trainer APIs
