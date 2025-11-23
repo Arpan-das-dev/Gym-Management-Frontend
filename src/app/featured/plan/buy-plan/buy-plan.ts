@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { Navbar } from '../../../shared/components/navbar/navbar';
 import { Footer } from '../../../shared/components/footer/footer';
 import { FormsModule } from '@angular/forms';
@@ -9,15 +9,41 @@ import {
   PlanPaymentRequestDto,
   plansResponseModel,
 } from '../../../core/Models/planModel';
-import { CuponValidationResponse } from '../../../core/Models/cuponCodeModels';
+import { CuponCodeResponseDto, CuponValidationResponse } from '../../../core/Models/cuponCodeModels';
+import { CommonModule, DatePipe } from '@angular/common';
+import { genericResponseMessage } from '../../../core/Models/genericResponseModels';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faCheckCircle, faCircle, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { erroResponseModel } from '../../../core/Models/errorResponseModel';
 
 @Component({
   selector: 'app-buy-plan',
-  imports: [Navbar, Footer, FormsModule],
+  imports: [Navbar, Footer, FormsModule, CommonModule, FontAwesomeModule],
   templateUrl: './buy-plan.html',
   styleUrl: './buy-plan.css',
+  providers: [DatePipe]
 })
-export class BuyPlan {
+export class BuyPlan implements OnInit {
+  // global ui state
+  loading = false;
+  showMessage = false;
+  messageText = '';
+  messageType: 'success' | 'error' = 'success';
+  // gloabal method to show full screen message with loading screen
+  showFullScreenMessage(type: 'success' | 'error', text: string) {
+    this.messageType = type;
+    this.messageText = text;
+    this.showMessage = true;
+    setTimeout(() => {
+      this.showMessage = false;
+    }, 3000);
+  }
+
+  icons = {
+    cogs: faCircle,
+    checkCircle: faCheckCircle,
+    exclamationCircle: faExclamationCircle,
+  }
   plan!: plansResponseModel | null;
   cuponCode: string = '';
   offerDiscount: number = 0;
@@ -34,7 +60,8 @@ export class BuyPlan {
   constructor(
     private planService: PlanService,
     private authService: Authservice,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone
   ) {
     // ✅ Load user details from auth service
     this.userId = this.authService.getUserId();
@@ -50,6 +77,28 @@ export class BuyPlan {
     }
   }
 
+  ngOnInit(): void {
+    this.loadAllCupons()
+  }
+  // load all cupons for validation
+  cuponList: CuponCodeResponseDto[] = [];
+  loadAllCupons() {
+    // This method would ideally call a service to fetch all coupons
+    this.loading = true;
+    this.planService.getAllPublicCupons().subscribe({
+      next: (res: {responseDtoList: CuponCodeResponseDto[]}) => {
+        // console.log("here goes the cupon codes ");
+        // console.log(res.responseDtoList);
+        this.cuponList = res.responseDtoList;
+        // console.log(this.cuponList);
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+      }
+    })
+  }
+
   // ✅ Validate coupon code and calculate discount
   cuponCodeCheck() {
     this.successMessage = '';
@@ -59,6 +108,7 @@ export class BuyPlan {
       this.errorMessage = 'Please enter a coupon code.';
       return;
     }
+    
 
     this.planService.getDiscount(this.cuponCode).subscribe({
       next: (res: CuponValidationResponse) => {
@@ -81,6 +131,12 @@ export class BuyPlan {
     });
   }
 
+  applyCoupon(code: string) {
+  this.cuponCode = code;
+  this.cuponCodeCheck();
+}
+
+
   // ✅ Initiate plan purchase (create Razorpay order)
   buy() {
     if (!this.plan) return;
@@ -93,9 +149,9 @@ export class BuyPlan {
       currency: 'INR',
       amount: this.plan.price - this.offerDiscount,
       cuponCode: this.cuponCode.trim(),
-      paymentDate: new Date().toISOString().slice(0, 19),
+      paymentDate: this.getLocalHighPrecisionTimestamp(),
     };
-
+    console.log(data.paymentDate);
     // Call backend to create Razorpay order
     this.planService.buyPlan(data).subscribe({
       next: (res) => {
@@ -133,7 +189,12 @@ export class BuyPlan {
       description: this.plan?.planName,
       image: 'assets/logo.png',
       order_id: orderId,
-      handler: (response: any) => this.handlePaymentSuccess(response),
+      handler: (response: any) => {
+        this.ngZone.run(() =>{
+          this.handlePaymentSuccess(response)
+        })
+        
+      } ,
       prefill: {
         name: this.userName,
         email: this.userMail,
@@ -167,6 +228,7 @@ export class BuyPlan {
 
   // ✅ Called when Razorpay returns successful payment response
   private handlePaymentSuccess(response: any) {
+    this.loading = true;
     const confirmData = {
       orderId: response.razorpay_order_id,
       paymentId: response.razorpay_payment_id,
@@ -174,32 +236,51 @@ export class BuyPlan {
       userMail: this.userMail,
     };
 
+
     // Confirm the payment with backend
-    this.planService.confirmPayment(confirmData).subscribe({
-      next: () => {
-        this.showPopup(
-          'Payment Successful ✅',
-          'Your payment was successful! Redirecting to home...'
-        );
-        setTimeout(() => this.router.navigate(['/home']), 2500);
-      },
-      error: () => {
-        this.showPopup(
-          'Payment Success ⚠️',
-          'Payment succeeded, but receipt generation failed.'
-        );
-      },
-    });
+    this.ngZone.run(()=> {
+      this.planService.confirmPayment(confirmData).subscribe({
+        next: (res: genericResponseMessage) => {
+          console.log(res.message);
+          this.showPopup("success", res.message || 'Payment Successful ✅ Your plan has been activated.');
+          setTimeout(()=>{
+            this.showFullScreenMessage("success",res.message ||'Payment Successful ✅ Your plan has been activated.')
+          },3000)
+          this.router.navigate(['/plans']);
+        },
+        error: (err: erroResponseModel) => {
+          this.showPopup('error', err.message || 'Payment confirmation failed. Please contact support.');
+        },
+      });
+    })
+    
   }
 
   // ✅ Popup UI feedback helpers
   showPopup(title: string, message: string) {
+  this.ngZone.run(() => {
     this.popupTitle = title;
     this.popupMessage = message;
-  }
+    this.loading = false; // stop loader
+  });
+}
 
   closePopup() {
     this.popupMessage = '';
     this.popupTitle = '';
+  }
+
+  getLocalHighPrecisionTimestamp(): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const millis = String(now.getMilliseconds()).padStart(3, '0');
+
+    // Example: "2025-11-22T03:04:15.567"
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${millis}`;
   }
 }

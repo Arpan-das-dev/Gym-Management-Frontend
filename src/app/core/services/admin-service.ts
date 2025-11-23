@@ -35,11 +35,11 @@ export class AdminService {
       .set('id', id).set('role', role).set('email', email);
     return this.httpClient.post<any>(url, null, { params: params });
   }
-  deleteUser(id: string, role: string): Observable<string> {
+  deleteUser(id: string, role: string): Observable<any> {
     const url = `${this.userManageMentUrl}/delete`;
     const params = new HttpParams()
       .set('identifier', id).set('role', role);
-    return this.httpClient.delete<string>(url, { params: params });
+    return this.httpClient.delete<any>(url, { params: params });
   }
 
   // managing plans via admin service
