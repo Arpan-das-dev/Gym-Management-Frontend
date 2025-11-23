@@ -3,7 +3,7 @@ import { AdminService } from '../../../core/services/admin-service';
 import { CommonModule, DatePipe, NgClass, NgStyle } from '@angular/common';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowDown, faArrowUp, faBars, faCheckCircle,faCogs,faEnvelope,faExclamationCircle,faEye,faLock,faLockOpen,faPhone,faSearch,faSnowflake,faSyncAlt,faTrash,} from '@fortawesome/free-solid-svg-icons';
+import { faArrowDown, faArrowUp, faBars, faCheckCircle,faCogs,faEnvelope,faExclamationCircle,faEye,faFilter,faLock,faLockOpen,faPhone,faSearch,faSnowflake,faSyncAlt,faTrash,} from '@fortawesome/free-solid-svg-icons';
 import { MemberService } from '../../../core/services/member-service';
 import { Subscription } from 'rxjs';
 import { AllMemberListResponseDto, AllMembersInfoWrapperResponseDtoList } from '../../../core/Models/MemberServiceModels';
@@ -12,6 +12,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { erroResponseModel } from '../../../core/Models/errorResponseModel';
 import { Navbar } from "../../../shared/components/navbar/navbar";
 import { Footer } from "../../../shared/components/footer/footer";
+import { MailService } from '../../../core/mail-service';
 
 @Component({
   selector: 'app-view-all-members',
@@ -45,7 +46,7 @@ sortDirection: 'asc' | 'desc' = 'desc';
     }, 3000);
   }
   private subs = new Subscription();
-  constructor(private admin: AdminService, private member : MemberService) {}
+  constructor(private admin: AdminService, private member : MemberService, private mailService: MailService) {}
   // icons object for fontawesome icons
   icons = {
     cogs: faCogs,
@@ -63,7 +64,8 @@ sortDirection: 'asc' | 'desc' = 'desc';
     mail : faEnvelope,
     arrowUp: faArrowUp,
     arrowDown: faArrowDown,
-    search : faSearch
+    search : faSearch,
+    filter: faFilter
   };
   // paging and data
   pageNo = 0;
@@ -168,8 +170,8 @@ closeMailPopup() {
   reload() {
     this.pageNo = 0;
   }
-
-  deleteMember(memberId:string){
+ deleteMessage: string = 'u are get out'
+  deleteMember(memberId:string, mail:string){
     this.loading = true;
     this.member.deleteMember(memberId).subscribe({
       next:(res:genericResponseMessage) => {
@@ -185,6 +187,29 @@ closeMailPopup() {
         this.showFullScreenMessage('error', errorMessage);
       }
     })
+    this.loading = true;
+    this.admin.deleteUser(memberId,'MEMBER').subscribe({
+          next:(res:genericResponseMessage) => {
+            this.loading = false;
+            console.log("✔️ res from auth service through admin service is"+ res.message);
+            this.showFullScreenMessage('success',res.message || "User deleted from Data base");
+            setTimeout(()=>{},2000)
+            this.mailService.sendMail(mail,"Account Deleted By Admin",this.deleteMessage).subscribe({
+              next:(res:genericResponseMessage) => {
+                console.log("✔️ message from notification 🔔"+ res);            
+              },error:(err:erroResponseModel) => {
+                  console.log("❌ message from notification 🔔"+ err.message);
+              },
+            })           
+          },
+          error:(err: erroResponseModel) => {
+            this.loading = true;
+            console.log("res from auth service through admin service is"+ err.message);
+            this.loading = false
+            this.showFullScreenMessage('error',err.message || "Failed to  deleted User from Data base");
+          }
+        });
+    
   }
 
   applyFilters() {
@@ -201,6 +226,23 @@ onSearch() {
       this.showFullScreenMessage('error', 'Subject and message cannot be empty.');
       return;
     }
+    this.loading = true;
+    this.mailService.sendMail(this.selectedMember.email, this.mailSubject.trim(), this.mailMessage.trim()).subscribe({
+      next:(res:genericResponseMessage) =>{
+        console.log(res);
+        this.loading = false;
+        const message = res.message ? res.message : 'Mail sent successfully.';
+        this.showFullScreenMessage('success', message);
+        this.closeMailPopup();
+      },
+      error:(err: HttpErrorResponse & { error: erroResponseModel }) => {
+        console.error('Error sending mail:', err);
+        this.loading = false;
+        const errorMessage = err.error && err.error.message ? err.error.message : 'Failed to send mail.';
+        this.showFullScreenMessage('error', errorMessage);
+      }
+    })
+
     }
     toggleFreeze(m: AllMemberListResponseDto){
       this.loading = true;
@@ -228,5 +270,14 @@ onSearch() {
       this.applyFilters();
     }
 
-    
+    resetFilter(){
+      this.searchText = '';
+      this.searchType = '';
+      this.gender = '';
+      this.status = '';
+      this.sortOption = 'planExpiration';
+      this.sortDirection = 'desc';
+      this.pageNo = 0;
+      this.loadAllMembers();
+    }
 }

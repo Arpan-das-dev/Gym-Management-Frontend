@@ -68,10 +68,17 @@
 }
 
 /* small avatar + status dot */
+.avatar-wrapper {
+  position: relative; /* All children will be positioned relative to this */
+}
 .avatar { width: 56px; height: 56px; border-radius: 9999px; object-fit: cover; border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 4px 12px rgba(2,6,23,0.25); }
-.status-dot { width: 10px; height: 10px; border-radius: 9999px; display:inline-block; margin-right:4px; }
-.status-dot.online { background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,0.28); }
-.status-dot.offline { background: #9ca3af; }
+.status-dot {
+   width: 10px; height: 10px; border-radius: 9999px; display:inline-block; margin-right:4px; }
+.status-dot.online {
+   background: blue;
+    box-shadow: 0 0 6px rgba(16,185,129,0.28); }
+.status-dot.offline {
+   background: red; }
 
 /* action dropdown */
 .action-btn { background: transparent; border: 1px solid rgba(255,255,255,0.04); padding: .45rem; border-radius: 10px; color: #fff; }

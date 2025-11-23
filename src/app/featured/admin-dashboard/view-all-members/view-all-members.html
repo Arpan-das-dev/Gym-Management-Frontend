@@ -50,7 +50,8 @@
      <!-- if some one using strong backend machine(deployment server) or local or dev case
       freely use (input)="onSearch()" -->
 
-    <button class="px-3 py-2 rounded-lg .glass-button border " (click)="onSearch()"> <fa-icon [icon]="icons.search"/> Search</button>
+    <button class="glass-button px-3 py-2 rounded-lg flex items-center gap-1" (click)="onSearch()">
+       <fa-icon [icon]="icons.search"/> Search</button>
     <select class="px-3 py-2 rounded-lg" [(ngModel)]="gender" (change)="applyFilters()">
       <option value="">All Genders</option>
       <option value="MALE">Male</option>
@@ -70,7 +71,7 @@
       <option value="durationleft">Plan Duration Left</option>
       <option value="date">Last Login</option>
     </select>
-
+    <button (click)="resetFilter()" class="glass-button px-3 py-2 rounded-lg flex items-center gap-1" > Reset filters <fa-icon [icon]="icons.filter" class="text-gray-300" /> </button>
     <div class="sort-arrows ml-2 flex items-center gap-1">
       <fa-icon
         [icon]="icons.arrowUp"
@@ -95,10 +96,11 @@
         <article class="glass-card group">
           <div class="card-top flex items-center justify-between">
             <div class="flex items-center gap-4">
-              <span class="status-dot" [ngClass]="m.isActive ? 'status-dot status-dot-online' : 'status-dot status-dot-offline'"></span>
-
-              <img [src]="m.profileImageUrl" alt="avatar" class="avatar"/>
-
+              <div class="avatar-wrapper"> 
+            <span class="status-dot"
+             [ngClass]="m.active ? 'bg-blue-500' : 'bg-orange-500'"></span>
+            <img [src]="m.profileImageUrl" alt="avatar" class="avatar"/>
+        </div>
               <div>
                 <h3 class="name">{{ m.firstName }} {{ m.lastName }}</h3>
                 <p class="sub text-sm text-slate-200/70">Plan: {{ m.planName }}</p>
@@ -116,7 +118,7 @@
                   <button (click)="toggleViewDetails(m.id)"><fa-icon [icon]="icons.eye"></fa-icon> View</button>
                   <button (click)="toggleFreeze(m)"><fa-icon [icon]="m.frozen ? icons.lockOpen : icons.lock"></fa-icon> {{ m.frozen ? 'Unfreeze' : 'Freeze' }}</button>
                   <button (click)="openMailPopup(m)"><fa-icon [icon]="icons.mail"></fa-icon> Mail</button>
-                  <button class="danger" (click)="deleteMember(m.id)"><fa-icon [icon]="icons.trash"></fa-icon> Delete</button>
+                  <button class="danger" (click)="deleteMember(m.id,m.email)"><fa-icon [icon]="icons.trash"></fa-icon> Delete</button>
                 </div>
               }
             </div>
@@ -148,10 +150,10 @@
 
   <!-- MAIL POPUP (unchanged) -->
   @if (mailPopupOpen) {
-    <div class="modal-backdrop">
-      <div class="modal glass-input">
-        <h2 class="text-lg font-semibold">Send Mail</h2>
-        <p class="text-sm opacity-70">To: {{ selectedMember.firstName }} {{ selectedMember.lastName }} — {{ selectedMember.email }}</p>
+    <div class="modal-backdrop ">
+      <div class="modal glass-input ">
+        <h2 class="text-lg font-semibold text-white">Send Mail</h2>
+        <p class="text-sm ">To: {{ selectedMember.firstName }} {{ selectedMember.lastName }} — {{ selectedMember.email }}</p>
 
         <input type="text" class="w-full px-3 py-2 rounded-lg" placeholder="Subject" [(ngModel)]="mailSubject" />
         <textarea class="w-full px-3 py-2 rounded-lg h-28" placeholder="Message" [(ngModel)]="mailMessage"></textarea>
