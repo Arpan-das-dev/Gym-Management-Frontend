@@ -23,9 +23,7 @@ export class PlanService {
     return this.httpClient.get<{ responseDtoList: plansResponseModel[] }>(url);
   }
 
-
   //2. update plans
-
 
   getDiscount(cuponCode: string): Observable<CuponValidationResponse> {
     const url = `${this.planService_Base_Url_cuponCodeManagement}/all/validateCuponCode`;
@@ -76,4 +74,11 @@ export class PlanService {
     const params = { pageSize, pageNo }
     return this.httpClient.get(url, { params })
   }
+
+  // get all public cupons
+  getAllPublicCupons(): Observable<any> {
+    const url = `${this.planService_Base_Url_cuponCodeManagement}/all/getAll`;
+    return this.httpClient.get<any>(url);
+  }
+  
 }
