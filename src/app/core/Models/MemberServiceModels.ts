@@ -16,7 +16,7 @@ export interface AllMemberListResponseDto {
   planName: string;
   planId?: string;
   profileImageUrl: string 
-  isActive: boolean;
+  active: boolean;
 }
 
 export interface AllMembersInfoWrapperResponseDtoList {
