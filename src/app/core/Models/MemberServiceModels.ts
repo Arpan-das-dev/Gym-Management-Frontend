@@ -28,6 +28,21 @@ export interface AllMembersInfoWrapperResponseDtoList {
   lastPage: boolean;
 }
 export interface LoginStreakResponseDto {
-    loginStreak: number;
-    maxLoginStreak: number;
+    logInStreak: number;
+    maxLogInStreak: number;
+}
+export interface MemberInfoResponseDto {
+  memberId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  gender: string;
+  frozen: boolean;
+}
+export interface MemberPlanInfoResponseDto {
+    planExpiration: string;
+    planId: string;
+    planName: string;
+    planDurationLeft: number;
 }
