@@ -1,60 +1,112 @@
+<!-- GLOBAL LOADER -->
+@if (loading) {
+  <div class="fixed inset-0 flex items-center justify-center bg-black/50 z-1000">
+    <div class="text-center animate-pulse">
+      <fa-icon [icon]="icons.cogs" class="text-5xl text-white mb-2"></fa-icon>
+      <p class="text-base font-semibold text-white">Processing...</p>
+    </div>
+  </div>
+}
+
+<!-- TOAST MESSAGE -->
+@if (showMessage) {
+  <div
+    class="fixed top-4 right-4 flex items-center px-4 py-3 rounded-xl shadow-lg text-white z-2000 transition-all"
+    [ngClass]="{
+      'bg-green-600': messageType === 'success',
+      'bg-red-600': messageType === 'error'
+    }"
+  >
+    <fa-icon
+      [icon]="messageType === 'success' ? icons.checkCircle : icons.exclamationCircle"
+    ></fa-icon>
+    <span class="ml-2 font-medium">{{ messageText }}</span>
+  </div>
+}
+
+<!-- MAIN WRAPPER -->
 <div
   class="flex flex-col items-center justify-center min-h-screen bg-gray-900 bg-cover bg-center p-6"
-  style="background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dGhlJTIwZ3ltfGVufDB8fDB8fHww&fm=jpg&q=60&w=3000');"
+  style="
+    background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&q=60&w=3000');
+  "
 >
-  <!-- Card -->
+  <!-- CARD -->
   <div
     class="bg-white/95 backdrop-blur-md shadow-2xl rounded-2xl w-full max-w-md p-8 transform transition duration-300 hover:scale-[1.02]"
   >
-    <!-- Logo -->
+    <!-- LOGO -->
     <div class="flex justify-center items-center mb-6">
-      <img src="assets/images/logo.svg" alt="FitStudio Logo" class="h-8 w-8 mr-2" />
+      <img
+        src="mainLogo.png"
+        class="h-10 w-10 mr-3 rounded-xl object-contain shadow-md"
+      />
       <h2 class="text-3xl font-extrabold text-gray-900">
         Fit<span class="text-orange-500">Studio</span>
       </h2>
     </div>
 
-    <!-- Greeting -->
+    <!-- GREETING -->
     <div class="text-center mb-6">
       <p class="text-lg text-gray-800 font-medium">
-        Hi, <span class="font-semibold text-orange-600">{{userName}}</span> 👋
+        Hi, <span class="font-semibold text-orange-600">{{ userName }}</span> 👋
       </p>
+
       <p class="text-gray-700 mt-1">
-        Thank you for choosing <strong>FitStudio</strong> for your fitness journey!
+        Your verification code has been sent to:
       </p>
-      <p class="text-gray-600 mt-2">
-        A verification code has been sent to your phone:
-        <strong>{{ phone }}</strong>
-      </p>
-      <p class="text-gray-600 mt-1">Please enter it below to continue.</p>
+
+      <p class="text-orange-600 font-semibold text-lg">{{ phone }}</p>
+
+      @if (!phonePresent || !phone) {
+        <div class="mt-4">
+          <p class="text-red-600 font-medium">
+            Unable to send OTP. Please enter your phone:
+          </p>
+
+          <input
+            type="text"
+            [(ngModel)]="phone"
+            class="w-full mt-2 border rounded-lg p-2 text-center"
+            placeholder="Enter phone number"
+          />
+
+          <button
+            type="button"
+            class="mt-3 w-full py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+            (click)="sendOtpThroughPhoneForUserVerification()"
+          >
+            Send OTP
+          </button>
+        </div>
+      }
+
+      <p class="text-gray-600 mt-3">Enter 6-digit code below to continue.</p>
     </div>
 
-    <!-- OTP Input -->
+    <!-- OTP INPUT FORM -->
     <form (ngSubmit)="verifyCode()" class="flex flex-col items-center space-y-4">
-      <label
-        for="otp"
-        class="font-semibold text-gray-700 text-sm uppercase tracking-wide"
-        >Enter 6-digit code</label
-      >
+      <label class="font-semibold text-gray-700 text-sm uppercase tracking-wide">
+        Enter OTP
+      </label>
+
       <input
-      [(ngModel)] ="otp"
-        type="text"
-        id="otp"
+        [(ngModel)]="otp"
+        name="otp"
         maxlength="6"
+        class="border-2 border-orange-500 rounded-xl p-3 text-xl text-blue-600 font-bold text-center tracking-widest w-48 focus:ring-2 focus:ring-orange-500 transition"
         placeholder="••••••"
-        class="border-2 border-orange-500 rounded-xl p-3 text-xl text-blue-600 font-bold text-center tracking-widest w-48 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
       />
 
-      <!-- Submit Button -->
       <button
         type="submit"
-        class="w-full py-3 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 shadow-md transition duration-200"
+        class="w-full py-3 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 shadow-md transition"
       >
         Verify Code
       </button>
     </form>
 
-    <!-- Resend Section -->
+    <!-- RESEND -->
     <div class="text-center mt-6">
       <p class="text-gray-600 text-sm">
         Didn’t receive the code?
