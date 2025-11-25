@@ -45,9 +45,9 @@ export class Signup implements OnInit {
       this.authservice.signup(data).pipe(first()).subscribe({
         next: (response) => {
           console.log('Signup successful', response);
-          localStorage.setItem('emailForVerification', data.email);
-          localStorage.setItem('phoneForVerification', data.phone);
-          localStorage.setItem('userName', data.firstName + ' ' + data.lastName);
+          sessionStorage.setItem('emailForVerification', data.email);
+          sessionStorage.setItem('phoneForVerification', data.phone);
+          sessionStorage.setItem('userName', data.firstName + ' ' + data.lastName);
           this.router.navigate(['/verify-email']);
         },
         error: (error) => {
