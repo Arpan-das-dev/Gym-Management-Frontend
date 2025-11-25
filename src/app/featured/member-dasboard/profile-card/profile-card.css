@@ -1,0 +1,12 @@
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.animate-fire {
+  animation: flicker 1.5s infinite;
+}
+.fire-icon-wrapper {
+  display: inline-block;
+  /* Add glowing effect */
+  filter: drop-shadow(0 0 6px rgba(255,140,0,0.8));
+}
