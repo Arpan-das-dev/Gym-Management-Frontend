@@ -10,6 +10,8 @@ import { jwtPayload } from '../Models/jwtModel';
 import { CookieService } from 'ngx-cookie-service';
 import { WebSocketService } from './web-socket-service';
 import { ActiveCountService } from './active-count-service';
+import { MemberService } from './member-service';
+import { LoginStreakResponseDto } from '../Models/MemberServiceModels';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +19,8 @@ import { ActiveCountService } from './active-count-service';
 export class Authservice {
   authServiceLoginUrl = "http://localhost:8080/fitStudio/auth"
   constructor(private http: HttpClient,
-    private router: Router, private cookies: CookieService,  private activeCount: ActiveCountService
+    private router: Router, private cookies: CookieService,  private activeCount: ActiveCountService,
+    private memberSevice : MemberService
   ) { }
 
   login(data: loginModel): Observable<loginResponse> {
@@ -71,17 +74,14 @@ export class Authservice {
   isLoggedIn(): boolean {
   const token = this.getToken();
   const role = this.getUserRole();
+// console.log(token);
+// console.log("role is"+role);
+
 
   // If no token or token expired, user is not logged in
-  if (!token || this.isTokenExpired()) {
+  if (!token || this.isTokenExpired() || !role) {
     return false;
   }
-
-  // If role is missing, consider user not logged in
-  if (!role) {
-    return false;
-  }
-
   return true;
 }
 
@@ -145,41 +145,26 @@ export class Authservice {
   }
 
   // send otp  through email
-  sendOtpEmail(email: string, name: string): Observable<string> {
+  sendOtpEmail(email: string, name: string): Observable<any> {
     const url = `${this.authServiceLoginUrl}/emailVerification/${email}/${name}`;
-    return this.http.post<string>(url,null).pipe(
-      tap(response => {
-        console.log(response);
-      }), catchError(error => {
-        console.error("OTP email verification error:", error);
-        return throwError(() => new Error("OTP email verification failed"));
-      })
-    );
+    return this.http.post<any>(url,null)
   }
 
   // verify account through email otp
-  verifyEmailOtp(email: string, otp: string): Observable<string> {
+  verifyEmailOtp(email: string, otp: string): Observable<any> {
   const url = this.authServiceLoginUrl + "/verifyEmail";
   const body: emailVerificationModel = {
     email: email,
     otp: otp
   };
 
-  return this.http.post(url, body, { responseType: 'text' }).pipe(
-    tap(response => {
-      console.log("Backend response:", response); // will log "Email verified successfully"
-    }),
-    catchError(error => {
-      console.error("Email OTP verification error:", error);
-      return throwError(() => new Error("Email OTP verification failed"));
-    })
-  );
+  return this.http.post(url, body)
 }
 
   // send otp through phone
-  sendOtpPhone(phone: string, name: string): Observable<string> {
+  sendOtpPhone(phone: string, name: string): Observable<any> {
     const url = `${this.authServiceLoginUrl}/phoneVerification/${phone}/${name}`;
-    return this.http.get<string>(url).pipe(
+    return this.http.post(url,null).pipe(
       tap(response => {
         console.log(response);
       }), catchError(error => {
@@ -190,7 +175,7 @@ export class Authservice {
   }
 
   // verify account through phone otp
-  verifyPhoneOtp(phone: string, otp: string): Observable<string> {
+  verifyPhoneOtp(phone: string, otp: string): Observable<any> {
     const url = this.authServiceLoginUrl + "/verifyPhone";
     const body = {
       phone: phone,
@@ -264,24 +249,52 @@ export class Authservice {
       tap(user=>{
         this.cookies.set('userId',user.id,{path: '/', sameSite: 'Strict'})
         this.cookies.set('userMail',user.email,{path:'/',sameSite:'Strict'})
+        this.cookies.set('userPhone',user.phone,{path:'/',sameSite:'Strict'})
         this.cookies.set('userName',`${user.firstName} ${user.lastName}`,{path:'/', sameSite:'Strict'})
         this.cookies.set('role',user.role,{path:'/', sameSite:'Strict'})
+        sessionStorage.setItem('email-verified',user.emailVerified ? 'true': 'false');
+        sessionStorage.setItem('phone-verifed', user.phoneVerified ? 'true' : 'false')
+        if(user.role === 'MEMBER') {
+          this.memberSevice.setLoginStreak(user.id).subscribe({
+            next : (res: LoginStreakResponseDto) => {
+              console.log(`fetched login streak as \n currentLoginStreak:: ${res.logInStreak} \n maxLoginStreak:: ${res.maxLogInStreak}`);
+            },
+            error :(err) => {
+              console.log("error occured due to ::");
+              console.log(err);
+            }          
+          })
+        }
       })
     );
   }
 
-  getUserId(){
-    return this.cookies.get('userId')
+  getUserId() : string{
+    const id : string | null =  this.cookies.get('userId')
+    if(!id) {
+      this.router.navigate(['login'])
+    }
+    return id;
   }
 
   getUserMail(){
     return this.cookies.get('userMail')
   }
 
+  getUserPhone() {
+    return this.cookies.get('userPhone')
+  }
   getUserName(){
     return this.cookies.get('userName')
   }
   getRole(){
     return this.cookies.get('role')
+  }
+
+  isEmailVerified() : boolean {
+    return sessionStorage.getItem('email-verified') === 'true'
+  }
+  isPhoneVerifed() : boolean {
+    return sessionStorage.getItem('phone-verifed') === 'true'
   }
 }
