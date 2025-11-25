@@ -65,11 +65,9 @@
     <ul class="hidden md:flex items-center space-x-6 font-medium text-white">
       @if (isLoggedIn) {
       <li>
-        <a
-          routerLink="/dashboard"
-          class="hover:text-orange-500 transition-colors duration-300"
-          >Dashboard</a
-        >
+        <button type="button"  class="hover:text-orange-500 transition-colors duration-300"
+        (click)="handleNavigation()">Dashboard</button>
+        
       </li>
       <li>
         <button
@@ -138,8 +136,8 @@
       <a
         routerLink="/dashboard"
         class="hover:text-orange-500 transition-colors duration-300"
-        (click)="hadleNavigation()"
-        >Dashboard</a
+        (click)="handleNavigation()"
+        >CHodon</a
       >
       <button
         (click)="logout(); isMenuOpen = false"
@@ -147,13 +145,12 @@
       >
         Logout
       </button>
-      } @else {
-      <a
-        routerLink="/login"
-        class="hover:text-orange-500 transition-colors duration-300"
-        (click)="isMenuOpen = false"
-        >Login</a
-      >
+      } @else { 
+       <button  
+      type="button"
+        class="hover:text-orange-500 transition-colors duration-300" 
+        
+        (click)=" goToLogin();isMenuOpen = false ">Login</button>
       <a
         routerLink="/signup"
         class="bg-orange-500 text-white px-4 py-2 rounded-full hover:bg-orange-600 transition-colors duration-300"
