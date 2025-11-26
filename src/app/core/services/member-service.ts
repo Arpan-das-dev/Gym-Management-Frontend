@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { FreezeRequestDto } from '../Models/MemberServiceModels';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -155,4 +156,39 @@ export class MemberService {
     const url = `${this.planInfoUrl}?memberId=${memberId}`
     return this.http.get(url);
   }
+
+  // member fit service
+  // this is the member service's fit service base url 
+  // remaing endpoints will be added later
+  private memberFitUrl = environment.apiBaseUrl+environment.microServices.MEMBER_SERVICE.Fit;
+  // 1. logs bmi and weight entries
+
+  // 1/1 get all bmi entries
+  getAllWeightBmiEntriesByMemberId(memberId:string, pageNo : number, pageSize : number) : Observable<any> {
+    const url = `${this.memberFitUrl}/get/${pageNo}/WeightBmiEntries/${pageSize}?memberId=${memberId}`;
+    return this.http.get(url);
+  }
+
+  // 1/2 add new bmi entry 
+  addNewWeightBmiEntry ( memberId:string ,weight: number, bmi: number) : Observable<any> {
+    const url = `${this.memberFitUrl}/weight-bmi-entry?memberId=${memberId}`
+    const body = {
+      date: new Date().toISOString().split('T')[0],
+      weight : weight,
+      bmi: bmi
+    }    
+    return this.http.post(url,body)
+  }
+
+  // 1/3 delete  old bmi entry
+  deleteEntries(memberId: string, date: Date) : Observable<any> {
+    const url = `${this.memberFitUrl}/deleteWeightBmi`
+    const params = new HttpParams().set('memberId',memberId).set('date',date.toISOString().split('T')[0])
+       return this.http.delete(url, {params})
+  }
+
+  // 2 get all bmi and weight entries's summary dto
+  // getMatrixOfWeightBmi(memberId : string, pageNo: number, pageSize: number) :Observable<any> {
+
+  // }
 }
