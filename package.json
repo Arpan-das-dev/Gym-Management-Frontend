@@ -32,6 +32,7 @@
     "@fortawesome/free-solid-svg-icons": "^7.1.0",
     "@stomp/stompjs": "^7.2.1",
     "@tailwindcss/postcss": "^4.1.16",
+    "chart.js": "^4.5.1",
     "jwt-decode": "^4.0.0",
     "ngx-cookie-service": "^20.1.1",
     "postcss": "^8.5.6",
