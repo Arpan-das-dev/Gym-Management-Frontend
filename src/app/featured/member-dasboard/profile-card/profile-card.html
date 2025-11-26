@@ -161,69 +161,60 @@
             </p>
         </div>
 
-       <div class="w-full md:w-80 p-6 rounded-2xl bg-[#1e1e1e]/70 backdrop-blur-lg
+        <div class="w-full md:w-80 p-6 rounded-2xl bg-[#1e1e1e]/70 backdrop-blur-lg
      border border-gray-700 shadow-xl text-slate-200
      hover:shadow-teal-400/30 transition-all duration-300 mt-2">
 
-    <h3 class="text-xl font-semibold mb-4 text-slate-100">
-        Plan Details
-    </h3>
+            <h3 class="text-xl font-semibold mb-4 text-slate-100">
+                Plan Details
+            </h3>
 
-    <!-- Main Icon & Plan Name -->
-    <div class="flex items-center gap-4 mb-4"
-        [ngClass]="getPlanStatusStyling(planDetails.planDurationLeft).glow">
-        
-        <fa-icon 
-            [icon]="icons.clipboard"
-            [ngClass]="getPlanStatusStyling(planDetails.planDurationLeft).iconColor"
-            class="text-4xl">
-        </fa-icon>
+            <!-- Main Icon & Plan Name -->
+            <div class="flex items-center gap-4 mb-4"
+                [ngClass]="getPlanStatusStyling(planDetails.planDurationLeft).glow">
 
-        <div>
-            <p class="text-2xl font-extrabold 
+                <fa-icon [icon]="icons.clipboard"
+                    [ngClass]="getPlanStatusStyling(planDetails.planDurationLeft).iconColor" class="text-4xl">
+                </fa-icon>
+
+                <div>
+                    <p class="text-2xl font-extrabold 
                 bg-clip-text text-transparent leading-none"
-                [ngClass]="'bg-linear-to-r ' + getPlanStatusStyling(planDetails.planDurationLeft).gradient">
+                        [ngClass]="'bg-linear-to-r ' + getPlanStatusStyling(planDetails.planDurationLeft).gradient">
 
-                {{ planDetails.planName || 'No Active Plan' }}
-            </p>
-            <p class="text-slate-400 mt-1 text-sm">Current Membership</p>
+                        {{ planDetails.planName || 'No Active Plan' }}
+                    </p>
+                    <p class="text-slate-400 mt-1 text-sm">Current Membership</p>
+                </div>
+            </div>
+
+
+            <!-- Days Left -->
+            <div class="flex items-center gap-3 mt-3">
+                <fa-icon [icon]="icons.clock" [ngClass]="getPlanStatusStyling(planDetails.planDurationLeft).iconColor"
+                    class="text-lg">
+                </fa-icon>
+
+                <p class="text-sm" [ngClass]="getPlanStatusStyling(planDetails.planDurationLeft).color">
+
+                    <span class="font-semibold">Days Left:</span>
+                    {{ planDetails.planDurationLeft }} days
+                </p>
+            </div>
+
+            <!-- Expiration Date -->
+            <div class="flex items-center gap-3 mt-3">
+                <fa-icon [icon]="icons.calender"
+                    [ngClass]="getPlanStatusStyling(planDetails.planDurationLeft).iconColor" class="text-lg">
+                </fa-icon>
+
+                <p class="text-sm" [ngClass]="getPlanStatusStyling(planDetails.planDurationLeft).color" D>
+
+                    <span class="font-semibold">Expires:</span>
+                    {{ planDetails.planExpiration |date:'mediumDate' }}
+                </p>
+            </div>
         </div>
-    </div>
-
-    
-    <!-- Days Left -->
-    <div class="flex items-center gap-3 mt-3">
-        <fa-icon 
-            [icon]="icons.clock" 
-            [ngClass]="getPlanStatusStyling(planDetails.planDurationLeft).iconColor"
-            class="text-lg">
-        </fa-icon>
-
-        <p class="text-sm"
-           [ngClass]="getPlanStatusStyling(planDetails.planDurationLeft).color">
-
-            <span class="font-semibold">Days Left:</span>
-            {{ planDetails.planDurationLeft }} days
-        </p>
-    </div>
-
-    <!-- Expiration Date -->
-    <div class="flex items-center gap-3 mt-3">
-        <fa-icon 
-            [icon]="icons.calender" 
-            [ngClass]="getPlanStatusStyling(planDetails.planDurationLeft).iconColor"
-            class="text-lg">
-        </fa-icon>
-
-        <p class="text-sm"
-           [ngClass]="getPlanStatusStyling(planDetails.planDurationLeft).color"
-           D>
-
-            <span class="font-semibold">Expires:</span>
-            {{ planDetails.planExpiration |date:'mediumDate' }}
-        </p>
-    </div>
-</div>
 
     </div>
 </div>

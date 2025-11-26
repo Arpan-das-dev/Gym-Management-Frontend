@@ -38,10 +38,11 @@ import { WebSocketService } from '../../../core/services/web-socket-service';
 import { genericResponseMessage } from '../../../core/Models/genericResponseModels';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { FitDetails } from "../fit-details/fit-details";
 
 @Component({
   selector: 'app-profile-card',
-  imports: [NgStyle, FontAwesomeModule, NgClass, NgStyle,DatePipe],
+  imports: [NgStyle, FontAwesomeModule, NgClass, NgStyle, DatePipe, FitDetails],
   templateUrl: './profile-card.html',
   styleUrl: './profile-card.css',
 })
