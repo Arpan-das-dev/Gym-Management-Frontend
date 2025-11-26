@@ -1,5 +1,23 @@
 <app-navbar/>
-<div id="mainBox" class="flex justify-center">
-<app-profile-card/>
+<!-- BACKGROUND (uses uploaded file) -->
+<div class="fixed inset-0 -z-10">
+  <img
+    src="allMembersBg.jpg"
+    alt="background"
+    class="w-full h-full object-cover brightness-90"
+  />
+  <!-- subtle overlay so glass cards pop -->
+  <div class="absolute inset-0 bg-black/20 pointer-events-none"></div>
+</div>
+
+<div id="mainBox" class="grid mt-auto justify-center  background-image">
+
+    <app-profile-card/>
+    <br>
+    <div class="fitDetials  flex justify-between">
+        <app-fit-details/>
+    </div>
+    
+
 </div>
 
