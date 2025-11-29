@@ -1,25 +1,7 @@
-<!-- GLOBAL LOADER -->
-@if (loading) {
-<div class="fixed inset-0 flex items-center justify-center bg-black/50 z-1000">
-    <div class="text-center animate-pulse">
-        <fa-icon [icon]="icons.loading" class="text-5xl text-white mb-2"></fa-icon>
-        <p class="text-base font-semibold text-white"> {{globalLoadinText}}... </p>
-    </div>
-</div>
-}
 
-<!-- TOAST MESSAGE -->
-@if (showMessage) {
-<div class="fixed top-4 right-4 flex items-center px-4 py-3 rounded-xl shadow-lg text-white z-2000 transition-all"
-    [ngClass]="{
-      'bg-green-600': messageType === 'success',
-      'bg-red-600': messageType === 'error'
-    }">
-    <fa-icon [icon]="messageType === 'success' ? icons.checkCircle : icons.exclamationCircle"></fa-icon>
-    <span class="ml-2 font-medium">{{ messageText }}</span>
-</div>
-}
-<div class="max-w-6xl w-full mx-auto p-8 rounded-3xl bg-[#1e1e1e]/70 backdrop-blur-xl
+<!-- MAIN CARD -->
+<div
+  class="w-full max-w-7xl mx-auto p-8 rounded-3xl bg-[#1e1e1e]/70 backdrop-blur-xl
          border border-gray-700 shadow-2xl text-white
          transition-all duration-500 hover:shadow-orange-400/40 animate-fadeIn">
 
@@ -31,222 +13,262 @@
             Weight & BMI Progress
         </h2>
 
-        <div class="flex items-center gap-3 max-md:w-full max-md:justify-end">
-            <!-- Toggle Chart/Table -->
-            <button type="button" (click)="toggleView()" class="px-4 py-2 rounded-full border border-gray-600
-               text-sm font-semibold bg-[#111827]/80
-               hover:bg-[#1f2937] hover:border-orange-400
-               flex items-center gap-2 transition-all">
-                <fa-icon [icon]="showTableView ? icons.chart : icons.table"></fa-icon>
-                <span class="max-sm:hidden">
-                    {{ showTableView ? 'View Chart' : 'View in Table' }}
-                </span>
-                <span class="sm:hidden">
-                    {{ showTableView ? 'Chart' : 'Table' }}
-                </span>
+        <!-- Top Right Buttons -->
+        <div class="flex items-center gap-3 max-md:w-full max-md:justify-end flex-wrap">
+
+            <!-- View: Daily Chart -->
+            <button type="button"
+                (click)="setViewMode('daily')"
+                [ngClass]="viewMode === 'daily'
+                    ? 'bg-orange-500 text-white border-orange-300'
+                    : 'bg-[#111827]/80 text-gray-300 border-gray-600'"
+                class="px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold border
+                       hover:bg-orange-500 hover:text-white transition-all flex items-center gap-2">
+                <fa-icon [icon]="icons.chart"></fa-icon> Chart
+            </button>
+
+            <!-- View: Table -->
+            <button type="button"
+                (click)="setViewMode('table')"
+                [ngClass]="viewMode === 'table'
+                    ? 'bg-blue-500 text-white border-blue-300'
+                    : 'bg-[#111827]/80 text-gray-300 border-gray-600'"
+                class="px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold border
+                       hover:bg-blue-500 hover:text-white transition-all flex items-center gap-2">
+                <fa-icon [icon]="icons.table"></fa-icon> Table
+            </button>
+
+            <!-- View: Monthly Progress -->
+            <button type="button"
+                (click)="setViewMode('monthly')"
+                [ngClass]="viewMode === 'monthly'
+                    ? 'bg-yellow-400 text-black border-yellow-300'
+                    : 'bg-[#111827]/80 text-gray-300 border-gray-600'"
+                class="px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold border
+                       hover:bg-yellow-400 hover:text-black transition-all flex items-center gap-2">
+                <fa-icon [icon]="icons.stats"></fa-icon> Monthly
             </button>
 
             <!-- Add BMI Log -->
-            <button type="button" (click)="openAddPanel()" class="px-4 py-2 rounded-full bg-linear-to-r from-orange-500 to-red-500
-               hover:from-orange-600 hover:to-red-600 text-white font-semibold
-               shadow-lg hover:shadow-orange-400/40 flex items-center gap-2
-               transition-all">
+            <button type="button" (click)="openAddPanel()"
+                class="px-4 py-2 rounded-full bg-linear-to-r from-orange-500 to-red-500
+                       hover:from-orange-600 hover:to-red-600 text-white font-semibold
+                       shadow-lg hover:shadow-orange-400/40 flex items-center gap-2 transition-all">
                 <fa-icon [icon]="icons.add"></fa-icon>
                 <span class="max-sm:hidden">Add BMI Log</span>
             </button>
         </div>
     </div>
 
-    <!-- MAIN CONTENT: chart OR table -->
+    <!-- MAIN CONTENT AREA -->
 
-    @if (!showTableView) {
-    <!-- Chart View -->
-    <div class="relative w-full h-72 mb-2 animate-slideUp">
-        <canvas id="weightChart"></canvas>
-    </div>
+    @if (viewMode === 'daily') {
+        <!-- DAILY CHART -->
+        <div class="relative w-full h-72 mb-2 animate-slideUp">
+            <canvas id="weightChart"></canvas>
+        </div>
 
-    <p class="text-xs text-gray-400 mb-6" >Entries for year  {{date.substring(6)}}</p>
-    <p class="text-xs text-gray-400 mb-6">
-        Tip: Track your progress regularly. Healthy BMI: 18.5 – 24.9
-    </p>
-    } @else {
-    <!-- Table View -->
-    <div class="overflow-auto max-h-80 rounded-xl border border-gray-700/60 animate-softFade">
-        <table class="w-full text-sm">
-            <thead class="bg-[#111827] text-gray-300 sticky top-0 backdrop-blur-md z-10">
-                <tr>
-                    <th class="px-4 py-3 text-left font-medium">Date</th>
-                    <th class="px-4 py-3 text-left font-medium">Weight (kg)</th>
-                    <th class="px-4 py-3 text-left font-medium">BMI</th>
-                    <th class="px-4 py-3 text-right font-medium">Actions</th>
-                </tr>
-            </thead>
+        <p class="text-xs text-gray-400 mb-6">Entries for {{ date.substring(6) }}</p>
+        <p class="text-xs text-gray-400 mb-6">
+            Tip: Healthy BMI is between <span class="text-orange-400 font-medium">18.5 – 24.9</span>
+        </p>
 
-            <tbody>
-                @for (item of bmiHistory; track item.date) {
-                <tr class="border-b border-gray-700/70 hover:bg-[#1f2937]
-                     transition-all duration-200 cursor-pointer hover:scale-[1.005]">
+    } @else if (viewMode === 'table') {
 
-                    <!-- Date -->
-                    <td class="px-4 py-3 align-top">
-                        <div class="flex flex-col gap-0.5">
+        <!-- TABLE VIEW -->
+        <div class="overflow-auto max-h-80 rounded-xl border border-gray-700/60 animate-softFade">
+            <table class="w-full text-sm">
+                <thead class="bg-[#111827] text-gray-300 sticky top-0 backdrop-blur-md z-10">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-medium">Date</th>
+                        <th class="px-4 py-3 text-left font-medium">Weight (kg)</th>
+                        <th class="px-4 py-3 text-left font-medium">BMI</th>
+                        <th class="px-4 py-3 text-right font-medium">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (item of bmiHistory; track item.date) {
+                    <tr class="border-b border-gray-700/70 hover:bg-[#1f2937]
+                             transition-all duration-200 cursor-pointer hover:scale-[1.005]">
+
+                        <td class="px-4 py-3">
                             <div class="flex items-center gap-2 text-gray-200">
                                 <fa-icon [icon]="icons.calender" class="text-blue-400 text-xs"></fa-icon>
-                                <span class="text-sm font-medium">
-                                    {{ item.date | date:'mediumDate' }}
+                                {{ item.date | date:'mediumDate' }}
+                            </div>
+                        </td>
+
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-2 text-orange-300 font-semibold">
+                                <fa-icon [icon]="icons.fire" class="text-orange-400 text-xs"></fa-icon>
+                                {{ item.weight }}
+                            </div>
+                        </td>
+
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-1 font-semibold" [ngClass]="getBmiClass(item.bmi)">
+                                <fa-icon [icon]="icons.heartbeat" class="text-xs"></fa-icon>
+                                {{ item.bmi }}
+                                <span class="text-[0.65rem] uppercase opacity-70">
+                                    {{ getBmiLabel(item.bmi) }}
                                 </span>
                             </div>
-                        </div>
-                    </td>
+                        </td>
 
-                    <!-- Weight -->
-                    <td class="px-4 py-3 align-top">
-                        <div class="flex items-center gap-2 text-orange-300 font-semibold">
-                            <fa-icon [icon]="icons.fire" class="text-orange-400 text-xs"></fa-icon>
-                            <span>{{ item.weight }}</span>
-                        </div>
-                    </td>
+                        <td class="px-4 py-3 text-right">
+                            <button (click)="deleteEntry(item)"
+                                class="inline-flex items-center justify-center p-2 rounded-full bg-[#111827]
+                                        hover:bg-red-600/80 border border-gray-700 hover:border-red-400 transition-all">
+                                <fa-icon [icon]="icons.trash" class="text-xs text-gray-300"></fa-icon>
+                            </button>
+                        </td>
 
-                    <!-- BMI -->
-                    <td class="px-4 py-3 align-top">
-                        <div class="flex items-center gap-2 font-semibold" [ngClass]="getBmiClass(item.bmi)">
-                            <fa-icon [icon]="icons.heartbeat" class="text-xs"></fa-icon>
-                            <span>{{ item.bmi }}</span>
-                            <span class="text-[0.65rem] uppercase tracking-wide opacity-80">
-                                {{ getBmiLabel(item.bmi) }}
-                            </span>
-                        </div>
-                    </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 
-                    <!-- Actions -->
-                    <td class="px-4 py-3 align-top text-right">
-                        <button type="button" (click)="deleteEntry(item)" class="inline-flex items-center justify-center rounded-full
-                         p-2 bg-[#111827] hover:bg-red-600/80 transition-all
-                         border border-gray-700 hover:border-red-400">
-                            <fa-icon [icon]="icons.trash" class="text-xs text-gray-300"></fa-icon>
-                        </button>
-                    </td>
-                </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+    } @else if (viewMode === 'monthly') {
+
+        <!-- MONTHLY GROUPED BAR CHART VIEW -->
+        <div class="relative w-full h-80 mb-4 animate-slideUp">
+            <canvas id="monthlyChart"></canvas>
+        </div>
+
+        <p class="text-xs text-gray-400">
+            Full monthly summary for average, min, max BMI & weight. With no of entries done in the month.
+            Hover on bars for exact values.
+        </p> 
+        <p class="text-xs text-red-500">
+            *To save money DB interaction is less so more data = more accuracy and not every time it's recompute to show 
+            updated value
+        </p>
     }
 
     <!-- Load Older -->
-    <div class="flex justify-center mt-6">
-        <button type="button" (click)="loadOlder()" [disabled]="lastPage" class="px-6 py-2 rounded-full bg-linear-to-r from-orange-500 to-red-500
-             hover:from-orange-600 hover:to-red-600 disabled:opacity-40
-             text-white font-semibold shadow-lg
-             hover:shadow-orange-400/40 transition-all duration-300
-             flex items-center gap-2">
+    @if (viewMode !== 'monthly') {
+    <div class="flex justify-center mt-6 gap-3">
+        <button (click)="loadOlder()" [disabled]="lastPage"
+            class="px-6 py-2 rounded-full bg-linear-to-r from-orange-500 to-red-500
+                   hover:from-orange-600 hover:to-red-600 disabled:opacity-40
+                   text-white font-semibold shadow-lg hover:shadow-orange-400/40
+                   transition-all duration-300 flex items-center gap-2">
             <fa-icon [icon]="icons.left"></fa-icon>
             Load Older
         </button>
-        
-        <button type="button" (click)="loadPrevious()" [disabled]="page === 0" class="px-6 py-2 rounded-full bg-linear-to-r from-orange-500 to-red-500
-             hover:from-orange-600 hover:to-red-600 disabled:opacity-40
-             text-white font-semibold shadow-lg
-             hover:shadow-orange-400/40 transition-all duration-300
-             flex items-center gap-2">
-            Load Previous<fa-icon [icon]="icons.right"></fa-icon>
+
+        <button (click)="loadPrevious()" [disabled]="page === 0"
+            class="px-6 py-2 rounded-full bg-linear-to-r from-orange-500 to-red-500
+                   hover:from-orange-600 hover:to-red-600 disabled:opacity-40
+                   text-white font-semibold shadow-lg hover:shadow-orange-400/40
+                   transition-all duration-300 flex items-center gap-2">
+            Load Previous <fa-icon [icon]="icons.right"></fa-icon>
         </button>
-        
     </div>
+    }
 </div>
 
-<!-- ================= SLIDE-OVER ADD PANEL ================= -->
-
+<!-- ================= SLIDE-OVER ADD PANEL (unchanged from your version) ================= -->
 @if (showAddPanel) {
-<div class="fixed inset-0 z-40 flex">
+<div class="fixed inset-0 z-50 flex">
 
-    <!-- Backdrop -->
-    <div class="flex-1 bg-black/60 backdrop-blur-sm animate-softFade" (click)="closeAddPanel()"></div>
+  <!-- Backdrop -->
+  <div class="flex-1 bg-black/60 backdrop-blur-sm animate-softFade"
+       (click)="closeAddPanel()"></div>
 
-    <!-- Panel -->
-    <div class="w-full max-w-md bg-[#111827] text-white shadow-2xl
-             border-l border-gray-700 animate-slideInRight
-             flex flex-col">
+  <!-- Compact Panel -->
+  <div
+    class="w-full max-w-sm md:max-w-md lg:max-w-sm
+           bg-[#111827] text-white shadow-2xl border-l border-gray-700
+           animate-slideInRight flex flex-col
+           max-h-[88vh] h-full">
 
-        <!-- Header -->
-        <div class="px-6 py-4 border-b border-gray-700 flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-orange-400">
-                Add BMI Log
-            </h3>
-            <button type="button" (click)="closeAddPanel()" class="rounded-full p-2 hover:bg-gray-800 transition">
-                <fa-icon [icon]="icons.close"></fa-icon>
-            </button>
+    <!-- HEADER (compact) -->
+    <div class="px-4 py-3 border-b border-gray-700 flex items-center justify-between shrink-0">
+      <h3 class="text-base font-semibold text-orange-400">Add BMI Log</h3>
+      <button (click)="closeAddPanel()" class="rounded-full p-1.5 hover:bg-gray-800 transition">
+        <fa-icon [icon]="icons.close" class="text-sm"></fa-icon>
+      </button>
+    </div>
+
+    <!-- CONTENT (more compact spacing) -->
+    <div class="px-4 py-3 space-y-3 flex-1 overflow-y-auto
+                scrollbar-thin scrollbar-thumb-gray-700">
+
+      <!-- DATE -->
+      <div class="space-y-1">
+        <label class="block text-xs text-gray-400">Date</label>
+        <input type="date"
+          class="w-full rounded-lg bg-[#020617] border border-gray-700 px-3 py-1.5 text-sm"
+          [(ngModel)]="newEntry.date">
+      </div>
+
+      <!-- WEIGHT -->
+      <div class="space-y-1">
+        <label class="block text-xs text-gray-400">Weight (kg)</label>
+        <input type="number"
+          class="w-full rounded-lg bg-[#020617] border border-gray-700 px-3 py-1.5 text-sm"
+          [(ngModel)]="newEntry.weight"
+          (input)="onWeightOrHeightChange()">
+      </div>
+
+      <!-- BMI -->
+      <div class="space-y-1">
+        <label class="block text-xs text-gray-400">BMI</label>
+        <input type="number"
+          class="w-full rounded-lg bg-[#020617] border border-gray-700 px-3 py-1.5 text-sm"
+          [(ngModel)]="newEntry.bmi" step="0.1">
+      </div>
+
+      <!-- BMI Helper -->
+      <div class="mt-1">
+        <button
+          type="button"
+          class="text-xs text-blue-400 hover:text-blue-300 underline flex items-center gap-1"
+          (click)="toggleBmiHelper()">
+          <fa-icon [icon]="icons.info" class="text-[0.65rem]"></fa-icon>
+          Need help with BMI?
+        </button>
+
+        @if (showBmiHelper) {
+        <div class="mt-2 rounded-xl bg-[#020617] border border-gray-700 p-3 space-y-2">
+          <p class="text-xs text-gray-300">Enter height to auto-calculate BMI.</p>
+
+          <div class="space-y-1">
+            <label class="block text-xs text-gray-400">Height (cm)</label>
+            <input type="number"
+              class="w-full rounded-lg bg-[#020617] border border-gray-700 px-3 py-1.5 text-sm"
+              [(ngModel)]="heightCm"
+              (input)="onWeightOrHeightChange()">
+          </div>
         </div>
-
-        <!-- Body -->
-        <div class="px-6 py-4 space-y-4 flex-1 overflow-auto">
-
-            <!-- Date -->
-            <div>
-                <label class="block text-sm text-gray-300 mb-1">Date</label>
-                <input type="date" class="w-full rounded-lg bg-[#020617] border border-gray-700 px-3 py-2 text-sm
-                        focus:outline-none focus:ring-1 focus:ring-orange-500" [(ngModel)]="newEntry.date">
-            </div>
-
-            <!-- Weight -->
-            <div>
-                <label class="block text-sm text-gray-300 mb-1">Weight (kg)</label>
-                <input type="number" class="w-full rounded-lg bg-[#020617] border border-gray-700 px-3 py-2 text-sm
-                        focus:outline-none focus:ring-1 focus:ring-orange-500" [(ngModel)]="newEntry.weight"
-                    (input)="onWeightOrHeightChange()">
-            </div>
-
-            <!-- BMI -->
-            <div>
-                <label class="block text-sm text-gray-300 mb-1">BMI</label>
-                <input type="number" class="w-full rounded-lg bg-[#020617] border border-gray-700 px-3 py-2 text-sm
-                        focus:outline-none focus:ring-1 focus:ring-blue-500" [(ngModel)]="newEntry.bmi" step="0.1">
-            </div>
-
-            <!-- Helper: Don’t know BMI -->
-            <div class="mt-3">
-                <button type="button"
-                    class="text-xs text-blue-400 hover:text-blue-300 underline flex items-center gap-1"
-                    (click)="toggleBmiHelper()">
-                    <fa-icon [icon]="icons.info" class="text-[0.7rem]"></fa-icon>
-                    Don’t know how to calculate BMI?
-                </button>
-
-                @if (showBmiHelper) {
-                <div class="mt-3 space-y-2 rounded-xl bg-[#020617] border border-gray-700 p-3">
-                    <p class="text-xs text-gray-300">
-                        Enter your height and we’ll calculate BMI for you.
-                    </p>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Height (cm)</label>
-                        <input type="number" class="w-full rounded-lg bg-[#020617] border border-gray-700 px-3 py-2 text-sm
-                              focus:outline-none focus:ring-1 focus:ring-blue-500" [(ngModel)]="heightCm"
-                            (input)="onWeightOrHeightChange()">
-                    </div>
-                    <p class="text-xs text-gray-400">
-                        Formula: <span class="text-gray-200 font-mono">BMI = weight / (height in m)²</span>
-                    </p>
-                </div>
-                }
-            </div>
-
-        </div>
-
-        <!-- Footer -->
-        <div class="px-6 py-4 border-t border-gray-700 flex justify-between items-center">
-            <button type="button" (click)="closeAddPanel()"
-                class="px-4 py-2 rounded-full bg-gray-800 text-sm hover:bg-gray-700 transition">
-                Cancel
-            </button>
-            <button type="button" (click)="saveNewEntry()" [disabled]="saving" class="px-5 py-2 rounded-full bg-linear-to-r from-orange-500 to-yellow-400
-                       hover:from-orange-600 hover:to-yellow-500 text-sm font-semibold
-                       shadow-md hover:shadow-orange-400/40 disabled:opacity-40 transition
-                       flex items-center gap-2">
-                <fa-icon [icon]="icons.checkCircle" class="text-xs"></fa-icon>
-                Save
-            </button>
-        </div>
+        }
+      </div>
 
     </div>
+
+    <!-- FOOTER (compact) -->
+    <div class="px-4 py-3 border-t border-gray-700 flex justify-between items-center shrink-0">
+      <button
+        (click)="closeAddPanel()"
+        class="px-3 py-1.5 rounded-full bg-gray-800 text-xs hover:bg-gray-700 transition">
+        Cancel
+      </button>
+
+      <button
+        (click)="saveNewEntry()" [disabled]="saving"
+        class="px-4 py-1.5 rounded-full bg-linear-to-r from-orange-500 to-yellow-400
+               hover:from-orange-600 hover:to-yellow-500 text-xs font-semibold
+               shadow-md hover:shadow-orange-400/40 disabled:opacity-40 transition
+               flex items-center gap-1.5">
+        <fa-icon [icon]="icons.checkCircle" class="text-[0.65rem]"></fa-icon>
+        Save
+      </button>
+    </div>
+
+  </div>
 </div>
 }
+
+
