@@ -1,7 +1,11 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
-import { FreezeRequestDto } from '../Models/MemberServiceModels';
+import {
+  FreezeRequestDto,
+  PrProgressRequestDto,
+  UpdatePrRequestDto,
+} from '../Models/MemberServiceModels';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -34,16 +38,14 @@ export class MemberService {
   getLoginStreak(id: string): Observable<any> {
     const url = `${this.baseUrl}getStreak`;
     const param = { id: id };
-    return this.http
-      .get<number>(url, { params: param });
+    return this.http.get<number>(url, { params: param });
   }
 
   // get member's profile info by id
   getMemberProfile(id: string): Observable<any> {
     const url = `${this.baseUrl}getBy`;
     const param = { id: id };
-    return this.http
-      .get<any>(url, { params: param });
+    return this.http.get<any>(url, { params: param });
   }
 
   // get all members info with paging with filters and sorting
@@ -121,8 +123,7 @@ export class MemberService {
   // delete member's profile image by member id
   deleteMemberProfileImage(memberId: string): Observable<any> {
     const url = `${this.memberProfileBaseUrl}/member/delete?memberId=${memberId}`;
-    return this.http.delete<any>(url)
-      
+    return this.http.delete<any>(url);
   }
 
   // member's profile controller to upload member's profile image/delete/view
@@ -140,55 +141,182 @@ export class MemberService {
     return this.http.post(uploadUrl, formData);
   }
 
-  getProfileImage(memberId:string) : Observable<any> {
-    const url = `${this.memberProfileImageBaseUrl}/all/getProfileImage?memberId=${memberId}`
+  getProfileImage(memberId: string): Observable<any> {
+    const url = `${this.memberProfileImageBaseUrl}/all/getProfileImage?memberId=${memberId}`;
     return this.http.get(url);
   }
 
-  deleteProfileImage(memberId : string) : Observable<any> {
-    const url = `${this.memberProfileImageBaseUrl}/member/delete?memberId=${memberId}`
+  deleteProfileImage(memberId: string): Observable<any> {
+    const url = `${this.memberProfileImageBaseUrl}/member/delete?memberId=${memberId}`;
     return this.http.delete(url);
   }
 
-  // retreive member's plan info 
-  private planInfoUrl = 'http://localhost:8080/fitStudio/member-service/planDetails'
-  getPlaninfo(memberId : string) : Observable<any>{
-    const url = `${this.planInfoUrl}?memberId=${memberId}`
+  // retreive member's plan info
+  private planInfoUrl =
+    'http://localhost:8080/fitStudio/member-service/planDetails';
+  getPlaninfo(memberId: string): Observable<any> {
+    const url = `${this.planInfoUrl}?memberId=${memberId}`;
     return this.http.get(url);
   }
 
   // member fit service
-  // this is the member service's fit service base url 
+  // this is the member service's fit service base url
   // remaing endpoints will be added later
-  private memberFitUrl = environment.apiBaseUrl+environment.microServices.MEMBER_SERVICE.Fit;
+  private memberFitUrl =
+    environment.apiBaseUrl + environment.microServices.MEMBER_SERVICE.Fit;
   // 1. logs bmi and weight entries
 
   // 1/1 get all bmi entries
-  getAllWeightBmiEntriesByMemberId(memberId:string, pageNo : number, pageSize : number) : Observable<any> {
+  getAllWeightBmiEntriesByMemberId(
+    memberId: string,
+    pageNo: number,
+    pageSize: number
+  ): Observable<any> {
     const url = `${this.memberFitUrl}/get/${pageNo}/WeightBmiEntries/${pageSize}?memberId=${memberId}`;
     return this.http.get(url);
   }
 
-  // 1/2 add new bmi entry 
-  addNewWeightBmiEntry ( memberId:string ,weight: number, bmi: number) : Observable<any> {
-    const url = `${this.memberFitUrl}/weight-bmi-entry?memberId=${memberId}`
+  // 1/2 add new bmi entry
+  addNewWeightBmiEntry(
+    memberId: string,
+    weight: number,
+    bmi: number,
+    date: Date
+  ): Observable<any> {
+    const url = `${this.memberFitUrl}/weight-bmi-entry?memberId=${memberId}`;
     const body = {
-      date: new Date().toISOString().split('T')[0],
-      weight : weight,
-      bmi: bmi
-    }    
-    return this.http.post(url,body)
+      date: date.toISOString().split('T')[0],
+      weight: weight,
+      bmi: bmi,
+    };
+    return this.http.post(url, body);
   }
 
   // 1/3 delete  old bmi entry
-  deleteEntries(memberId: string, date: Date) : Observable<any> {
-    const url = `${this.memberFitUrl}/deleteWeightBmi`
-    const params = new HttpParams().set('memberId',memberId).set('date',date.toISOString().split('T')[0])
-       return this.http.delete(url, {params})
+  deleteEntries(memberId: string, date: Date): Observable<any> {
+    const url = `${this.memberFitUrl}/deleteWeightBmi`;
+    const params = new HttpParams()
+      .set('memberId', memberId)
+      .set('date', date.toISOString().split('T')[0]);
+    return this.http.delete(url, { params });
   }
 
   // 2 get all bmi and weight entries's summary dto
-  // getMatrixOfWeightBmi(memberId : string, pageNo: number, pageSize: number) :Observable<any> {
+  getMatrixOfWeightBmi(
+    memberId: string,
+    pageNo: number,
+    pageSize: number
+  ): Observable<any> {
+    const url = `${this.memberFitUrl}/bmiSummary?memberId=${memberId}&pageNo=${pageNo}&pageSize=${pageSize}`;
+    console.log('sending request to..', url);
+    return this.http.get(url);
+  }
 
-  // }
+  // 3/1 add new pr record
+  addNewPr(
+    memberId: string,
+    prProgress: PrProgressRequestDto[]
+  ): Observable<any> {
+    const url = `${this.memberFitUrl}/addPr?memberId=${memberId}`;
+    return this.http.post(url, prProgress);
+  }
+
+  // 3/2 get all prs my members
+  getAllPastPrRecords(
+    memberId: string,
+    pageNo: number,
+    pageSize: number,
+    searchBy?: string,
+    sortDirection?: string,
+    from?: Date,
+    to?: Date
+  ): Observable<any> {
+    let params = new HttpParams()
+      .set('memberId', memberId)
+      .set('pageNo', pageNo)
+      .set('pageSize', pageSize)
+      .set('sortDirection', sortDirection || 'DESC');
+
+    if (searchBy && searchBy.trim() !== '') {
+      params = params.set('searchBy', searchBy.trim());
+    }
+
+    if (from) {
+      params = params.set('from', from.toISOString().split('T')[0]);
+    }
+
+    if (to) {
+      params = params.set('to', to.toISOString().split('T')[0]);
+    }
+
+    const url = `${this.memberFitUrl}/getPrs`;
+
+    return this.http.get(url, { params });
+  }
+
+  // 3/3 delete a whole day's record
+  delteBulkPr(memberId: string, date: string): Observable<any> {
+    const url = `${this.memberFitUrl}/deleteOneDay`;
+    const params = new HttpParams().set('memberId', memberId).set('date', date);
+    return this.http.delete(url, { params: params });
+  }
+
+  // 3/4 delete each workout
+  deleteOnePr(memberId: string, date: string, workoutName: string) {
+    const url = `${this.memberFitUrl}/deletePr/${workoutName}`;
+    const params = new HttpParams().set('memberId', memberId).set('date', date);
+    return this.http.delete(url, { params: params });
+  }
+
+  // 3/5 update pr for one workout of a day
+  updateParticularPr(
+    memberId: string,
+    workoutName: string,
+    data: UpdatePrRequestDto
+  ): Observable<any> {
+    const url = `${this.memberFitUrl}/updatePr/${workoutName}?memberId=${memberId}`;
+    return this.http.put(url, data);
+  }
+
+  //3/6 get all pr summaries
+  getAllPrSummary(
+    memberId: string,
+    pageNo: number,
+    pageSize: number,
+    searchBy?: string,
+    sortDirection?: string,
+    from?: Date,
+    to?: Date
+  ): Observable<any> {
+    let params = new HttpParams()
+      .set('memberId', memberId)
+      .set('pageNo', pageNo)
+      .set('pageSize', pageSize)
+      .set('sortDirection', sortDirection || 'DESC');
+
+    if (searchBy && searchBy.trim() !== '') {
+      params = params.set('searchBy', searchBy.trim());
+    }
+
+    if (from) {
+      params = params.set('from', from.toISOString().split('T')[0]);
+    }
+
+    if (to) {
+      params = params.set('to', to.toISOString().split('T')[0]);
+    }
+
+    const url = `${this.memberFitUrl}/prSummary`;
+    console.log("sending req to ",url);
+    
+    return this.http.get(url, { params: params }).pipe(
+      tap((res)=> console.log(res))
+    );
+  }
+
+  getMemberWeightBmiChange(memberId:string) :Observable<any> {
+    const url = `${this.memberFitUrl}/getBmi/WeightInfo?memberId=${memberId}`
+    console.log("sending req to \n",url);
+    return this.http.get(url);    
+  }
 }
