@@ -68,11 +68,53 @@ export interface MonthlySummary {
   minWeight: number;
   maxWeight: number;
   entryCount: number;
+  monthValue: number;
+  year: number;
 }
 
 export interface MonthlySummaryList {
-  summaryResponseDtoList: MonthlySummary[];
+  summaryResponseDto: MonthlySummary[];
   pageNo: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  lastPage: boolean;
+}
+export interface PrProgressRequestDto {
+  workoutName: string;
+  weight: number;
+  repetitions: number;
+  achievedDate: string;
+}
+
+export interface PrLists {
+  responseDtoList: PrProgressRequestDto[];
+  pageNo: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  lastPage: boolean;
+}
+export interface UpdatePrRequestDto {
+  weight: number;
+  repetitions: number;
+  archivedDate: string;
+}
+
+export interface PrSummaryResponseDto {
+  workoutName: string;
+  avgWeight: number;
+  avgReps: number;
+  maxWeight: number;
+  maxReps: number;
+  entryCount: number;
+  monthValue: number;
+  year: number;
+  monthName?: string;
+}
+export interface PrSummaryList {
+  responseDtoList: PrSummaryResponseDto[];
+    pageNo: number;
   pageSize: number;
   totalElements: number;
   totalPages: number;
