@@ -18,6 +18,7 @@ import {
   faChartBar,
   faSave,
   faDownload,
+  faCogs,
 } from '@fortawesome/free-solid-svg-icons';
 import { Chart, registerables } from 'chart.js';
 import { Authservice } from '../../../core/services/authservice';
@@ -35,6 +36,7 @@ import {
 } from '../../../core/Models/MemberServiceModels';
 import { genericResponseMessage } from '../../../core/Models/genericResponseModels';
 import { errorOutPutMessageModel } from '../../../core/Models/errorResponseModel';
+import { BmiWeightInfoResponseDto } from '../weight-bmi-info/weight-bmi-info';
 
 Chart.register(...registerables);
 
@@ -103,9 +105,21 @@ export class PrDetails implements AfterViewInit {
   // multi rows for add panel
   editRows: (PrProgressRequestDto & { _id: string })[] = [];
 
+  loadMemberBodyWeight() {
+    this.loader.show('',faCogs)
+    this.member.getMemberWeightBmiChange(this.memberId || this.auth.getUserId()).subscribe({
+      next:(res:BmiWeightInfoResponseDto) => {
+        console.log(res.currentBodyWeight);
+        this.memberBodyWeight = res.currentBodyWeight;
+        this.loader.hide()
+      }, error: (err) => {
+        console.log(err);
+      }
+    })
+  }
   // bodyweight logic
   bodyWeightWorkouts = ['Pull-Up (Bodyweight)', 'Chin-Up (Bodyweight)'];
-  memberBodyWeight = 0; // you’ll fill via some member profile API if you want
+  memberBodyWeight = 0; 
 
   // master workout list
   allPrs: string[] = [
@@ -140,6 +154,7 @@ export class PrDetails implements AfterViewInit {
   ngAfterViewInit(): void {
     this.memberId = this.auth.getUserId();
     this.loadPage();
+    this.loadMemberBodyWeight()
   }
 
   // ====== VIEW / UNIT CONTROLS ======
@@ -360,9 +375,7 @@ export class PrDetails implements AfterViewInit {
     this.editRows = [];
     this.addRow();
     this.showAddPanel = true;
-    setTimeout(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, 10);
+  //  document.body.style.overflow = 'hidden';
   }
 
   addRow() {
@@ -380,6 +393,9 @@ export class PrDetails implements AfterViewInit {
   }
 
   autoFillForBodyWeight(row: any) {
+    console.log("autofilled triggerd");
+    console.log("current body weight its ::=> ",this.memberBodyWeight);
+    
     if (this.bodyWeightWorkouts.includes(row.workoutName) && this.memberBodyWeight > 0) {
       row.weight = this.selectedUnit === 'kg'
         ? this.memberBodyWeight
@@ -389,6 +405,7 @@ export class PrDetails implements AfterViewInit {
 
   closeAddPanel() {
     this.showAddPanel = false;
+    // document.body.style.overflow = 'auto';
   }
 
   submitMulti() {
@@ -500,6 +517,7 @@ export class PrDetails implements AfterViewInit {
     this.warningText = text;
     this.warningAction = action;
     this.showWarning = true;
+    // document.body.style.overflow = 'hidden';
   }
 
   cancelWarning() {
