@@ -1,220 +1,190 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { Authservice } from '../../../core/services/authservice';
-import { MemberService } from '../../../core/services/member-service';
+import { Component, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
-import {
-  Chart,
-  CategoryScale,
-  LinearScale,
-  LineController,
-  LineElement,
-  PointElement,
-  Tooltip,
-  Legend,
-} from 'chart.js';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { DatePipe, NgClass } from '@angular/common';
 import {
-  faCogs,
   faExclamationCircle,
   faCheckCircle,
   faLeftLong,
+  faRightLong,
   faCalendar,
   faHeartbeat,
   faFire,
-  faPlus,
-  faXmark,
-  faTableCellsLarge,
   faChartLine,
+  faTableList,
+  faChartColumn,
+  faPlus,
+  faTimes,
   faInfoCircle,
   faTrash,
-  faDumbbell,
-  faWeightScale,
-  faRightLong,
   faRedo,
 } from '@fortawesome/free-solid-svg-icons';
+
+import { DatePipe, NgClass } from '@angular/common';
+import { Chart, registerables } from 'chart.js';
+import { Authservice } from '../../../core/services/authservice';
+import { MemberService } from '../../../core/services/member-service';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   allWeightBmiEntries,
   MemberWeighBmiEntryResponseDto,
+  MonthlySummary,
+  MonthlySummaryList,
 } from '../../../core/Models/MemberServiceModels';
-import { HttpErrorResponse } from '@angular/common/http';
+import { genericResponseMessage } from '../../../core/Models/genericResponseModels';
 import { erroResponseModel } from '../../../core/Models/errorResponseModel';
 import { FormsModule } from '@angular/forms';
-import { genericResponseMessage } from '../../../core/Models/genericResponseModels';
-Chart.register(
-  CategoryScale,
-  LinearScale,
-  LineController,
-  LineElement,
-  PointElement,
-  Tooltip,
-  Legend
-);
+import { NotifyService } from '../../../core/services/notify-service';
+import { LoadingService } from '../../../core/services/loading-service';
+
+Chart.register(...registerables);
+
 @Component({
   selector: 'app-fit-details',
+  standalone: true,
   imports: [FontAwesomeModule, NgClass, DatePipe, FormsModule],
   templateUrl: './fit-details.html',
-  styleUrl: './fit-details.css',
+  styleUrls: ['./fit-details.css'],
 })
 export class FitDetails implements AfterViewInit {
-  // global variables
-  userId: string = '';
-  // global loading screen animations
-  loading = false;
-  showMessage = false;
-  messageText = '';
-  globalLoadinText = '';
-  messageType: 'success' | 'error' = 'success';
-  showFullScreenMessage(type: 'success' | 'error', text: string) {
-    this.messageType = type;
-    this.messageText = text;
-    this.showMessage = true;
-    setTimeout(() => {
-      this.showMessage = false;
-      this.icons.loading = faCogs;
-    }, 5000);
-  }
+  constructor(
+    private auth: Authservice,
+    private member: MemberService,
+    private route: Router,
+    private notify: NotifyService,
+    private loader: LoadingService
+  ) {}
 
-  // global icons
+  // Icons
   icons = {
-    loading: faCogs,
     exclamationCircle: faExclamationCircle,
     checkCircle: faCheckCircle,
     left: faLeftLong,
     right: faRightLong,
     calender: faCalendar,
     heartbeat: faHeartbeat,
-    fire: faWeightScale,
-    add: faPlus,
-    close: faXmark,
-    table: faTableCellsLarge,
+    fire: faFire,
     chart: faChartLine,
+    table: faTableList,
+    stats: faChartColumn,
+    add: faPlus,
+    close: faTimes,
     info: faInfoCircle,
     trash: faTrash,
   };
-  constructor(
-    private auth: Authservice,
-    private member: MemberService,
-    private route: Router
-  ) {}
+
+  // ---------------- VIEW MODES -----------------
+  viewMode: 'daily' | 'table' | 'monthly' = 'daily';
+  setViewMode(mode: 'daily' | 'table' | 'monthly') {
+    this.viewMode = mode;
+
+    if (mode === 'daily') {
+      setTimeout(() => this.updateDailyChart(), 80);
+    }
+
+    if (mode === 'table') {
+      // no chart
+    }
+
+    if (mode === 'monthly') {
+      if (!this.monthlyLoaded) {
+        this.loadMonthlySummary();
+      } else {
+        setTimeout(() => this.updateMonthlyChart(), 80);
+      }
+    }
+  }
+
+  // ---------------- DAILY BMI ENTRIES -----------------
+
+  userId = '';
+  bmiHistory: MemberWeighBmiEntryResponseDto[] = [];
+  page = 0;
+  pageSize = 30;
+  lastPage = false;
+  totalPages = 0;
+
+  date = new Date().toISOString();
+
+  chart: Chart | null = null;
 
   ngAfterViewInit() {
     setTimeout(() => {
       this.userId = this.auth.getUserId();
-      this.loadWeightBmiEntries();
-    });
+      this.loadDailyEntries();
+    }, 0);
   }
 
-  // bmi - weight data and variables
-  bmiHistory: MemberWeighBmiEntryResponseDto[] = [];
-  page = 0;
-  pageSize = 15;
-  totalPages = 0;
-  lastPage = false;
-  chart: Chart | null = null;
-  showTableView = false;
-
-  // slide-over panel state
-  showAddPanel = false;
-  showBmiHelper = false;
-  saving = false;
-  date: string= new Date().toLocaleDateString().split('T')[0]
-  // add new log variables and datas
-  newEntry: { date: string | null; weight: number | null; bmi: number | null } =
-    {
-      date: null,
-      weight: null,
-      bmi: null,
-    };
-  heightCm: number | null = null;
-
-  toggleView() {
-    this.showTableView = !this.showTableView;
-    if (!this.showTableView) {
-      setTimeout(() => {
-        this.updateChart();
-      }, 50);
-    }
-  }
-
-  loadWeightBmiEntries() {
-    this.loading = true;
-    this.globalLoadinText = 'Fetching BMI Entries';
-    this.icons.loading = faDumbbell;
+  loadDailyEntries() {
+    this.loader.show('Fetching BMI Entries', faFire);
     this.member
       .getAllWeightBmiEntriesByMemberId(this.userId, this.page, this.pageSize)
       .subscribe({
         next: (res: allWeightBmiEntries) => {
-          // console.log('fetched data == ', res);
+          this.bmiHistory = res.bmiEntryResponseDtoList;
           this.lastPage = res.lastPage;
           this.totalPages = res.totalPages;
-          this.bmiHistory = res.bmiEntryResponseDtoList;
-          this.page = res.pageNo
-          this.pageSize = res.pageSize
-          console.log(`is it last page ? ${this.lastPage} total pages are ${this.totalPages} 
-            \n current page no is ${this.page} and page size is ${this.pageSize} loaded data are no ${res.bmiEntryResponseDtoList.length}`);
-          
-          setTimeout(() => this.updateChart(), 10);
-          this.loading = false;
-          this.showFullScreenMessage('success', 'Retrieved all data');
+
+          this.loader.hide();
+          this.notify.showSuccess('Daily data loaded');
+
+          if (this.viewMode === 'daily') {
+            setTimeout(() => this.updateDailyChart(), 80);
+          }
         },
         error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
-          const errorMessage = error?.error?.message
-            ? error.error.message
-            : 'Failed to get profile image';
-          console.log('error caused due to ', errorMessage);
-          this.loading = false;
-          this.showFullScreenMessage('error', errorMessage);
+          this.loader.hide();
+          const msg = error?.error?.message || 'Failed to fetch BMI entries';
+          this.notify.showError(msg);
         },
       });
   }
+
   loadOlder() {
-    if (this.lastPage) return;
-    this.page++;
-    console.log(this.lastPage);
-    
-    this.loadWeightBmiEntries();
+    if (!this.lastPage) {
+      this.page++;
+      this.loadDailyEntries();
+    }
   }
-  loadPrevious(){
-    this.page --;
-    this.loadWeightBmiEntries()
-    console.log(this.lastPage);
-    console.log("elements left",this.totalPages);
-    
+
+  loadPrevious() {
+    if (this.page > 0) {
+      this.page--;
+      this.loadDailyEntries();
+    }
   }
-  updateChart() {
-    if (!this.bmiHistory || this.bmiHistory.length === 0) return;
+
+  // DAILY LINE CHART
+  updateDailyChart(): void {
+    if (!this.bmiHistory.length) return;
+
     const canvas = document.getElementById('weightChart') as HTMLCanvasElement;
     if (!canvas) {
-      console.log('Canvas not found yet, retrying...');
-      setTimeout(() => this.updateChart(), 50);
-      return;
+      return setTimeout(() => this.updateDailyChart(), 50) as unknown as void;
     }
-
-    const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
-    const dates = this.bmiHistory.map((d) => new Date(d.date).toLocaleDateString('en-us', options));
-    const weights = this.bmiHistory.map((d) => d.weight);
-    const bmis = this.bmiHistory.map((d) => d.bmi);
 
     if (this.chart) this.chart.destroy();
 
-    this.chart = new Chart('weightChart', {
+    const dates = this.bmiHistory.map((d) => d.date);
+    const weight = this.bmiHistory.map((d) => d.weight);
+    const bmi = this.bmiHistory.map((d) => d.bmi);
+
+    this.chart = new Chart(canvas, {
       type: 'line',
       data: {
         labels: dates,
         datasets: [
           {
             label: 'Weight (kg)',
-            data: weights,
-            borderColor: 'orange',
+            data: weight,
+            borderColor: '#f97316',
             borderWidth: 3,
             tension: 0.4,
             pointRadius: 3,
           },
           {
             label: 'BMI',
-            data: bmis,
-            borderColor: 'cyan',
+            data: bmi,
+            borderColor: '#06b6d4',
             borderWidth: 3,
             tension: 0.4,
             pointRadius: 3,
@@ -224,50 +194,172 @@ export class FitDetails implements AfterViewInit {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: '#e5e7eb' } },
+        },
         scales: {
-          x: {
-            type: 'category',
-            ticks: { color: '#ccc' },
-          },
-          y: {
-            type: 'linear',
-            ticks: { color: '#ccc' },
-          },
+          x: { ticks: { color: '#d1d5db' } },
+          y: { ticks: { color: '#d1d5db' } },
         },
       },
     });
   }
 
-  // ====== BMI helpers (colors + labels) ======
+  // ---------------- MONTHLY SUMMARY -----------------
 
-  getBmiLabel(bmi: number): string {
-    if (bmi < 18.5) return 'Underweight';
-    if (bmi < 25) return 'Healthy';
-    if (bmi < 30) return 'Overweight';
+  monthlyLoaded = false;
+  monthlyPage = 0;
+  monthlyPageSize = 12;
+  monthlyLastPage = false;
+
+  monthlySummaries: MonthlySummary[] = [];
+  monthlyChart: Chart | null = null;
+
+  readonly monthLabels = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+
+  loadMonthlySummary() {
+    this.loader.show('Fetching Monthly Progress', faCalendar);
+    this.member
+      .getMatrixOfWeightBmi(this.userId, this.monthlyPage, this.monthlyPageSize)
+      .subscribe({
+        next: (res: MonthlySummaryList) => {
+          this.monthlySummaries = res.summaryResponseDto;
+          this.monthlyLastPage = res.lastPage;
+          console.log(res);
+          if (!res.summaryResponseDto || res.summaryResponseDto.length === 0) {
+            console.warn('No monthly summaries found');
+            this.monthlyLoaded = true;
+            this.loader.hide();
+            return;
+          }
+          console.log(res.summaryResponseDto[0].year);
+          this.monthlyLoaded = true;
+          this.loader.hide();
+
+          setTimeout(() => this.updateMonthlyChart(), 70);
+        },
+        error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
+          this.loader.hide();
+          const msg = error?.error?.message || 'Failed to fetch BMI summaries';
+          this.notify.showError(msg);
+        },
+      });
+  }
+
+  updateMonthlyChart(): void {
+    const canvas = document.getElementById('monthlyChart') as HTMLCanvasElement;
+    if (!canvas) {
+      setTimeout(() => this.updateMonthlyChart(), 40);
+      return;
+    }
+
+    if (this.monthlyChart) this.monthlyChart.destroy();
+
+    const labels = this.monthlySummaries.map((m) => {
+      const monthName = this.monthLabels[m.monthValue - 1];
+      const label = `${monthName} ${m.year} (${m.entryCount})`;
+      return label;
+    });
+
+    const avgBmi = this.monthlySummaries.map((x) => x.avgBmi);
+    const minBmi = this.monthlySummaries.map((x) => x.minBmi);
+    const maxBmi = this.monthlySummaries.map((x) => x.maxBmi);
+    const avgW = this.monthlySummaries.map((x) => x.avgWeight);
+    const minW = this.monthlySummaries.map((x) => x.minWeight);
+    const maxW = this.monthlySummaries.map((x) => x.maxWeight);
+
+    this.monthlyChart = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Avg BMI',
+            data: avgBmi,
+            backgroundColor: 'rgba(249,115,22,0.7)',
+          },
+          {
+            label: 'Min BMI',
+            data: minBmi,
+            backgroundColor: 'rgba(59,130,246,0.7)',
+          },
+          {
+            label: 'Max BMI',
+            data: maxBmi,
+            backgroundColor: 'rgba(234,179,8,0.8)',
+          },
+          {
+            label: 'Avg Weight',
+            data: avgW,
+            backgroundColor: 'rgba(45,212,191,0.8)',
+          },
+          {
+            label: 'Min Weight',
+            data: minW,
+            backgroundColor: 'rgba(56,189,248,0.8)',
+          },
+          {
+            label: 'Max Weight',
+            data: maxW,
+            backgroundColor: 'rgba(248,113,113,0.8)',
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: '#e5e7eb' } },
+        },
+        scales: {
+          x: { ticks: { color: '#cbd5e1' } },
+          y: { ticks: { color: '#cbd5e1' } },
+        },
+      },
+    });
+  }
+
+  // ---------------- BMI COLOR LOGIC ------------------
+  getBmiClass(bmi: number) {
+    if (bmi < 18.5) return 'text-blue-400';
+    if (bmi <= 24.9) return 'text-green-400';
+    if (bmi <= 29.9) return 'text-yellow-300';
+    return 'text-red-400';
+  }
+
+  getBmiLabel(bmi: number) {
+    if (bmi < 18.5) return 'Under';
+    if (bmi <= 24.9) return 'Normal';
+    if (bmi <= 29.9) return 'Over';
     return 'Obese';
   }
 
-  getBmiClass(bmi: number): string {
-    if (bmi < 18.5) return 'text-blue-300'; // underweight
-    if (bmi < 25) return 'text-emerald-300'; // healthy
-    if (bmi < 30) return 'text-orange-300'; // overweight
-    return 'text-red-400'; // obese
-  }
-
-  // ====== Add BMI Panel Handling ======
+  // ---------------- ADD PANEL ------------------
+  showAddPanel = false;
+  newEntry = { date: '', weight: 0, bmi: 0 };
+  heightCm = 0;
+  showBmiHelper = false;
+  saving = false;
 
   openAddPanel() {
-    const today = new Date().toISOString().substring(0, 10);
-    this.newEntry = {
-      date: today,
-      weight: null,
-      bmi: null,
-    };
-    this.heightCm = null;
-    this.showBmiHelper = false;
     this.showAddPanel = true;
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 10);
   }
-
   closeAddPanel() {
     this.showAddPanel = false;
   }
@@ -277,65 +369,62 @@ export class FitDetails implements AfterViewInit {
   }
 
   onWeightOrHeightChange() {
-    if (!this.showBmiHelper) return;
-    if (!this.newEntry.weight || !this.heightCm) return;
-
-    const hMeters = this.heightCm / 100;
-    if (hMeters <= 0) return;
-
-    const bmi = this.newEntry.weight / (hMeters * hMeters);
-    this.newEntry.bmi = Math.round(bmi * 10) / 10; // 1 decimal place
+    if (this.newEntry.weight && this.heightCm) {
+      const hm = this.heightCm / 100;
+      this.newEntry.bmi = +(this.newEntry.weight / (hm * hm)).toFixed(1);
+    }
   }
 
   saveNewEntry() {
-    if (!this.newEntry.date || this.newEntry.weight == null || this.newEntry.bmi == null) {
-      return;
-    }
-    this.loading = true;
-    this.globalLoadinText = 'Updating Entries'
-    this.saving = true;
-    this.page =0;
-    this.icons.loading = faRedo;
-    this.member.addNewWeightBmiEntry(this.userId,this.newEntry.weight, this.newEntry.bmi).subscribe({
-      next :(res:genericResponseMessage) => {
-        console.log(res.message);
-        this.loadWeightBmiEntries()
-        this.loading = false;
-        this.showFullScreenMessage('success',res.message || 'new bmi entries updated successfully')
-      },
-      error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
+    this.loader.show('saving new entry for BMI', faRedo);
+
+    this.member
+      .addNewWeightBmiEntry(
+        this.userId,
+        this.newEntry.weight,
+        this.newEntry.bmi,
+        new Date(this.newEntry.date)
+      )
+      .subscribe({
+        next: (res: genericResponseMessage) => {
+          this.closeAddPanel();
+          this.loadDailyEntries();
+          this.updateMonthlyChart();
+          this.loader.hide();
+          this.notify.showSuccess(res.message || 'BMI log added');
+          this.saving = false;
+        },
+        error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
           const errorMessage = error?.error?.message
             ? error.error.message
-            : 'Failed to get profile image';
-          console.log('error caused due to ', errorMessage);
-          this.loading = false;
-          this.showFullScreenMessage('error', errorMessage);
-        },      
-    })
+            : 'Failed to save entry';
+          console.log(error);
+          this.loader.hide();
+          this.notify.showError(errorMessage);
+          this.saving = false;
+        },
+      });
   }
 
-  // ====== Delete entry per row ======
+  deleteEntry(item: MemberWeighBmiEntryResponseDto) {
+    this.loader.show('Deleting entries', faTrash);
 
-  deleteEntry(entry: MemberWeighBmiEntryResponseDto) {
-    
-    this.loading = true;
-    this.globalLoadinText = 'Deleteing Entries';
-    this.icons.loading = faTrash;
-    this.page =0;
-    this.member.deleteEntries(this.userId, new Date(entry.date)).subscribe({
-      next :(res: genericResponseMessage) => {
-         console.log(res.message);
-        this.loadWeightBmiEntries()
-        this.loading = false;
-        this.showFullScreenMessage('success',res.message || 'new bmi entries updated successfully')
-      },error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
-          const errorMessage = error?.error?.message
-            ? error.error.message
-            : 'Failed to get profile image';
-          console.log('error caused due to ', errorMessage);
-          this.loading = false;
-          this.showFullScreenMessage('error', errorMessage);
-        }
-    })
+    this.member.deleteEntries(this.userId, new Date(item.date)).subscribe({
+      next: (res: genericResponseMessage) => {
+        console.log(res);
+        this.loadDailyEntries();
+        this.loader.hide();
+        this.notify.showSuccess(res.message || 'Entry removed');
+      },
+      error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
+        const errorMessage = error?.error?.message
+          ? error.error.message
+          : 'Failed to save entry';
+        console.log(error);
+        this.loader.hide();
+        this.notify.showError(errorMessage);
+        this.saving = false;
+      },
+    });
   }
 }
