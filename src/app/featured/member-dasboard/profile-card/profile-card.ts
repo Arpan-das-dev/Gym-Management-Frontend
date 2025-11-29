@@ -1,12 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
+  faBoltLightning,
   faCalendar,
   faCamera,
   faCheckCircle,
   faClipboard,
   faClock,
   faCogs,
+  faDownload,
   faDumbbell,
   faEnvelope,
   faExclamationCircle,
@@ -14,11 +16,13 @@ import {
   faFire,
   faGenderless,
   faIdBadge,
+  faList,
   faMale,
   faMars,
   faPhone,
   faReceipt,
   faTrash,
+  faUpload,
   faUser,
   faUserShield,
   faUserTie,
@@ -38,11 +42,13 @@ import { WebSocketService } from '../../../core/services/web-socket-service';
 import { genericResponseMessage } from '../../../core/Models/genericResponseModels';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { FitDetails } from "../fit-details/fit-details";
+import { LoadingService } from '../../../core/services/loading-service';
+import { NotifyService } from '../../../core/services/notify-service';
+
 
 @Component({
   selector: 'app-profile-card',
-  imports: [NgStyle, FontAwesomeModule, NgClass, NgStyle, DatePipe, FitDetails],
+  imports: [NgStyle, FontAwesomeModule, NgClass, NgStyle, DatePipe],
   templateUrl: './profile-card.html',
   styleUrl: './profile-card.css',
 })
@@ -65,20 +71,7 @@ export class ProfileCard implements OnInit, OnDestroy {
         break;
     }
   }
-  loading = false;
-  showMessage = false;
-  messageText = '';
-  globalLoadinText = '';
-  messageType: 'success' | 'error' = 'success';
-  showFullScreenMessage(type: 'success' | 'error', text: string) {
-    this.messageType = type;
-    this.messageText = text;
-    this.showMessage = true;
 
-    setTimeout(() => {
-      this.showMessage = false;
-    }, 5000);
-  }
   icons = {
     member: faUser,
     trainer: faDumbbell,
@@ -112,7 +105,7 @@ export class ProfileCard implements OnInit, OnDestroy {
     private authservice: Authservice,
     private router: Router,
     private websocket: WebSocketService,
-    private member: MemberService
+    private member: MemberService, private loader : LoadingService, private notify : NotifyService
   ) {}
 
   interval = 3600 * 1000;
@@ -124,11 +117,16 @@ export class ProfileCard implements OnInit, OnDestroy {
       this.setLoginStreak(this.memberDetail.memberId);
       console.log('executed after  1hour');
     }, this.interval);
+    this.loadAllUsersCount()
+    console.log(this.loadAllUsersCount());
+    console.log(`members : ${this.liveMemberCount} admin: ${this.liveAdminCount} trainer: ${this.liveTrainerCount}`);
+    
+    
   }
 
   getBasicinfo() {
-    this.loading = true;
-    this.globalLoadinText = 'loding details for your account';
+    this.loader.show('loding details for your account', faCogs)
+
     this.member.getMemberProfile(this.userId).subscribe({
       next: (res: MemberInfoResponseDto) => {
         setTimeout(() => {
@@ -136,17 +134,16 @@ export class ProfileCard implements OnInit, OnDestroy {
           this.genderMapper(res.gender)
           this.getLoginStreak(res.memberId);
           this.getProfileImage(res.memberId, res.gender.toLowerCase());
-          this.loading = false;
+          this.loader.hide();
+          this.notify.showSuccess(`Loded all details for ${res.firstName} ${res.lastName}`)
         });
       },
-      error: (err: erroResponseModel) => {
-        console.log('an error occured due to ', err.message);
-        this.loading = false;
-        this.showFullScreenMessage(
-          'error',
-          err.message || 'an error occured please try again later'
-        );
-      },
+       error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
+        const errorMessage = error?.error?.message ? error.error.message : 'Failed to save entry';
+        console.log(error);
+        this.loader.hide()
+        this.notify.showError(errorMessage)
+      }
     });
   }
 
@@ -173,105 +170,115 @@ export class ProfileCard implements OnInit, OnDestroy {
     this.uploadImage(file);
   }
   uploadImage(file: File) {
-    // console.log(this.memberDetail);
-    // console.log('user Id =' + this.userId);
-    this.globalLoadinText = 'uploading';
-    this.loading = true;
-    this.member.uploadImage(this.userId, file).subscribe({
-      next: (res: genericResponseMessage) => {
-        // console.log('image upload successfully to = ' + res.message);
-        this.profileImage = res.message || '';
-        this.loading = false;
-        this.showFullScreenMessage(
-          'success',
-          'profile image uploaded successfully '
-        );
-      },
-      error: (err: erroResponseModel) => {
-        this.loading = false;
-        console.log(err.message);
-        this.showFullScreenMessage(
-          'error',
-          err.message ||
-            'Failed to upload image due to internal issue try again later'
-        );
-      },
-    });
-  }
+  this.loader.show('uploading', faUpload);
 
-  deletable: boolean = false;
+  this.member.uploadImage(this.userId, file).subscribe({
+    next: (res: genericResponseMessage) => {
+
+      if (res.message && res.message.includes("http")) {
+        // 🔥 Force browser to load new image (no cache)
+        this.profileImage = res.message + '?t=' + performance.now();
+
+        // 🔥 Mark delete as available
+        this.canDelete = true;
+      } else {
+        this.profileImage = this.memberDetail.gender.toLowerCase() === 'female'
+          ? 'defaultFemale.png'
+          : 'defaultMale.png';
+        this.canDelete = false;
+      }
+
+      this.loader.hide();
+      this.notify.showSuccess('Profile image uploaded successfully');
+    },
+    error: (error) => {
+      const errorMessage = error?.error?.message ?? 'Upload failed';
+      this.loader.hide();
+      this.notify.showError(errorMessage);
+    }
+  });
+}
+
+
+ 
+  canDelete: boolean = false;
   getProfileImage(memberId: string, gender: string) {
-    this.loading = true;
+    this.loader.show('Fetching Profile Image', faDownload)
     this.member.getProfileImage(memberId).subscribe({
       next: (res: genericResponseMessage) => {
         if (!res.message || !res.message.includes('http')) {
           this.profileImage =
             gender === 'female' ? 'defaultFemale.png' : 'defaultMale.png';
-          this.deletable = false;
+          this.canDelete = false;
         } else {
           this.profileImage = res.message;
-          this.deletable = true;
+          this.canDelete = true;
         }
-        this.loading = false;
+       this.loader.hide()
         this.getPlanDetails(memberId);
+        console.log("is it deletable ?? "+'['+ this.canDelete +']' + res.message);
+        
       },
-      error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
-        const errorMessage = error?.error?.message
-          ? error.error.message
-          : 'Failed to get profile image';
-        console.log('error caused due to ', errorMessage);
-        this.loading = false;
-        this.showFullScreenMessage('error', errorMessage);
-      },
+       error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
+        const errorMessage = error?.error?.message ? error.error.message : 'Failed to save entry';
+        console.log(error);
+        this.loader.hide()
+        this.notify.showError(errorMessage)
+      }
     });
   }
 
-  deleteImage() {
-    // console.log('delete image triggered');
-    this.loading = true;
-    this.globalLoadinText = 'deleting';
-    const memberId = this.memberDetail.memberId;
-    this.member.deleteMemberProfileImage(memberId).subscribe({
-      next: (res: genericResponseMessage) => {
-        this.getProfileImage(memberId, this.memberDetail.gender);
-        this.loading = false;
-        const message = res.message || 'image deleted successfully ';
-        this.showFullScreenMessage('success', message);
-      },
-      error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
-        const errorMessage = error?.error?.message
-          ? error.error.message
-          : 'Failed to delete profile image';
-        console.log('error caused due to ', errorMessage);
-        this.loading = false;
-        this.showFullScreenMessage('error', errorMessage);
-      },
-    });
+deleteImage() {
+  console.log("DELETE CLICKED!"); // MUST always fire
+
+  if (!this.canDelete) {
+    console.log("Delete blocked because canDelete = false");
+    return;
   }
+
+  this.loader.show('Deleting image...', this.icons.trash);
+
+  const memberId = this.memberDetail.memberId;
+
+  this.member.deleteMemberProfileImage(memberId).subscribe({
+    next: (res) => {
+      console.log("DELETE SUCCESS:", res);
+      // Wait for S3 consistency
+      setTimeout(() => {
+        this.getProfileImage(memberId, this.memberDetail.gender);
+      }, 300);
+
+      this.loader.hide();
+      this.notify.showSuccess(res.message || 'Image deleted successfully');
+    },
+    error: (err) => {
+      console.log("DELETE ERROR:", err);
+      this.loader.hide();
+      this.notify.showError(err?.error?.message || 'Failed to delete image');
+    }
+  });
+}
 
   // login streak values
   currentLoginStreak: number = 0;
   maxLoginStreak: number = 0;
   // 1. get LoginStreak
   getLoginStreak(memberId: string) {
-    this.loading = true;
-    this.globalLoadinText = 'fetching login streak';
+    this.loader.show('fetching login streak', faBoltLightning)
     this.member.getLoginStreak(memberId).subscribe({
       next: (res: LoginStreakResponseDto) => {
         // console.log('get the response::', typeof res);
         // console.log(res);
         this.currentLoginStreak = res.logInStreak;
         this.maxLoginStreak = res.maxLogInStreak;
-        this.loading = false;
+        this.loader.hide()
       },
-      error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
-        const errorMessage = error?.error?.message
-          ? error.error.message
-          : 'Failed to load login Streak';
-        console.log('error caused due to ', errorMessage);
-        this.loading = false;
-        this.showFullScreenMessage('error', errorMessage);
-      },
+ error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
+        const errorMessage = error?.error?.message ? error.error.message : 'Failed to save entry';
+        console.log(error);
+        this.loader.hide()
+        this.notify.showError(errorMessage)
+      }
     });
   }
 
@@ -295,51 +302,37 @@ export class ProfileCard implements OnInit, OnDestroy {
   };
 
   getPlanDetails(memberId: string) {
-    this.loading = true;
-    this.globalLoadinText = 'Fetching Plan infos';
+    this.loader.show('Fetching Plan infos', faList)
     this.member.getPlaninfo(memberId).subscribe({
       next: (res: MemberPlanInfoResponseDto) => {
-        this.loading = false;
+        this.loader.hide()
         this.showAllertMessage(res.planDurationLeft);
         this.getPlanStatusStyling(res.planDurationLeft);
         // console.log(res);
         this.planDetails = res;
       },
-      error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
-        const errorMessage = error?.error?.message
-          ? error.error.message
-          : 'Failed to planInfo';
-        console.log('error caused due to ', errorMessage);
-        this.loading = false;
-        this.showFullScreenMessage('error', errorMessage);
-      },
+ error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
+        const errorMessage = error?.error?.message ? error.error.message : 'Failed to save entry';
+        console.log(error);
+        this.loader.hide()
+        this.notify.showError(errorMessage)
+      }
     });
   }
 
   showAllertMessage(planDurationLeft: number): void {
     const days = Number(planDurationLeft);
     if (days <= 0) {
-      this.showFullScreenMessage(
-        'error',
-        'Your plan has expired. Please renew or account will be frozen in 10 days'
-      );
+      this.notify.showError( 'Your plan has expired. Please renew or account will be frozen in 10 days')
     } else if (days === 1) {
-      this.showFullScreenMessage(
-        'error',
-        'Your plan expires tomorrow. Please renew soon.'
-      );
+      this.notify.showError('Your plan expires tomorrow. Please renew soon.')
     } else if (days <= 7) {
-      this.showFullScreenMessage(
-        'success',
-        `Your plan will expire in ${days} day${
+      this.notify.showError(`Your plan will expire in ${days} day${
           days > 1 ? 's' : ''
-        }. Consider renewing soon.`
-      );
+        }. Consider renewing soon.`)
+      
     } else {
-      this.showFullScreenMessage(
-        'success',
-        `Your plan is active for ${days} more day${days > 1 ? 's' : ''}.`
-      );
+      this.notify.showSuccess( `Your plan is active for ${days} more day${days > 1 ? 's' : ''}.`)
     }
   }
 
