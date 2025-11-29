@@ -1,23 +1,66 @@
-<app-navbar/>
-<!-- BACKGROUND (uses uploaded file) -->
-<div class="fixed inset-0 -z-10">
-  <img
-    src="allMembersBg.jpg"
-    alt="background"
-    class="w-full h-full object-cover brightness-90"
-  />
-  <!-- subtle overlay so glass cards pop -->
-  <div class="absolute inset-0 bg-black/20 pointer-events-none"></div>
-</div>
-
-<div id="mainBox" class="grid mt-auto justify-center  background-image">
-
-    <app-profile-card/>
-    <br>
-    <div class="fitDetials  flex justify-between">
-        <app-fit-details/>
+<!-- 🌐 GLOBAL LOADER -->
+@if (loading) {
+  <div class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-99998">
+    <div class="text-center animate-pulse">
+      <fa-icon [icon]="icons.loading" class="text-5xl text-white mb-2"></fa-icon>
+      <p class="text-base font-semibold text-white">{{ globalLoadinText }}...</p>
     </div>
+  </div>
+}
+
+<!-- 🌐 GLOBAL TOAST -->
+@if (showMessage) {
+  <div class="fixed inset-0 flex justify-center items-start z-99999 pointer-events-none">
+    <div
+      class="mt-6 px-5 py-3 rounded-xl shadow-xl text-white pointer-events-auto
+             animate-fadeIn transition-all"
+      [ngClass]="{
+        'bg-green-600': messageType === 'success',
+        'bg-red-600': messageType === 'error'
+      }">
+
+      <fa-icon
+        [icon]="messageType === 'success' ? icons.checkCircle : icons.exclamationCircle"
+        class="mr-2"
+      ></fa-icon>
+
+      <span class="font-medium">{{ messageText }}</span>
+    </div>
+  </div>
+}
+
+<app-navbar />
+
+<!-- Background -->
+<div class="dashboard-bg"></div>
+
+<!-- MAIN WRAPPER -->
+<div class="w-full flex flex-col items-center min-h-screen pt-10 pb-24 
+            px-4 sm:px-6 lg:px-10 animate-fade-in">
+
+  <div class="w-full max-w-7xl space-y-10"> 
+
+    <!-- PROFILE CARD -->
+    <app-profile-card class="dashboard-section"></app-profile-card>
+    <br>
+    <!-- BMI + Upcoming Session (future) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 
+                gap-6 sm:gap-8 w-full">
+      <!-- ⬆ uniform gap horizontally & vertically -->
+      <app-weight-bmi-info class="dashboard-section"></app-weight-bmi-info>
+      <!-- <app-upcoming-session class="dashboard-section"></app-upcoming-session> -->
+    </div>
+
+    <app-pr-details class="dashboard-section w-full"></app-pr-details>
+    <!-- Fitness Details card -->
+    <app-fit-details class="dashboard-section w-full"></app-fit-details>
+    <br>
+    <!-- PR Details card -->
     
 
+  </div>
 </div>
+
+<app-footer />
+
 
