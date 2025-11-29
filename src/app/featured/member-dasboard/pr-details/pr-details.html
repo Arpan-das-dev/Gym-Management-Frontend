@@ -446,147 +446,139 @@
 
 <!-- SLIDE-OVER PANEL -->
 @if (showAddPanel) {
-  <div class="fixed inset-0 z-40 flex overflow-hidden">
+<div class="fixed inset-0 z-50 flex items-center justify-center">
 
-    <!-- Backdrop -->
-    <div class="flex-1 bg-black/60 backdrop-blur-sm animate-softFade"
-         (click)="closeAddPanel()"></div>
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm animate-softFade"
+       (click)="closeAddPanel()"></div>
 
-    <!-- Panel -->
-    <div class="w-full max-w-md md:max-w-lg bg-[#111827] text-white shadow-2xl
-               border-l border-gray-700 animate-slideInRight flex flex-col fixed right-0 top-0">
+  <!-- POPUP WRAPPER -->
+  <div class="relative w-full max-w-lg md:max-w-2xl 
+              bg-[#111827] text-white rounded-2xl shadow-2xl border border-gray-700
+              animate-slideUp overflow-hidden max-h-[90vh] flex flex-col">
 
-      <!-- Header -->
-      <div class="px-5 md:px-6 py-4 border-b border-gray-700 flex items-center justify-between">
-        <h3 class="text-lg font-semibold text-orange-400">
-          {{ updateMode ? 'Update PR Record' : 'Add Multiple PR Records' }}
-        </h3>
-        <button type="button" (click)="closeAddPanel()"
-                class="rounded-full p-2 hover:bg-gray-800 transition">
-          <fa-icon [icon]="icons.close"></fa-icon>
-        </button>
-      </div>
+    <!-- HEADER -->
+    <div class="px-5 md:px-6 py-4 border-b border-gray-700 flex items-center justify-between shrink-0">
+      <h3 class="text-lg font-semibold text-orange-400">
+        {{ updateMode ? 'Update PR Record' : 'Add Multiple PR Records' }}
+      </h3>
+      <button type="button" (click)="closeAddPanel()"
+              class="rounded-full p-2 hover:bg-gray-800 transition">
+        <fa-icon [icon]="icons.close"></fa-icon>
+      </button>
+    </div>
 
-      <!-- CONTENT -->
-      <div class="px-5 md:px-6 py-4 space-y-5 flex-1 overflow-y-auto h-[calc(100vh-140px)]">
+    <!-- CONTENT (Scroll inside modal ONLY) -->
+    <div class="px-5 md:px-6 py-4 space-y-5 overflow-y-auto flex-1 
+                scrollbar-thin scrollbar-thumb-gray-700">
 
-        @for (r of editRows; track r._id) {
-        <div class="p-4 rounded-xl bg-[#020617]/60 border border-gray-700 space-y-3 animate-softFade">
+      @for (r of editRows; track r._id) {
+      <div class="p-4 rounded-xl bg-[#020617]/60 border border-gray-700 space-y-3 animate-softFade">
 
-          <!-- Workout -->
-          <div>
-            <label class="block text-sm text-gray-300 mb-1">Workout</label>
-            <select
-              [(ngModel)]="r.workoutName"
-              (change)="autoFillForBodyWeight(r)"
-              class="w-full rounded-lg bg-[#020617] border border-gray-700 px-3 py-2 text-sm
-                     focus:outline-none focus:ring-1 focus:ring-orange-500">
-              <option value="" disabled>Select workout</option>
-              @for (w of allPrs; track $index) {
-              <option [value]="w">{{ w }}</option>
-              }
-            </select>
-          </div>
-
-          <!-- Weight + Reps -->
-          <div class="grid grid-cols-3 gap-3">
-            <div class="col-span-2">
-              <label class="block text-sm text-gray-300 mb-1">Weight</label>
-              <input
-                type="number"
-                min="1"
-                [(ngModel)]="r.weight"
-                class="w-full rounded-lg bg-[#020617] border border-gray-700 px-3 py-2 text-sm
-                       focus:outline-none focus:ring-1 focus:ring-orange-500">
-            </div>
-            <div>
-              <label class="block text-sm text-gray-300 mb-1">Reps</label>
-              <input
-                type="number"
-                min="1"
-                [(ngModel)]="r.repetitions"
-                class="w-full rounded-lg bg-[#020617] border border-gray-700 px-3 py-2 text-sm
-                       focus:outline-none focus:ring-1 focus:ring-orange-500">
-            </div>
-          </div>
-
-          <!-- Date -->
-          <div>
-            <label class="block text-sm text-gray-300 mb-1">Date</label>
-            <input
-              type="date"
-              [(ngModel)]="r.achievedDate"
-              class="w-full rounded-lg bg-[#020617] border border-gray-700 px-3 py-2 text-sm
-                     focus:outline-none focus:ring-1 focus:ring-orange-500">
-          </div>
-
-          <!-- Volume -->
-          <div class="text-xs text-gray-400">
-            Volume:
-            <span class="text-emerald-300 font-semibold">{{ getRowVolume(r) }}</span>
-          </div>
-
-          <!-- Remove row -->
-          <div class="text-right">
-            @if (!updateMode) {
-            <button
-              type="button"
-              (click)="removeRow(r._id)"
-              class="px-3 py-1.5 rounded-full bg-red-600/70 hover:bg-red-500 text-xs flex items-center gap-1">
-              <fa-icon [icon]="icons.trash"></fa-icon>
-              Remove
-            </button>
+        <!-- Workout -->
+        <div>
+          <label class="block text-sm text-gray-300 mb-1">Workout</label>
+          <select
+            [(ngModel)]="r.workoutName"
+            (change)="autoFillForBodyWeight(r)"
+            class="w-full rounded-lg bg-[#020617] border border-gray-700 px-3 py-2 text-sm
+                   focus:outline-none focus:ring-1 focus:ring-orange-500">
+            <option value="" disabled>Select workout</option>
+            @for (w of allPrs; track $index) {
+            <option [value]="w">{{ w }}</option>
             }
+          </select>
+        </div>
+
+        <!-- Weight + Reps -->
+        <div class="grid grid-cols-3 gap-3">
+          <div class="col-span-2">
+            <label class="block text-sm text-gray-300 mb-1">Weight</label>
+            <input
+              type="number" min="1" [(ngModel)]="r.weight"
+              class="w-full rounded-lg bg-[#5c5e67] border border-gray-700 px-3 py-2 text-sm
+                     focus:outline-none focus:ring-1 focus:ring-orange-500">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-300 mb-1">Reps</label>
+            <input
+              type="number" min="1" [(ngModel)]="r.repetitions"
+              class="w-full rounded-lg bg-[#5c5e67] border border-gray-700 px-3 py-2 text-sm
+                     focus:outline-none focus:ring-1 focus:ring-orange-500">
           </div>
         </div>
-        }
 
-        @if(!updateMode) {
-        <button
-          type="button"
-          (click)="addRow()"
-          class="w-full px-4 py-2 rounded-xl bg-white/10 border border-gray-600 text-sm
-                 flex items-center justify-center gap-2 hover:bg-white/20 transition">
-          <fa-icon [icon]="icons.add"></fa-icon>
-          Add Another Workout
-        </button>
-        }
-      </div>
+        <!-- Date -->
+        <div>
+          <label class="block text-sm text-gray-300 mb-1">Date</label>
+          <input
+            type="date" [(ngModel)]="r.achievedDate"
+            class="w-full rounded-lg bg-[#5c5e67] border border-gray-700 px-3 py-2 text-sm
+                   focus:outline-none focus:ring-1 focus:ring-orange-500">
+        </div>
 
-      <!-- FOOTER -->
-      <div class="px-5 md:px-6 py-4 border-t border-gray-700 flex justify-between items-center">
-        <button
-          type="button"
-          (click)="closeAddPanel()"
-          class="px-4 py-2 rounded-full bg-gray-800 text-sm hover:bg-gray-700 transition">
-          Cancel
-        </button>
+        <!-- Volume -->
+        <div class="text-xs text-gray-400">
+          Volume: <span class="text-emerald-300 font-semibold">{{ getRowVolume(r) }}</span>
+        </div>
 
-        @if (updateMode) {
-        <button
-          type="button"
-          (click)="submitUpdateSingle()"
-          class="px-5 py-2 rounded-full bg-linear-to-r from-orange-500 to-yellow-400
-                 hover:from-orange-600 hover:to-yellow-500 text-sm font-semibold
-                 shadow-md hover:shadow-orange-400/40 transition flex items-center gap-2">
-          <fa-icon [icon]="icons.checkCircle" class="text-xs"></fa-icon>
-          Update
-        </button>
-        } @else {
-        <button
-          type="button"
-          (click)="submitMulti()"
-          class="px-5 py-2 rounded-full bg-linear-to-r from-orange-500 to-yellow-400
-                 hover:from-orange-600 hover:to-yellow-500 text-sm font-semibold
-                 shadow-md hover:shadow-orange-400/40 transition flex items-center gap-2">
-          <fa-icon [icon]="icons.checkCircle" class="text-xs"></fa-icon>
-          Save All
-        </button>
+        <!-- Remove -->
+        @if (!updateMode) {
+        <div class="text-right">
+          <button
+            type="button"
+            (click)="removeRow(r._id)"
+            class="px-3 py-1.5 rounded-full bg-red-600/70 hover:bg-red-500 text-xs flex items-center gap-1">
+            <fa-icon [icon]="icons.trash"></fa-icon>
+            Remove
+          </button>
+        </div>
         }
       </div>
+      }
+
+      @if (!updateMode) {
+      <button
+        type="button" (click)="addRow()"
+        class="w-full px-4 py-2 rounded-xl bg-white/10 border border-gray-600 text-sm
+               flex items-center justify-center gap-2 hover:bg-white/20 transition">
+        <fa-icon [icon]="icons.add"></fa-icon>
+        Add Another Workout
+      </button>
+      }
+
     </div>
+
+    <!-- FOOTER -->
+    <div class="px-5 md:px-6 py-4 border-t border-gray-700 flex justify-between items-center shrink-0">
+      <button type="button" (click)="closeAddPanel()"
+              class="px-4 py-2 rounded-full bg-gray-800 text-sm hover:bg-gray-700 transition">
+        Cancel
+      </button>
+
+      @if (updateMode) {
+      <button type="button" (click)="submitUpdateSingle()"
+              class="px-5 py-2 rounded-full bg-linear-to-r from-orange-500 to-yellow-400
+                     hover:from-orange-600 hover:to-yellow-500 text-sm font-semibold
+                     shadow-md hover:shadow-orange-400/40 transition flex items-center gap-2">
+        <fa-icon [icon]="icons.checkCircle" class="text-xs"></fa-icon>
+        Update
+      </button>
+      } @else {
+      <button type="button" (click)="submitMulti()"
+              class="px-5 py-2 rounded-full bg-linear-to-r from-orange-500 to-yellow-400
+                     hover:from-orange-600 hover:to-yellow-500 text-sm font-semibold
+                     shadow-md hover:shadow-orange-400/40 transition flex items-center gap-2">
+        <fa-icon [icon]="icons.checkCircle" class="text-xs"></fa-icon>
+        Save All
+      </button>
+      }
+    </div>
+
   </div>
+</div>
 }
+
 
 <!-- WARNING POPUP -->
 @if (showWarning) {
