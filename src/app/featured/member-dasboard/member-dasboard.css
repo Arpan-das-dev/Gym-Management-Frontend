@@ -1,22 +1,62 @@
-body {
-  margin: 0;
-  height: 100vh;
-  width: 100%;
-  position: relative; /* for positioning the pseudo-element */
-  display: flex;
-  flex-direction: column;
-}
-
-body::before {
-  content: "";
-  position: fixed; /* fixed so it stays on full viewport */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+/* -------------------------
+   Dashboard Background Layer
+   ------------------------- */
+.dashboard-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: url("/memberDashboard.jpg");
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(2px);
-  z-index: -1; 
+  filter: brightness(0.9);
+}
+
+.dashboard-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(4px);
+}
+
+/* -------------------------
+   Section Wrapper (same width for all)
+   ------------------------- */
+.dashboard-section {
+  width: 100%;
+  /* REMOVE max-width:900px (the main bug) */
+  max-width: 100%; 
+  margin-left: auto;
+  margin-right: auto;
+  animation: softPop 0.4s ease;
+}
+
+/* -------------------------
+   Fade In Animation
+   ------------------------- */
+@keyframes dashboardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: dashboardFadeIn 0.9s ease forwards;
+}
+
+/* Optional subtle scale animation */
+@keyframes softPop {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
