@@ -7,3 +7,6 @@ export interface genericResponseMessage {
   response?: string;
   orderId?: string;
 }
+export interface GenericResponse {
+  message : string
+}
