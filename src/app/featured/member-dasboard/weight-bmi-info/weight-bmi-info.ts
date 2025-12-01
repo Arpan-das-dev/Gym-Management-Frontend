@@ -54,7 +54,6 @@ bmiWeightInfo: BmiWeightInfoResponseDto = {
       }, error:(error: erroResponseModel & {error: HttpErrorResponse}) => {
         console.log(error);
         const errorMessage = error?.error?.message ? error.error.message : 'Failed to save entry';
-        console.log(error);
         this.loader.hide()
         this.notify.showError(errorMessage)
       }
