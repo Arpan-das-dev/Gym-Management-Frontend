@@ -4,12 +4,7 @@ import { Signup } from './featured/auth/signup/signup';
 import { Homepage } from './shared/components/homepage/homepage';
 import { Plan } from './featured/plan/plan';
 import { roleGuard } from './core/guards/role-guard';
-import { ProfileCard } from './shared/components/profile-card/profile-card';
-import { CreatePlans } from './featured/plan/create-plans/create-plans';
 import { authGuard } from './core/guards/auth-guard';
-import { Component } from '@angular/core';
-import { BuyPlan } from './featured/plan/buy-plan/buy-plan';
-import { ViewAllMembers } from './featured/admin-dashboard/view-all-members/view-all-members';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -17,8 +12,6 @@ export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'signup', component: Signup },
   { path: 'plans', component: Plan },
-  { path: 'profile', component: ProfileCard },
-
   // path for auths
   {
     path: 'verify-email',
@@ -75,6 +68,17 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./featured/member-dasboard/member-dasboard').then(
         (m) => m.MemberDasboard
+      ),
+  },
+
+  // 3. trainer dashboard
+  {
+    path: 'trainer-dashboard',
+    canActivate: [roleGuard, authGuard],
+    data: { roles: ['TRAINER', 'TRAINER_PENDING'] },
+    loadComponent: () =>
+      import('./featured/trainer-dasboard/trainer-dasboard').then(
+        (t) => t.TrainerDasboard
       ),
   },
   {
@@ -147,6 +151,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./featured/plan/recent-transactions/recent-transactions').then(
         (m) => m.RecentTransactions
+      ),
+  },
+  // path for footer
+  {
+    path: 'terms-of-service',
+    loadComponent: () =>
+      import('./shared/terms-of-service/terms-of-service').then(
+        (t) => t.TermsOfService
       ),
   },
 
