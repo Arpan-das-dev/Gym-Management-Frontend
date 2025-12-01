@@ -152,8 +152,7 @@ export class MemberService {
   }
 
   // retreive member's plan info
-  private planInfoUrl =
-    'http://localhost:8080/fitStudio/member-service/planDetails';
+  private planInfoUrl ='http://localhost:8080/fitStudio/member-service/planDetails';
   getPlaninfo(memberId: string): Observable<any> {
     const url = `${this.planInfoUrl}?memberId=${memberId}`;
     return this.http.get(url);
