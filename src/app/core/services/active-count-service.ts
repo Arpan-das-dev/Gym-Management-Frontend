@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +25,7 @@ export class ActiveCountService {
   }
 
   // Trainer APIs
-  private trainerCountUrl = 'http://localhost:8080/fitStudio/trainer-service/count';
+  private trainerCountUrl = environment.microServices.TRAINER_SERVICE.STATUS;
 
   trainerIncrement(id: string): Observable<any> {
     return this.httpClient.post(`${this.trainerCountUrl}/increment?id=${id}`, {});
