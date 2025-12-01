@@ -3,15 +3,41 @@ import { FormBuilder, FormGroup, FormsModule, Validators, ReactiveFormsModule } 
 import { Router, RouterLink } from '@angular/router';
 import { Authservice } from '../../../core/services/authservice';
 import { loginModel } from '../../../core/Models/loginModels';
+import { faCheckCircle, faCogs, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { NgClass } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule,ReactiveFormsModule,RouterLink],
+  imports: [FormsModule,ReactiveFormsModule,RouterLink,NgClass,FontAwesomeModule],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
 export class Login {
 
+  // global loading  and message variables
+    // global loading screen
+    loading = false;
+    showMessage = false;
+    messageText = '';
+    globalLoadinText = '';
+    messageType: 'success' | 'error' = 'success';
+  
+    showFullScreenMessage(type: 'success' | 'error', text: string) {
+      this.messageType = type;
+      this.messageText = text;
+      this.showMessage = true;
+  
+      setTimeout(() => {
+        this.showMessage = false;
+        this.icons.loading = faCogs;
+      }, 3000);
+    }
+    icons = {
+      loading: faCogs,
+      checkCircle: faCheckCircle,
+      exclamationCircle: faExclamationCircle,
+    };
   loginForm: FormGroup;
 
   validated: boolean = false;
