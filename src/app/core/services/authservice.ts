@@ -252,6 +252,8 @@ export class Authservice {
         this.cookies.set('userPhone',user.phone,{path:'/',sameSite:'Strict'})
         this.cookies.set('userName',`${user.firstName} ${user.lastName}`,{path:'/', sameSite:'Strict'})
         this.cookies.set('role',user.role,{path:'/', sameSite:'Strict'})
+        console.log(user.role);
+        
         sessionStorage.setItem('email-verified',user.emailVerified ? 'true': 'false');
         sessionStorage.setItem('phone-verifed', user.phoneVerified ? 'true' : 'false')
         if(user.role === 'MEMBER') {
