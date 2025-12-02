@@ -3,14 +3,19 @@ import { Component, OnInit } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCamera,
+  faClose,
   faCogs,
   faDownload,
   faDumbbell,
+  faEdit,
   faEnvelope,
   faGenderless,
   faIdBadge,
   faMars,
   faPhone,
+  faPlus,
+  faRecycle,
+  faSave,
   faTrash,
   faUpload,
   faUser,
@@ -21,7 +26,7 @@ import { Authservice } from '../../../core/services/authservice';
 import { TrainerService } from '../../../core/services/trainer-service';
 import { NotifyService } from '../../../core/services/notify-service';
 import { LoadingService } from '../../../core/services/loading-service';
-import { TrainerResponseDto } from '../../../core/Models/TrainerServiceModels';
+import { SpecialityResponseDto, TrainerResponseDto } from '../../../core/Models/TrainerServiceModels';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { WebSocketService } from '../../../core/services/web-socket-service';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -30,10 +35,12 @@ import {
   GenericResponse,
   genericResponseMessage,
 } from '../../../core/Models/genericResponseModels';
+import { FormsModule } from '@angular/forms';
+import { SerarchPipePipe } from '../../../shared/pipes/serarch-pipe-pipe';
 
 @Component({
   selector: 'app-profile-cardT',
-  imports: [FontAwesomeModule, NgStyle, NgClass],
+  imports: [FontAwesomeModule, FormsModule,NgStyle,SerarchPipePipe,NgClass],
   templateUrl: './profile-card.html',
   styleUrl: './profile-card.css',
 })
@@ -50,6 +57,7 @@ export class ProfileCard implements OnInit {
   ) {}
   // implent ngOnInit to load required things when page loads
   ngOnInit(): void {
+    this.getAllPreDefinedSpecialites()
     this.trainerId = this.auth.getUserId();
     setTimeout(() => {
       this.loadTrainerInfo();
@@ -67,6 +75,10 @@ export class ProfileCard implements OnInit {
     user: faUser,
     mail: faEnvelope,
     phone: faPhone,
+    edit: faEdit,
+    close : faClose,
+    replace : faRecycle,
+    plus: faPlus
   };
   /**
    * profile image sections responsible to
@@ -157,12 +169,12 @@ export class ProfileCard implements OnInit {
         this.loader.hide();
         this.notify.showSuccess(message);
       },
-      // error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
-      //   const errorMessage = error?.error?.message ? error.error.message : 'Failed to Delete Your Image';
-      //   console.log(error);
-      //   this.loader.hide()
-      //   this.notify.showError(errorMessage)
-      // }
+      error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
+        const errorMessage = error?.error?.message ? error.error.message : 'Failed to Delete Your Image';
+        console.log(error);
+        this.loader.hide()
+        this.notify.showError(errorMessage)
+      }
     });
   }
 
@@ -211,7 +223,7 @@ export class ProfileCard implements OnInit {
   loadTrainerInfo() {
     this.loader.show('Loading Your Account Details', faCogs);
     this.trainer.getTrainerById(this.trainerId).subscribe({
-      next: (res: TrainerResponseDto | any) => {
+      next: (res: TrainerResponseDto ) => {
         console.log('fetched from backend ::=>');
         console.log(res);
         this.trainerDetail = res;
@@ -221,21 +233,213 @@ export class ProfileCard implements OnInit {
           this.genderIcon = faMars;
         }
         this.genderMapper(res.gender)
+        this.getAboutForTrainer(res.trainerId)
+        this.loadTrainerSpecialityById()
         this.loader.hide();
         this.notify.showSuccess('SuccessFully Loaded Your account Details');
         this.getProfileImage();
       },
       error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
-        const errorMessage = error?.error?.message
-          ? error.error.message
-          : 'Failed to Load Users Info';
-        console.log(error);
+        const errorMessage = error?.error?.message;
+        console.log(errorMessage);
         this.loader.hide();
-        this.notify.showError(errorMessage);
+        this.catchError(errorMessage,'Failed To Load Users Info')
       },
     });
   }
 
+  /**
+   * other's info of trainer's profile 
+   * eg: trainers about and trainer's specialites 
+   * and all the variables and methods are written below
+   */
+  aboutTrainer:string = ''
+  aboutPopup:boolean = false // this variable is responsible to show popup box
+  aboutCharCount:number = 0;
+  updateCharCount(){
+    this.aboutCharCount = this.aboutTrainer.length
+  }
+  /**
+   * this makes the reverse of the above variable
+   * {@link aboutPopup}
+   */
+  openAboutPopup(){
+    this.aboutPopup = true;
+    console.log("about popupTriggered");
+    
+  }
+  /**
+   * this method does just reverse of {@link openAboutPopup}
+   * so the popup is hidden
+   */
+  closeAboutPopup() {
+    this.aboutPopup = false;
+  }
+  saveAboutInfo() {
+    this.loader.show("Saving Your Update",faSave)
+    this.trainer.setTrainerAbout(this.trainerId,this.aboutTrainer).subscribe({
+      next:(res:GenericResponse) => {
+        console.log("Fetched response from backend ==> \n",res.message);
+        this.aboutTrainer = res.message;
+        this.loader.hide()
+        this.closeAboutPopup()
+        this.notify.showSuccess("Successfully Updated Your About")        
+      },
+      error:(err:erroResponseModel & {err:HttpErrorResponse}) => {
+        const errorMessage = err?.err?.message;
+        console.log(errorMessage);
+        this.loader.hide()
+        this.catchError(errorMessage,"Failed To Update About Please Try Again Later")        
+      }
+    })
+  }
+  getAboutForTrainer(trainerId:string) {
+
+    this.trainer.getTrainerAbout(trainerId).subscribe({
+      next:(res:GenericResponse) => {
+        this.aboutTrainer = res.message;
+        console.log(res);
+      },
+      error:(err:erroResponseModel & {err:HttpErrorResponse}) => {
+        const errorMessage = err?.err?.message;
+        console.log(errorMessage);
+        this.catchError(errorMessage,"Failed To Update About Please Try Again Later")        
+      }
+    })
+  }
+  updateAboutForTrainer() {
+    this.saveAboutInfo()
+  }
+
+  /**
+   * below methods are for manage specialies
+   * and all the variables are related to it
+   * 
+   */
+  // get specialites from backend 
+  specialities:string[] = []
+  trainerSpecialities : string [] = []
+  searchText :string = ''
+  // this method is to retreive all specialites defined in the backend
+  getAllPreDefinedSpecialites() {
+    this.trainer.getAllPreDefinedSpecialites().subscribe({
+    next:(res:SpecialityResponseDto) => {
+      console.log("number of speciality fetched from backend is::=>",res.specialityList.length);
+      this.specialities = res.specialityList.map(item=> item.replace("_"," "));
+    }, error:(err: erroResponseModel & {err:HttpErrorResponse}) => {
+      const errorMessage = err?.err?.message;
+        console.log(errorMessage);
+        this.catchError(errorMessage,"Failed To Load All PreDefined Specialites")
+    }
+    })
+  }
+  // this.method is to load all speciality for any specific trainer
+  loadTrainerSpecialityById() {
+    this.loader.show("Loading Your Specialities",faDownload)
+    this.trainer.getSpecialityByTrainerId(this.trainerId).subscribe({
+      next:(res:SpecialityResponseDto) => {
+        console.log("fetched trainer's speciality of ",res.specialityList.length+" no");
+        console.log(res);
+        this.trainerSpecialities = res.specialityList;
+        this.loader.hide();
+        this.notify.showSuccess('Successfully Loaded All Specialites')        
+      }, error:(err: erroResponseModel & {err:HttpErrorResponse}) => {
+      const errorMessage = err?.err?.message;
+        console.log(errorMessage);
+        this.catchError(errorMessage,"Failed To Load All PreDefined Specialites")
+    }
+    })
+  }
+  newSpeciality: string = ''
+  addSpecialityPopup:boolean = false;
+  openAddSpecialityPopup(){
+    this.addSpecialityPopup = true // this makes the popup visible so that trainers can update or delete speciality
+  }
+  closeAddSpecialityPopup(){
+    this.addSpecialityPopup = false; // makes to close the popup
+    this.newSpeciality = ''
+        this.searchText = ''
+  }
+  selectSpeciality(sp:string) {
+    this.newSpeciality = sp;
+    this.searchText = sp;
+  }
+  // this method is to save a new speciality for a trainer
+  saveSpeciality(){
+    this.loader.show('Updating New Speciality In Your Profile',faSave);
+    
+    this.trainer.addNewSpecialityByTrainerId(this.trainerId,this.newSpeciality).subscribe({
+      next:(res:SpecialityResponseDto) => {
+        this.newSpeciality = ''
+        this.searchText = ''
+        console.log("fetched trainer's speciality of ",res.specialityList.length+" no");
+        console.log(res);
+        this.trainerSpecialities = res.specialityList;
+        this.closeAddSpecialityPopup()
+        this.loader.hide();
+        this.notify.showSuccess('Successfully Updated Your Specialites')        
+      },error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
+        const errorMessage = error?.error?.message ? error.error.message : 'Failed to Add Speciality';
+        console.log(error);
+        this.loader.hide()
+        this.notify.showError(errorMessage)
+      }
+    })
+  }
+ // this method is to remove speciality for trainer
+ confirmRemoveSpeciality(sp:string){
+  this.loader.show("Deleting Speciality From Your Profile", faTrash)
+  this.trainer.deleteSpecialityByTrainerId(this.trainerId,sp).subscribe({
+    next:(res: GenericResponse) => {
+      console.log(res.message);
+      this.loadTrainerSpecialityById();
+      this.loader.hide()
+      this.notify.showSuccess(res.message);      
+    }, error:(err: erroResponseModel & {err:HttpErrorResponse}) => {
+      const errorMessage = err?.err?.message;
+        console.log(errorMessage);
+        this.catchError(errorMessage,"Failed To Load All PreDefined Specialites")
+    }
+  })
+ }
+
+ /**
+  * here all varables and methods are to update speciality
+  */
+ oldSpeciality = ''
+ newReplaceableSpeciality = ''
+ updateSpecialityCondition: boolean = false;
+ updateSpeciality(sp:string) {
+  this.oldSpeciality = sp
+  this.updateSpecialityCondition = true;
+ }
+
+ updateSpecialites() {
+  this.loader.show('Replacing Your Speciality',faRecycle)
+  this.trainer.replaceSpeciality(this.oldSpeciality,this.newReplaceableSpeciality,this.trainerId).subscribe({
+    next:(res:SpecialityResponseDto) => {
+      console.log("fetched trainer's speciality of ",res.specialityList.length+" no");
+        console.log(res);
+        this.trainerSpecialities = res.specialityList;
+        this.loader.hide();
+        this.notify.showSuccess('Successfully Updated Your Specialites')        
+      }, error:(err: erroResponseModel & {err:HttpErrorResponse}) => {
+      const errorMessage = err?.err?.message;
+        console.log(errorMessage);
+        this.catchError(errorMessage,"Failed To Update Your Speciality Specialites")
+    }
+  })
+ }
+
+ trainerStatus:string = "AVAILABLE"
+  catchError(error: string | (erroResponseModel & {error: HttpErrorResponse}), defaultMessage: string) {
+    const errorMessage = typeof error === 'string' ? error : error?.error?.message;
+    if(errorMessage && !errorMessage.includes("/")) {
+      this.notify.showError(errorMessage)
+    } else {
+      this.notify.showError(defaultMessage);
+    }
+  }
   liveMemberCount = 0;
   liveAdminCount = 0;
   liveTrainerCount = 0;
