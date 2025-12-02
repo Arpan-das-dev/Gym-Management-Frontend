@@ -1,14 +1,15 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import { AllPublicTrainerInfoResponseWrapperDto, TrainerResponseDto } from '../Models/TrainerServiceModels';
-import { genericResponseMessage } from '../Models/genericResponseModels';
+import { GenericResponse, genericResponseMessage } from '../Models/genericResponseModels';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TrainerService {
+  
   constructor(private http: HttpClient) {}
   // base url which is resposbile to get profiles for trainers
   // home page (every one can see), admin dashboard (only admin can see more detailed and required details for a trianer)
@@ -38,6 +39,61 @@ export class TrainerService {
     console.log("sending request to ::=> \n",url);
     return this.http.get(url);
   }
+
+  /**
+   * this mehod is to save trainer's info
+   * @param trainerId 
+   * @param aboutTrainer
+   * @returns {GenericResponse} contains about of the trainer which is updated
+   */
+  setTrainerAbout(trainerId: string, aboutTrainer: string) :Observable<any>{
+    const url = `${this.TRAINER_BASE_URL}/trainer/setAbout`;
+    const body ={
+      trainerId : trainerId,
+      about : aboutTrainer
+    }
+    return this.http.post(url,body)
+  }
+  /**
+   * 
+   */
+  getTrainerAbout(trainerId:string) : Observable<any> {
+    const url = `${this.TRAINER_BASE_URL}/all/getAbout?trainerId=${trainerId}`;
+    return this.http.get(url)
+  }
+
+  /**
+   * This section is for Speciality for trainer
+   * 1. get All available specialites 2. get speciality by trainer id
+   * 3. delete speciality 4. replace speciality
+   */
+  getAllPreDefinedSpecialites() : Observable<any> {
+    const url = `${this.TRAINER_BASE_URL}/trainer/getSpecialites`;
+    return this.http.get(url);
+  }
+
+  getSpecialityByTrainerId(trainerId: string) : Observable<any> {
+    const url = `${this.TRAINER_BASE_URL}/all/getSpeciality?trainerId=${trainerId}`;
+    return this.http.get(url);
+  }
+
+  addNewSpecialityByTrainerId(trainerId:string, speciality:string) :Observable<any>{
+    const url = `${this.TRAINER_BASE_URL}/trainer/speciality`;
+    const params = new HttpParams().set('trainerId',trainerId).set('speciality',speciality);
+    return this.http.post(url, {},{params:params});
+  }
+
+  deleteSpecialityByTrainerId(trainerId:string,specialityName:string) : Observable<any> {
+    const url = `${this.TRAINER_BASE_URL}/trainer/delete`;
+    const params = new HttpParams().set('trainerId',trainerId).set('specialityName',specialityName);
+    return this.http.delete(url,{params:params})
+  }
+  replaceSpeciality(oldSpeciality:string, newSpeciality:string, trainerId:string) :Observable<any> {
+    const url =`${this.TRAINER_BASE_URL}/trainer/update`;
+    const params = new HttpParams().set('trainerId',trainerId).set('oldSpecialityName',oldSpeciality).set('newSpecialityName',newSpeciality)
+    return this.http.put(url,{params: params})
+  }
+
 
   /**
    * this section is for trainer's profile where trainer can upload only image at any format
