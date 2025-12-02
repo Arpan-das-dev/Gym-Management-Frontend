@@ -111,6 +111,7 @@ export class ProfileCard implements OnInit, OnDestroy {
   interval = 3600 * 1000;
   intervalId: any;
   ngOnInit(): void {
+    
     this.userId = this.authservice.getUserId();
     this.getBasicinfo();
     this.intervalId = setInterval(() => {
