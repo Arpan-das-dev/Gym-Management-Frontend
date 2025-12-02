@@ -29,5 +29,37 @@
   </div>
 }
 <app-navbar/>
-<app-profile-cardT/>
+<!-- 
+<!-- Background -->
+<div class="dashboard-bg"></div>
+
+<!-- MAIN WRAPPER -->
+<div class="w-full flex flex-col items-center min-h-screen pt-10 pb-24 
+            px-4 sm:px-6 lg:px-10 animate-fade-in">
+
+  <div class="w-full max-w-7xl space-y-10"> 
+
+    <!-- PROFILE CARD -->
+     <app-profile-cardT class="dashboard-section"/>
+    <br>
+    <!-- BMI + Upcoming Session (future) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 
+                gap-6 sm:gap-8 w-full">
+      <!-- ⬆ uniform gap horizontally & vertically -->
+      <!-- <app-weight-bmi-info class="dashboard-section"></app-weight-bmi-info> -->
+      <!-- <app-upcoming-session class="dashboard-section"></app-upcoming-session> -->
+    </div>
+
+    <!-- <app-pr-details class="dashboard-section w-full"></app-pr-details> -->
+    <!-- Fitness Details card -->
+    <!-- <app-fit-details class="dashboard-section w-full"></app-fit-details> -->
+    <br>
+    <!-- PR Details card -->
+    
+
+  </div>
+</div>
+
+-->
+
 <app-footer/>
