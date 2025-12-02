@@ -1,0 +1,42 @@
+/* Fade-in */
+.animate-fadeIn {
+  animation: fadeIn .6s ease-out both;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Delayed fade-ins */
+.animate-fadeInDelay1 { animation: fadeIn .6s .1s ease-out both; }
+.animate-fadeInDelay2 { animation: fadeIn .6s .2s ease-out both; }
+.animate-fadeInDelay3 { animation: fadeIn .6s .3s ease-out both; }
+.animate-fadeInDelay4 { animation: fadeIn .6s .4s ease-out both; }
+.animate-fadeInDelay5 { animation: fadeIn .6s .5s ease-out both; }
+
+/* Slide-up */
+.animate-slideUp {
+  animation: slideUp .5s ease-out both;
+}
+@keyframes slideUp {
+  from { transform: translateY(6px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* Scale-in for tags */
+.animate-scaleIn {
+  animation: scaleIn .3s ease-out both;
+}
+@keyframes scaleIn {
+  from { transform: scale(.8); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* Modal popup scale */
+.animate-popupScale {
+  animation: popupScale .25s ease-out both;
+}
+@keyframes popupScale {
+  from { transform: scale(.85); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
