@@ -5,6 +5,7 @@ import { Homepage } from './shared/components/homepage/homepage';
 import { Plan } from './featured/plan/plan';
 import { roleGuard } from './core/guards/role-guard';
 import { authGuard } from './core/guards/auth-guard';
+import { OurTrainers } from './shared/our-trainers/our-trainers';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -12,6 +13,7 @@ export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'signup', component: Signup },
   { path: 'plans', component: Plan },
+  { path: 'ourTrainers', component: OurTrainers},
   // path for auths
   {
     path: 'verify-email',
