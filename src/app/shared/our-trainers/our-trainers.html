@@ -1,0 +1,43 @@
+<app-navbar/>
+  @if (loading) {
+    <div class="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+      <div class="text-center animate-pulse">
+        <fa-icon [icon]="icons.cogs" class="text-5xl mb-2"></fa-icon>
+        <p class="text-base font-semibold">Processing...</p>
+      </div>
+    </div>
+  }
+
+  <!-- TOAST -->
+  @if (showMessage) {
+    <div
+      class="toast"
+      [ngClass]="{
+        'toast-success': messageType === 'success',
+        'toast-error': messageType === 'error'
+      }"
+    >
+      <fa-icon [icon]="messageType === 'success' ? icons.checkCircle : icons.exclamationCircle"></fa-icon>
+      <span class="ml-2">{{ messageText }}</span>
+    </div>
+  }
+  @for (trainer of Trainers; track $index) {
+    <div> 
+        <div id="profileImage">
+            <img src="{{trainer.profileImageUrl }}" alt="">
+        </div>
+        {{trainer.firstName}} {{trainer.lastName}} {{trainer.gender}}
+        {{trainer.email}}
+        {{trainer.about}}
+        {{trainer.clientCount}}
+        {{trainer.averageRating}} 
+        base on ({{trainer.reviewCount}} reviews)
+    </div>
+    @for (sp of trainer.specialities; track $index) {
+        <div id="sp">
+            {{sp}}
+        </div>
+    }
+    <button type="button" (click)="handleNavigation(trainer)">View Reviews ({{trainer.reviewCount}} reviews)</button>
+  }
+<app-footer/>
