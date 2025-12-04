@@ -4,15 +4,18 @@ import { Observable, tap } from 'rxjs';
 import {
   FreezeRequestDto,
   PrProgressRequestDto,
-  UpdatePrRequestDto,
+  UpdatePrRequestDto,MemberPlanInfoResponseDto,
+  MemberInfoResponseDto
 } from '../Models/MemberServiceModels';
 import { environment } from '../../../environments/environment';
+import { TrainerAssignRequestDto } from '../Models/TrainerServiceModels';
+import { CookieService } from 'ngx-cookie-service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MemberService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cookie : CookieService,) {}
   // Member management related methods will go here
   private baseUrl = 'http://localhost:8080/fitStudio/member-service/';
   // Freeze or Unfreeze Member (if true, freeze; if false, unfreeze)
@@ -45,7 +48,18 @@ export class MemberService {
   getMemberProfile(id: string): Observable<any> {
     const url = `${this.baseUrl}getBy`;
     const param = { id: id };
-    return this.http.get<any>(url, { params: param });
+    return this.http.get<MemberInfoResponseDto>(url, { params: param })
+    .pipe(tap((res:MemberInfoResponseDto) =>{
+      const access:boolean = res.frozen
+      this.cookie.set('hasAccess',`${!access}`,{path:'/', sameSite:'Strict'})
+    }));
+  }
+
+  hasAccess(memberId : string) : boolean{
+    const access =  this.cookie.get('hasAccess');
+    if(!access) this.getMemberProfile(memberId);
+    if(access === 'true') return true;
+    return false;
   }
 
   // get all members info with paging with filters and sorting
@@ -155,7 +169,26 @@ export class MemberService {
   private planInfoUrl ='http://localhost:8080/fitStudio/member-service/planDetails';
   getPlaninfo(memberId: string): Observable<any> {
     const url = `${this.planInfoUrl}?memberId=${memberId}`;
-    return this.http.get(url);
+    return this.http.get<MemberPlanInfoResponseDto>(url).pipe(
+      tap((res:MemberPlanInfoResponseDto) => {
+        const presentPlan : boolean = !res.planId && !res.planId
+        const duration : boolean = res.planDurationLeft > 0
+        if(!presentPlan && duration) {
+          console.log("setting for valid plan is ==> ",true);
+          this.cookie.set('validPlan',"true",{path:'/', sameSite:'Strict'})
+        } else {
+          console.log("setting for valid plan is ==> ",false);
+          this.cookie.set('validPlan',"false",{path:'/', sameSite:'Strict'})
+        }
+      })
+    );
+  }
+
+  hasValidPlan(memberId: string):boolean {
+    const value = this.cookie.get('validPlan');
+    if(!value) this.getPlaninfo(memberId);
+    if(value === 'true') return true;
+    return false;
   }
 
   // member fit service
@@ -317,5 +350,22 @@ export class MemberService {
     const url = `${this.memberFitUrl}/getBmi/WeightInfo?memberId=${memberId}`
     console.log("sending req to \n",url);
     return this.http.get(url);    
+  }
+  /**
+   * this section is for member and trainer's connection
+   * here member can request for trainer see past and upcoming sessions
+   * also get minmial details of their trainer's current status
+   */
+  private MEMBER_TRAINER_URL = `${environment.apiBaseUrl}${environment.microServices.MEMBER_SERVICE.TRAINER}`;
+
+  requestToGetCoach(data : TrainerAssignRequestDto) :Observable<any> {
+    const url = `${this.MEMBER_TRAINER_URL}/member/request`;
+    console.log('Sending request to --> \n',url);
+    return this.http.post(url,data)
+  }
+
+  getTrainerInfo(memberId:string) : Observable<any> {
+    const url = `${this.MEMBER_TRAINER_URL}/member/getTrainer?memberId=${memberId}`;
+    return this.http.get(url);
   }
 }
