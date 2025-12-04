@@ -1,0 +1,118 @@
+<div class="trainer-card flex flex-col h-full w-full p-6 rounded-2xl 
+         bg-[#101418]/80 backdrop-blur-xl border border-[#1f2937] 
+         shadow-xl text-slate-200 transition-all duration-500
+         hover:shadow-blue-400/40 hover:scale-[1.01]
+         animate-card-fade">
+
+    <!-- CASE 1: No Trainer -->
+    @if (!trainer.trainerId || trainer.trainerId === '') {
+    <div class="flex flex-col items-center justify-center h-full py-10 animate-slide-left">
+
+        <div class="w-28 h-28 flex items-center justify-center rounded-2xl 
+               bg-black/30 border border-gray-700 shadow-xl mb-6
+               hover:shadow-blue-400/40 hover:scale-105 transition">
+            <fa-icon [icon]="icons.plus" class="text-5xl text-blue-400"></fa-icon>
+        </div>
+
+        <p class="text-xl font-semibold text-center mb-4">
+            You currently have no trainer assigned
+        </p>
+
+        <button class="px-6 py-3 rounded-xl bg-blue-600/30 text-blue-300 
+               border border-blue-500/40 hover:bg-blue-600/40
+               transition-all duration-300 flex items-center gap-2" (click)="requestTrainer()">
+            <fa-icon [icon]="icons.userTie"></fa-icon>
+            Request Trainer
+        </button>
+
+    </div>
+    }
+
+    <!-- CASE 2: Trainer exists -->
+    @else {
+
+    <!-- TITLE -->
+    <div class="flex justify-between items-center mb-5 animate-slide-left">
+        <h3 class="text-xl font-semibold text-slate-100 flex items-center gap-3">
+            <fa-icon [icon]="icons.userTie" class="text-orange-400 text-2xl"></fa-icon>
+            Your Trainer
+        </h3>
+
+        <span class="px-3 py-1 rounded-full text-xs font-bold" [ngClass]="{
+          'bg-green-600/30 text-green-300 border border-green-500/40': trainerStatus === 'available',
+          'bg-yellow-600/30 text-yellow-300 border border-yellow-500/40': trainerStatus === 'busy',
+          'bg-red-600/30 text-red-300 border border-red-500/40': trainerStatus === 'unavailable'
+        }">
+            {{ trainerStatus.toUpperCase() }}
+        </span>
+    </div>
+
+    <!-- IMAGE -->
+    <div class="self-center mb-5 p-1 rounded-2xl animate-card-fade"
+        [ngClass]="trainerActive ? 'ring-4 ring-green-500 animate-pulse-soft' : 'ring-4 ring-gray-600'">
+        <img [src]="trainer.profileImageUrl || 'defaultProfile.png'" class="w-40 h-40 sm:w-48 sm:h-48 rounded-2xl object-cover shadow-xl
+               transition-transform duration-500 hover:scale-[1.03]" />
+    </div>
+
+    <!-- NAME -->
+    <p class="text-center text-2xl text-white font-bold mb-1 animate-slide-left">
+        {{ trainer.trainerName }}
+    </p>
+
+    <!-- DATE -->
+    <div class="text-center text-slate-300 text-sm mb-4 animate-slide-left">
+        <fa-icon [icon]="icons.calendar"></fa-icon>
+        <span class="ml-1 text-blue-300 font-semibold">{{ trainer.eligibilityDate }}</span>
+    </div>
+
+    <!-- DAYS LEFT -->
+    @if (trainer.eligibilityDate) {
+    <p class="text-center text-green-300 font-semibold text-sm mb-6 animate-slide-left">
+        {{ getDaysLeft(trainer.eligibilityDate) }} days left
+    </p>
+    }
+
+    <!-- BUTTON -->
+    <div class="mt-auto flex justify-center animate-card-fade">
+        <button class="px-6 py-2 rounded-xl bg-blue-600/20 text-blue-300 border border-blue-500/40
+               hover:bg-blue-600/30 hover:scale-[1.05]
+               transition-all duration-300 flex items-center gap-2" (click)="showExtendModal = true">
+            <fa-icon [icon]="icons.calendarPlus"></fa-icon>
+            Extend Date
+        </button>
+    </div>
+
+    }
+
+    <!-- ======================= -->
+    <!--        MODAL POPUP       -->
+    <!-- ======================= -->
+    @if (showExtendModal) {
+    <div class="fixed inset-0 flex justify-center items-center bg-black/60 backdrop-blur-sm
+             z-9999 animate-card-fade">
+        <div class="bg-[#111]/90 p-6 rounded-2xl border border-gray-700 shadow-2xl 
+               w-80 text-center animate-softPop">
+            <h3 class="text-lg font-semibold text-white mb-4">
+                Extend Trainer Eligibility?
+            </h3>
+
+            <p class="text-slate-300 text-sm mb-6">
+                Are you sure you want to extend your trainer's eligibility?
+            </p>
+
+            <div class="flex justify-center gap-4">
+                <button class="px-4 py-2 rounded-xl bg-red-600/30 text-red-300 
+                   border border-red-500/40 hover:bg-red-600/40 transition" (click)="showExtendModal = false">
+                    Cancel
+                </button>
+
+                <button class="px-4 py-2 rounded-xl bg-green-600/30 text-green-300 
+                   border border-green-500/40 hover:bg-green-600/40 transition" (click)="confirmExtendDate()">
+                    Yes, Extend
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+
+</div>
