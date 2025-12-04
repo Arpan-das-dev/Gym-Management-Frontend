@@ -253,6 +253,7 @@ export class Authservice {
         this.cookies.set('userName',`${user.firstName} ${user.lastName}`,{path:'/', sameSite:'Strict'})
         this.cookies.set('role',user.role,{path:'/', sameSite:'Strict'})
         console.log(user.role);
+        console.log(user);
         
         sessionStorage.setItem('email-verified',user.emailVerified ? 'true': 'false');
         sessionStorage.setItem('phone-verifed', user.phoneVerified ? 'true' : 'false')
