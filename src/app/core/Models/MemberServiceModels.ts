@@ -114,9 +114,15 @@ export interface PrSummaryResponseDto {
 }
 export interface PrSummaryList {
   responseDtoList: PrSummaryResponseDto[];
-    pageNo: number;
+  pageNo: number;
   pageSize: number;
   totalElements: number;
   totalPages: number;
   lastPage: boolean;
+}
+export interface TrainerInfoResponseDto {
+  trainerId: string;
+  trainerName: string;
+  profileImageUrl: string;
+  eligibilityDate: string;
 }
