@@ -45,11 +45,13 @@
     <br>
     <!-- BMI + Upcoming Session (future) -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 
-                gap-6 sm:gap-8 w-full">
-      <!-- ⬆ uniform gap horizontally & vertically -->
-      <app-weight-bmi-info class="dashboard-section"></app-weight-bmi-info>
-      <!-- <app-upcoming-session class="dashboard-section"></app-upcoming-session> -->
-    </div>
+            gap-6 sm:gap-8 w-full items-stretch content-stretch">
+
+            
+      <app-weight-bmi-info class="dashboard-section h-full"></app-weight-bmi-info>
+      <app-trainer-info class="dashboard-section h-full"></app-trainer-info>
+
+</div>
 
     <app-pr-details class="dashboard-section w-full"></app-pr-details>
     <!-- Fitness Details card -->

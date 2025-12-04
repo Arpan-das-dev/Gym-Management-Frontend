@@ -10,10 +10,11 @@ import { LoadingService } from '../../core/services/loading-service';
 import { Footer } from "../../shared/components/footer/footer";
 import { PrDetails } from "./pr-details/pr-details";
 import { WeightBmiInfo } from "./weight-bmi-info/weight-bmi-info";
+import { TrainerInfo } from "./trainer-info/trainer-info";
 
 @Component({
   selector: 'app-member-dasboard',
-  imports: [ProfileCard, Navbar, FitDetails, FontAwesomeModule, NgClass, Footer, PrDetails, WeightBmiInfo],
+  imports: [ProfileCard, Navbar, FitDetails, FontAwesomeModule, NgClass, Footer, PrDetails, WeightBmiInfo, TrainerInfo],
   templateUrl: './member-dasboard.html',
   styleUrl: './member-dasboard.css',
 })
