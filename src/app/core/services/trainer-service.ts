@@ -139,4 +139,34 @@ export class TrainerService {
     const url = `${this.TRAINER_PROFILE__URL}/trainer/delete?trainerId=${trainerId}`;
     return this.http.delete(url);
   }
+
+  /**
+   * this section for trainer's status where trainer can set their status if they are active or not
+   * and only the members and admin can see the requests
+   */
+  private TRAINER_STATUS_URL= `${environment.apiBaseUrl}${environment.microServices.TRAINER_SERVICE.STATUS}`;
+
+  /**
+   * This method is to set status by trainer
+   * which required these parameters
+   * @param trainerId
+   * @param status
+   * @returns {GenericResponse}
+   */
+
+  setStatus(trainerId:string,status:string) :Observable<any>{
+    const url = `${this.TRAINER_STATUS_URL}/trainer/status?status=${status.toUpperCase()}&trainerId=${trainerId}`;
+    return this.http.post(url,null);
+  }
+
+  /**
+   * this method is to get status which can 
+   * be requested by any user(eg: member/trainer/admin)
+   * which takes a valid trainer Id as param @param trainerId
+   * and returns @returns {GenericResponse}
+   */
+  getStatus(trainerId:string) : Observable<any> {
+    const url = `${this.TRAINER_STATUS_URL}/trainer/status?trainerId=${trainerId}`;
+    return this.http.get(url);
+  }
 }
