@@ -1,24 +1,34 @@
 import { Component, OnInit } from '@angular/core';
 import { Navbar } from '../components/navbar/navbar';
 import { Footer } from '../components/footer/footer';
-import { Router} from '@angular/router';
+import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCheckCircle,
   faCircle,
+  faComment,
+  faEnvelope,
   faExclamationCircle,
+  faFire,
+  faGenderless,
+  faMars,
+  faStar,
+  faUserPlus,
+  faVenus,
 } from '@fortawesome/free-solid-svg-icons';
 import { Authservice } from '../../core/services/authservice';
 import { TrainerService } from '../../core/services/trainer-service';
 import { NgClass } from '@angular/common';
 import {
   AllPublicTrainerInfoResponseWrapperDto,
-  PublicTrainerInfoResponseDto,
+  publicTrainerInfoResponseDtoList,
+  TrainerAssignRequestDto,
 } from '../../core/Models/TrainerServiceModels';
 import { erroResponseModel } from '../../core/Models/errorResponseModel';
 import { HttpErrorResponse } from '@angular/common/http';
-import {GenericResponse,} from '../../core/Models/genericResponseModels';
+import { GenericResponse } from '../../core/Models/genericResponseModels';
 import { DataTransferService } from '../../core/services/data-transfer-service';
+import { MemberService } from '../../core/services/member-service';
 
 @Component({
   selector: 'app-our-trainers',
@@ -37,6 +47,7 @@ export class OurTrainers implements OnInit {
   showMessage = false;
   messageText = '';
   messageType: 'success' | 'error' = 'success';
+  globalLoadinText  :string = 'loading'
   // gloabal method to show full screen message with loading screen
   showFullScreenMessage(type: 'success' | 'error', text: string) {
     this.messageType = type;
@@ -47,7 +58,13 @@ export class OurTrainers implements OnInit {
     }, 3000);
   }
 
-  constructor(private auth: Authservice, private trainer: TrainerService, private router: Router, private dataTransfer : DataTransferService) {}
+  constructor(
+    private auth: Authservice,
+    private trainer: TrainerService,
+    private router: Router,
+    private dataTransfer: DataTransferService,
+    private member :MemberService
+  ) {}
   ngOnInit(): void {
     this.isLoggedIn = this.auth.isLoggedIn();
     this.loadAllTrainers();
@@ -60,9 +77,14 @@ export class OurTrainers implements OnInit {
     cogs: faCircle,
     checkCircle: faCheckCircle,
     exclamationCircle: faExclamationCircle,
+    mail: faEnvelope,
+    star: faStar,
+    fire: faFire,
+    comment: faComment,
+    userPlus: faUserPlus,
   };
 
-  Trainers: PublicTrainerInfoResponseDto[] = [];
+  Trainers: publicTrainerInfoResponseDtoList[] = [];
 
   loadAllTrainers() {
     this.loading = true;
@@ -70,8 +92,9 @@ export class OurTrainers implements OnInit {
       next: (res: AllPublicTrainerInfoResponseWrapperDto) => {
         console.log('Successfully fetched all trainers from db');
         console.log(res);
-        this.Trainers = res.responseDtoList;
-        res.responseDtoList.map((t) => {
+        this.Trainers = res.publicTrainerInfoResponseDtoList;
+        res.publicTrainerInfoResponseDtoList.map((t) => {
+          t.showAll = false;
           this.trainer.getProfileImageByTrainerId(t.id).subscribe({
             next: (res: GenericResponse) => {
               console.log(res.message);
@@ -102,10 +125,91 @@ export class OurTrainers implements OnInit {
       },
     });
   }
-  handleNavigation(trainer:PublicTrainerInfoResponseDto){
+  handleNavigation(trainer: publicTrainerInfoResponseDtoList) {
     const id = trainer.id;
-    this.dataTransfer.setTrainerId(id);
-    this.router.navigate(['/do it later'])
+    console.log(`current trainer's id is --> ${id}`);
+    this.dataTransfer.setTrainerObject(trainer);
+    this.router.navigate(['/do it later']);
+  }
+
+  genderThemeMapper(gender: string): any[] {
+    const gend = gender.toLowerCase();
+    let genderIcon = faGenderless;
+    let genderValue: string = '';
+    let genderImage: string = '';
+    switch (gend) {
+      case 'female':
+        genderValue = 'text-xl text-rose-600';
+        genderIcon = faVenus;
+        genderImage = 'defaultFemale.png';
+        break;
+      case 'male':
+        genderValue = 'text-xl text-blue-600';
+        genderIcon = faMars;
+        genderImage = 'defaultMale.png';
+        break;
+      default:
+        genderValue = 'text-xl text-gray-600';
+        genderImage = 'defaultProfile.png';
+    }
+    return [genderValue, genderIcon, genderImage];
+  }
+requestAsCoach(trainer: publicTrainerInfoResponseDtoList) {
+  this.loading = true;
+
+  if (!this.auth.isLoggedIn()) {
+    this.loading = false;
+    return this.showFullScreenMessage('error', 'You are not logged in. Please login.');
+  }
+
+  if (!this.auth.isEmailVerified()) {
+    this.loading = false;
+    return this.showFullScreenMessage('error', 'Your email is not verified.');
+  }
+
+  if (!this.auth.isPhoneVerifed()) {
+    this.loading = false;
+    return this.showFullScreenMessage('error', 'Your phone number is not verified.');
+  }
+
+  const memberId = this.auth.getUserId(); 
+
+  if (this.member.hasAccess(memberId) && this.member.hasValidPlan(memberId)) {
+    this.loading = false;
+    return this.handleMemberRequest(trainer, memberId);  
+  }
+
+  this.loading = false;
+  this.showFullScreenMessage('error', 'You do not have a valid plan or access.');
+}
+  
+  handleMemberRequest(trainer: publicTrainerInfoResponseDtoList,memberId:string) {
+    console.log("handing request triggered");
+    this.loading = true
+    this.globalLoadinText = 'Sending Request to Admin'
+    const assignData : TrainerAssignRequestDto = {
+      memberId: memberId,
+      requestDate : new Date().toISOString(),
+      trainerId : trainer.id,
+      trainerName : `${trainer.firstName} ${trainer.lastName}`,
+      trainerProfileImageUrl : trainer.profileImageUrl
+    }
+    this.member.requestToGetCoach(assignData).subscribe({
+      next:(res:GenericResponse) => {
+        console.log(`get the response from backend is ${res.message}`);
+        this.loading = false;
+        this.showFullScreenMessage('success',res.message)        
+      },
+      error: (err: erroResponseModel & { err: HttpErrorResponse }) => {
+        console.log('Error Occured ::=>');
+        console.log(err);
+        const errorMessage = err?.err?.message
+          ? err?.err?.message
+          : 'Failed To Request Admin Due to Internal Error';
+        this.loading = false;
+        this.showFullScreenMessage('error', errorMessage);
+      }
+    })
   }
 }
 /**

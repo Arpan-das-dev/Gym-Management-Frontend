@@ -1,43 +1,132 @@
-<app-navbar/>
-  @if (loading) {
-    <div class="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div class="text-center animate-pulse">
-        <fa-icon [icon]="icons.cogs" class="text-5xl mb-2"></fa-icon>
-        <p class="text-base font-semibold">Processing...</p>
-      </div>
+<!-- 🌐 GLOBAL LOADER -->
+@if (loading) {
+  <div class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-99998">
+    <div class="text-center animate-pulse">
+      <fa-icon [icon]="icons.cogs" class="text-5xl text-white mb-2"></fa-icon>
+      <p class="text-base font-semibold text-white">{{ globalLoadinText }}...</p>
     </div>
-  }
+  </div>
+}
 
-  <!-- TOAST -->
-  @if (showMessage) {
+<!-- 🌐 GLOBAL TOAST -->
+@if (showMessage) {
+  <div class="fixed inset-0 flex justify-center items-start z-99999 pointer-events-none">
     <div
-      class="toast"
+      class="mt-6 px-5 py-3 rounded-xl shadow-xl text-white pointer-events-auto
+             animate-fadeIn transition-all"
       [ngClass]="{
-        'toast-success': messageType === 'success',
-        'toast-error': messageType === 'error'
-      }"
-    >
-      <fa-icon [icon]="messageType === 'success' ? icons.checkCircle : icons.exclamationCircle"></fa-icon>
-      <span class="ml-2">{{ messageText }}</span>
+        'bg-green-600': messageType === 'success',
+        'bg-red-600': messageType === 'error'
+      }">
+
+      <fa-icon
+        [icon]="messageType === 'success' ? icons.checkCircle : icons.exclamationCircle"
+        class="mr-2"
+      ></fa-icon>
+
+      <span class="font-medium">{{ messageText }}</span>
     </div>
-  }
-  @for (trainer of Trainers; track $index) {
-    <div> 
-        <div id="profileImage">
-            <img src="{{trainer.profileImageUrl }}" alt="">
+  </div>
+}
+<app-navbar />
+<!-- PAGE BG + TITLE -->
+<div class="trainer-bg relative">
+  <div class="absolute inset-0 bg-orange-600/20"></div>
+
+  <div class="relative text-center pt-16 pb-10">
+    <h1 class="text-5xl font-extrabold text-orange-500 drop-shadow-lg">
+      Our Expert Trainers
+    </h1>
+    <p class="text-gray-200 mt-2">
+      Meet the professionals helping you achieve your fitness goals
+    </p>
+  </div>
+
+  <!-- RESPONSIVE GRID -->
+  <div
+    class="max-w-7xl mx-auto px-4 pb-24 grid gap-10
+          sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+  >
+    @for (trainer of Trainers; track $index) {
+      <div class="trainer-card">
+
+        <!-- IMAGE -->
+        <div class="img-box">
+          <img
+            [src]="trainer.profileImageUrl && trainer.profileImageUrl.includes('https')
+                ? trainer.profileImageUrl
+                : genderThemeMapper(trainer.gender)[2]"
+            class="img"
+            alt="trainer"
+          />
         </div>
-        {{trainer.firstName}} {{trainer.lastName}} {{trainer.gender}}
-        {{trainer.email}}
-        {{trainer.about}}
-        {{trainer.clientCount}}
-        {{trainer.averageRating}} 
-        base on ({{trainer.reviewCount}} reviews)
-    </div>
-    @for (sp of trainer.specialities; track $index) {
-        <div id="sp">
-            {{sp}}
+
+        <!-- CONTENT -->
+        <div class="content p-6">
+
+          <!-- NAME -->
+          <h2 class="trainer-name">
+            {{ trainer.firstName }} <span class="text-blue-400">{{ trainer.lastName }}</span>
+          </h2>
+
+          <!-- EMAIL -->
+          <p class="info-line">
+            <fa-icon [icon]="icons.mail" class="text-blue-400"></fa-icon>
+            {{ trainer.email }}
+          </p>
+
+          <!-- GENDER -->
+          <p class="info-line">
+            <strong [ngClass]="genderThemeMapper(trainer.gender)[0]">
+              <fa-icon [icon]="genderThemeMapper(trainer.gender)[1]"></fa-icon>
+            </strong>
+            {{ trainer.gender.toUpperCase() }}
+          </p>
+
+          <!-- ABOUT SECTION -->
+          <div class="mt-3 text-gray-300 text-sm leading-relaxed">
+            <p [class.line-clamp-2]="!trainer.showAll">{{ trainer.about }}</p>
+
+            <button
+              class="read-more"
+              (click)="trainer.showAll = !trainer.showAll"
+            >
+              {{ trainer.showAll ? 'Show Less' : 'Read More' }}
+            </button>
+          </div>
+
+          <!-- SPECIALITIES -->
+          <div class="flex flex-wrap gap-2 mt-4">
+            @for (sp of trainer.specialities; track $index) {
+              <span class="speciality-chip">
+                {{ sp.replace("_", " ") }}
+              </span>
+            }
+          </div>
+
+          <!-- BOTTOM BUTTONS -->
+          <div class="mt-6 space-y-3">
+            <button
+              class="primary-btn"
+              (click)="handleNavigation(trainer)"
+            >
+              <fa-icon [icon]="icons.comment"></fa-icon>
+              View Reviews ({{ trainer.reviewCount }})
+            </button>
+
+            <button
+              class="secondary-btn"
+              (click)="requestAsCoach(trainer)"
+            >
+              <fa-icon [icon]="icons.userPlus"></fa-icon>
+              Request as Coach
+            </button>
+          </div>
+
         </div>
+      </div>
     }
-    <button type="button" (click)="handleNavigation(trainer)">View Reviews ({{trainer.reviewCount}} reviews)</button>
-  }
-<app-footer/>
+  </div>
+</div>
+
+<app-footer />
