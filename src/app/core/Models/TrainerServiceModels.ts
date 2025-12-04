@@ -1,4 +1,4 @@
-export interface PublicTrainerInfoResponseDto {
+export interface publicTrainerInfoResponseDtoList {
   id: string;
   firstName: string;
   lastName: string;
@@ -7,13 +7,14 @@ export interface PublicTrainerInfoResponseDto {
   email: string;
   gender: string;
   averageRating: number;
-  profileImageUrl : string;
-  reviewCount : number;
-  specialities : string[]
+  profileImageUrl: string;
+  reviewCount: number;
+  specialities: string[];
+  showAll: boolean;
 }
 
 export interface AllPublicTrainerInfoResponseWrapperDto {
-  responseDtoList: PublicTrainerInfoResponseDto[];
+  publicTrainerInfoResponseDtoList: publicTrainerInfoResponseDtoList[];
 }
 export interface TrainerResponseDto {
   trainerId: string;
@@ -28,5 +29,12 @@ export interface TrainerResponseDto {
   averageRating: number;
 }
 export interface SpecialityResponseDto {
-     specialityList: string[];
+  specialityList: string[];
+}
+export interface TrainerAssignRequestDto {
+  memberId: string;
+  trainerId: string;
+  trainerName: string;
+  trainerProfileImageUrl: string;
+  requestDate: string;
 }
