@@ -10,7 +10,7 @@ import {faBoxesPacking,faCamera,faCheck,faCheckCircle,faChevronDown,faClipboardL
 import { CommonModule, DatePipe, NgClass, NgStyle } from '@angular/common';
 import { Footer } from '../../shared/components/footer/footer';
 import { PlanService } from '../../core/services/plan-service';
-import { genericResponseMessage } from '../../core/Models/genericResponseModels';
+import { GenericResponse, genericResponseMessage } from '../../core/Models/genericResponseModels';
 import { MonthlyRevenueResponseDto, TotalUserResponseDto } from '../../core/Models/planModel';
 import { erroResponseModel } from '../../core/Models/errorResponseModel';
 import { AllMemberRequestDtoList, AllPendingRequestResponseWrapperDto, ApprovalRequestDto, ApprovalResponseDto, MemberRequestResponse, PendingRequestResponseDto, TrainerAssignmentResponseDto } from '../../core/Models/adminServiceModels';
@@ -330,34 +330,39 @@ export class AdminDashboard implements OnInit,OnDestroy {
     this.eligibilityDate = '';
   }
 
-  submitApproval() {
-    if (!this.eligibilityDate) {
-      this.modalError = 'Please select an eligibility date.';
-      return;
-    }
-
-    this.modalLoading = true;
-
-    // fake 1ms delay
-    setTimeout(() => {
-      this.adminservice
-        .approveMemberRequest(this.modalRequestId, this.eligibilityDate)
-        .subscribe({
-          next: (res: TrainerAssignmentResponseDto) => {
-            this.modalLoading = false;
-            this.showApprovalModal = false;
-            this.pushToast(
-              `Trainer ${res.trainerName} assigned to member ${res.memberId}`,
-              'success'
-            );
-          },
-          error: () => {
-            this.modalLoading = false;
-            this.modalError = 'Failed to approve request. Try again.';
-          },
-        });
-    }, 1);
+submitApproval() {
+  if (!this.eligibilityDate) {
+    this.modalError = 'Please select an eligibility date.';
+    return;
   }
+
+  this.modalLoading = true;
+
+  this.adminservice
+    .approveMemberRequest(this.modalRequestId, this.eligibilityDate)
+    .subscribe({
+      next: (res: GenericResponse) => {
+        this.loadAllMemberRequests()
+        this.modalLoading = false;
+        this.showApprovalModal = false;
+
+        this.pushToast(res.message, 'success');
+      },
+
+      error: (err: erroResponseModel & { error?: any }) => {
+
+        // ERROR
+        this.modalLoading = false;
+
+        const backendMessage =
+          err?.error?.message ||     // when backend sends GenericResponseDto on error
+          err?.message ||            // when HttpErrorResponse.message exists
+          'Failed to approve request. Try again.';   // fallback
+
+        this.modalError = backendMessage;
+      }
+    });
+}
 
   rejectAssignment(requestId: string) {
     this.adminservice.declineMemberRequest(requestId).subscribe({
