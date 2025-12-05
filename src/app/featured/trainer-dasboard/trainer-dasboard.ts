@@ -8,10 +8,11 @@ import { LoadingService } from '../../core/services/loading-service';
 import { Navbar } from "../../shared/components/navbar/navbar";
 import { ProfileCard } from "./profile-card/profile-card";
 import { Footer } from "../../shared/components/footer/footer";
+import { DashboardInfo } from "./dashboard-info/dashboard-info";
 
 @Component({
   selector: 'app-trainer-dasboard',
-  imports: [FontAwesomeModule, NgClass, Navbar, ProfileCard, Footer],
+  imports: [FontAwesomeModule, NgClass, Navbar, ProfileCard, Footer, DashboardInfo],
   templateUrl: './trainer-dasboard.html',
   styleUrl: './trainer-dasboard.css',
 })
