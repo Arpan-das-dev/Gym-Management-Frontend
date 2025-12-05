@@ -15,7 +15,7 @@ import {
   faUserTie,
 } from '@fortawesome/free-solid-svg-icons';
 import { TrainerInfoResponseDto } from '../../../core/Models/MemberServiceModels';
-import { erroResponseModel } from '../../../core/Models/errorResponseModel';
+import { erroResponseModel, errorOutPutMessageModel } from '../../../core/Models/errorResponseModel';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgClass } from '@angular/common';
@@ -23,6 +23,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TrainerAssignRequestDto } from '../../../core/Models/TrainerServiceModels';
 import { GenericResponse } from '../../../core/Models/genericResponseModels';
+import { TrainerService } from '../../../core/services/trainer-service';
 
 @Component({
   selector: 'app-trainer-info',
@@ -64,7 +65,8 @@ export class TrainerInfo implements OnInit {
     private member: MemberService,
     private loader: LoadingService,
     private notify: NotifyService,
-    private router: Router
+    private router: Router,
+    private trainerService : TrainerService
   ) {
     this.memberId = this.auth.getUserId();
   }
@@ -81,7 +83,7 @@ export class TrainerInfo implements OnInit {
     this.member.getTrainerInfo(this.memberId).subscribe({
       next: (res: TrainerInfoResponseDto) => {
         this.trainer = res;
-        this.trainerActive = true;
+        this.getStatusOfTrainer(res.trainerId)
         this.loader.hide();
         this.notify.showSuccess("Fetched Trainer's Details Successfully");
       },
@@ -142,5 +144,30 @@ export class TrainerInfo implements OnInit {
   }
   requestTrainer() {
     this.router.navigate(['ourTrainers']);
+  }
+
+  getStatusOfTrainer(trainerId : string){
+    this.loader.show('Getting Trainer Status', faCog);
+    this.trainerService.getStatus(trainerId).subscribe({
+      next:(res: GenericResponse) => {
+        console.log(`Get status from backend ${res.message}`);
+        console.log(res);
+        this.trainerStatus = (res.message.toLowerCase() as 'available' | 'unavailable' | 'busy') || 'unavailable';
+        if(res.message==='UNAVAILABLE') {
+          this.trainerActive = false;
+        } else{
+          this.trainerActive = true 
+        }
+        console.log(`current trainer status is ::-> ${this.trainerActive}`);
+        
+        this.loader.hide();
+        this.notify.showSuccess('Successfully Retrieved Trainer status'); 
+      }, error:(err: errorOutPutMessageModel & {err: HttpErrorResponse}) => {
+        console.log(err);
+        const message = err.err.message ? err.err.message : 'Failed To Load Trainer Status Due to Internal Server Error';
+        this.loader.hide();
+        this.notify.showError(message);        
+      }
+    })
   }
 }
