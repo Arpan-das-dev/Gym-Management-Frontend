@@ -38,3 +38,22 @@ export interface TrainerAssignRequestDto {
   trainerProfileImageUrl: string;
   requestDate: string;
 }
+export interface TrainerDashBoardInfoResponseDto {
+  clientMatrixInfo: ClientMatrixInfo;
+  sessionMatrixInfo: SessionMatrixInfo;
+  ratingMatrixInfo: RatingMatrixInfo;
+}
+export interface ClientMatrixInfo {
+  currentMonthClientCount: number;
+  previousMonthClientCount: number;
+  change: number;
+}
+export interface SessionMatrixInfo {
+  totalSessionsThisWeek: number;
+  totalSessionsLeft: number;
+}
+export interface RatingMatrixInfo {
+  currentRating: number;
+  oldRating: number;
+  change: number;
+}
