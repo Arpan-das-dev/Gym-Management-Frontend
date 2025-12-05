@@ -153,12 +153,12 @@ export class ProfileCard implements OnInit, OnDestroy {
   liveTrainerCount = 0;
 
   loadAllUsersCount() {
-    this.websocket.connect('ws://localhost:8080/ws');
+    // this.websocket.connect('ws://localhost:8080/ws');
 
-    this.websocket.subscribe('/topic/activeMembers', (count) => {
-      this.liveMemberCount = count;
-      console.log('count is' + count);
-    });
+    // this.websocket.subscribe('/topic/activeMembers', (count) => {
+    //   this.liveMemberCount = count;
+    //   console.log('count is' + count);
+    // });
   }
 
   profileImage = '';
