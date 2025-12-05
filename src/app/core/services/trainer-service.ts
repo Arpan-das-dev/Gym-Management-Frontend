@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
-import { AllPublicTrainerInfoResponseWrapperDto, TrainerResponseDto } from '../Models/TrainerServiceModels';
+import { AllPublicTrainerInfoResponseWrapperDto, TrainerDashBoardInfoResponseDto, TrainerResponseDto } from '../Models/TrainerServiceModels';
 import { GenericResponse, genericResponseMessage } from '../Models/genericResponseModels';
 
 @Injectable({
@@ -37,6 +37,16 @@ export class TrainerService {
   getTrainerById(trainerId : string) : Observable<any> {
     const url = `${this.TRAINER_BASE_URL}/trainer/get?trainerId=${trainerId}`;
     console.log("sending request to ::=> \n",url);
+    return this.http.get(url);
+  }
+
+  /**
+   * 
+   * @param trainerId 
+   * @returns {TrainerDashBoardInfoResponseDto}
+   */
+  getDashboardInfo(trainerId :string) : Observable<any> {
+    const url = `${this.TRAINER_BASE_URL}/trainer/dashboard?trainerId=${trainerId}`;
     return this.http.get(url);
   }
 
@@ -166,7 +176,9 @@ export class TrainerService {
    * and returns @returns {GenericResponse}
    */
   getStatus(trainerId:string) : Observable<any> {
-    const url = `${this.TRAINER_STATUS_URL}/trainer/status?trainerId=${trainerId}`;
+    const url = `${this.TRAINER_STATUS_URL}/all/status?trainerId=${trainerId}`;
     return this.http.get(url);
   }
+
+
 }
