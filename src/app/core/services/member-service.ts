@@ -4,18 +4,20 @@ import { Observable, tap } from 'rxjs';
 import {
   FreezeRequestDto,
   PrProgressRequestDto,
-  UpdatePrRequestDto,MemberPlanInfoResponseDto,
-  MemberInfoResponseDto
+  UpdatePrRequestDto,
+  MemberPlanInfoResponseDto,
+  MemberInfoResponseDto,
 } from '../Models/MemberServiceModels';
 import { environment } from '../../../environments/environment';
 import { TrainerAssignRequestDto } from '../Models/TrainerServiceModels';
 import { CookieService } from 'ngx-cookie-service';
+import { GenericResponse } from '../Models/genericResponseModels';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MemberService {
-  constructor(private http: HttpClient, private cookie : CookieService,) {}
+  constructor(private http: HttpClient, private cookie: CookieService) {}
   // Member management related methods will go here
   private baseUrl = 'http://localhost:8080/fitStudio/member-service/';
   // Freeze or Unfreeze Member (if true, freeze; if false, unfreeze)
@@ -48,17 +50,21 @@ export class MemberService {
   getMemberProfile(id: string): Observable<any> {
     const url = `${this.baseUrl}getBy`;
     const param = { id: id };
-    return this.http.get<MemberInfoResponseDto>(url, { params: param })
-    .pipe(tap((res:MemberInfoResponseDto) =>{
-      const access:boolean = res.frozen
-      this.cookie.set('hasAccess',`${!access}`,{path:'/', sameSite:'Strict'})
-    }));
+    return this.http.get<MemberInfoResponseDto>(url, { params: param }).pipe(
+      tap((res: MemberInfoResponseDto) => {
+        const access: boolean = res.frozen;
+        this.cookie.set('hasAccess', `${!access}`, {
+          path: '/',
+          sameSite: 'Strict',
+        });
+      })
+    );
   }
 
-  hasAccess(memberId : string) : boolean{
-    const access =  this.cookie.get('hasAccess');
-    if(!access) this.getMemberProfile(memberId);
-    if(access === 'true') return true;
+  hasAccess(memberId: string): boolean {
+    const access = this.cookie.get('hasAccess');
+    if (!access) this.getMemberProfile(memberId);
+    if (access === 'true') return true;
     return false;
   }
 
@@ -166,28 +172,35 @@ export class MemberService {
   }
 
   // retreive member's plan info
-  private planInfoUrl ='http://localhost:8080/fitStudio/member-service/planDetails';
+  private planInfoUrl =
+    'http://localhost:8080/fitStudio/member-service/planDetails';
   getPlaninfo(memberId: string): Observable<any> {
     const url = `${this.planInfoUrl}?memberId=${memberId}`;
     return this.http.get<MemberPlanInfoResponseDto>(url).pipe(
-      tap((res:MemberPlanInfoResponseDto) => {
-        const presentPlan : boolean = !res.planId && !res.planId
-        const duration : boolean = res.planDurationLeft > 0
-        if(!presentPlan && duration) {
-          console.log("setting for valid plan is ==> ",true);
-          this.cookie.set('validPlan',"true",{path:'/', sameSite:'Strict'})
+      tap((res: MemberPlanInfoResponseDto) => {
+        const presentPlan: boolean = !res.planId && !res.planId;
+        const duration: boolean = res.planDurationLeft > 0;
+        if (!presentPlan && duration) {
+          console.log('setting for valid plan is ==> ', true);
+          this.cookie.set('validPlan', 'true', {
+            path: '/',
+            sameSite: 'Strict',
+          });
         } else {
-          console.log("setting for valid plan is ==> ",false);
-          this.cookie.set('validPlan',"false",{path:'/', sameSite:'Strict'})
+          console.log('setting for valid plan is ==> ', false);
+          this.cookie.set('validPlan', 'false', {
+            path: '/',
+            sameSite: 'Strict',
+          });
         }
       })
     );
   }
 
-  hasValidPlan(memberId: string):boolean {
+  hasValidPlan(memberId: string): boolean {
     const value = this.cookie.get('validPlan');
-    if(!value) this.getPlaninfo(memberId);
-    if(value === 'true') return true;
+    if (!value) this.getPlaninfo(memberId);
+    if (value === 'true') return true;
     return false;
   }
 
@@ -339,17 +352,17 @@ export class MemberService {
     }
 
     const url = `${this.memberFitUrl}/prSummary`;
-    console.log("sending req to ",url);
-    
-    return this.http.get(url, { params: params }).pipe(
-      tap((res)=> console.log(res))
-    );
+    console.log('sending req to ', url);
+
+    return this.http
+      .get(url, { params: params })
+      .pipe(tap((res) => console.log(res)));
   }
 
-  getMemberWeightBmiChange(memberId:string) :Observable<any> {
-    const url = `${this.memberFitUrl}/getBmi/WeightInfo?memberId=${memberId}`
-    console.log("sending req to \n",url);
-    return this.http.get(url);    
+  getMemberWeightBmiChange(memberId: string): Observable<any> {
+    const url = `${this.memberFitUrl}/getBmi/WeightInfo?memberId=${memberId}`;
+    console.log('sending req to \n', url);
+    return this.http.get(url);
   }
   /**
    * this section is for member and trainer's connection
@@ -358,14 +371,55 @@ export class MemberService {
    */
   private MEMBER_TRAINER_URL = `${environment.apiBaseUrl}${environment.microServices.MEMBER_SERVICE.TRAINER}`;
 
-  requestToGetCoach(data : TrainerAssignRequestDto) :Observable<any> {
+  /**
+   *
+   * @param {TrainerAssignRequestDto} to request admin for a particular admin
+   * @returns {GenericResponse} which contains a message that the request pitched in the admin db
+   */
+  requestToGetCoach(data: TrainerAssignRequestDto): Observable<any> {
     const url = `${this.MEMBER_TRAINER_URL}/member/request`;
-    console.log('Sending request to --> \n',url);
-    return this.http.post(url,data)
+    console.log('Sending request to --> \n', url);
+    return this.http.post(url, data);
   }
 
-  getTrainerInfo(memberId:string) : Observable<any> {
+  /**
+   *
+   * @param memberId
+   * @returns {GenericResponse}
+   */
+  getTrainerInfo(memberId: string): Observable<any> {
     const url = `${this.MEMBER_TRAINER_URL}/member/getTrainer?memberId=${memberId}`;
     return this.http.get(url);
+  }
+
+  getUpComingSessions(
+    memberId: string,
+    pageNo: number,
+    pageSize: number
+  ): Observable<any> {
+    const url = `${this.MEMBER_TRAINER_URL}/member/sessions/next`;
+    const params = new HttpParams()
+      .set('memberId', memberId)
+      .set('pageNo', pageNo)
+      .set('pageSize', pageSize || 15)
+    console.log(
+      `sending req to backend to get member's upcoming sessions \n ${url}`
+    );
+    return this.http.get(url,{params});
+  }
+
+  getPastSessions(
+    memberId: string,
+    pageNo: number,
+    pageSize: number,
+    sortDirection: string
+  ): Observable<any> {
+    const url = `${this.MEMBER_TRAINER_URL}/member/sessions/past`;
+    const params = new HttpParams()
+      .set('memberId', memberId)
+      .set('pageNo', pageNo)
+      .set('pageSize', pageSize || 15)
+      .set('sortDirection', sortDirection || 'DESC');
+    return this.http.get(url, { params });
   }
 }
