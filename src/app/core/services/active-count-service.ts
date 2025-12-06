@@ -25,18 +25,18 @@ export class ActiveCountService {
   }
 
   // Trainer APIs
-  private trainerCountUrl = environment.microServices.TRAINER_SERVICE.STATUS;
+  private trainerCountUrl = `${environment.apiBaseUrl}${environment.microServices.TRAINER_SERVICE.STATUS}`;
 
   trainerIncrement(id: string): Observable<any> {
-    return this.httpClient.post(`${this.trainerCountUrl}/increment?id=${id}`, {});
+    return this.httpClient.post(`${this.trainerCountUrl}/trainer/increment?id=${id}`, {});
   }
 
   trainerDecrement(id: string): Observable<any> {
-    return this.httpClient.post(`${this.trainerCountUrl}/decrement?id=${id}`, {});
+    return this.httpClient.post(`${this.trainerCountUrl}/trainer/decrement?id=${id}`, {});
   }
 
   trainerGetActiveCount(): Observable<number> {
-    return this.httpClient.get<number>(`${this.trainerCountUrl}/active-count`);
+    return this.httpClient.get<number>(`${this.trainerCountUrl}/all/active-count`);
   }
 
   // Admin APIs
