@@ -57,3 +57,14 @@ export interface RatingMatrixInfo {
   oldRating: number;
   change: number;
 }
+
+export interface MemberResponseDto {
+    memberId : string;
+    trainerId : string;
+    memberName : string;
+    memberProfileImageUrl : string;
+    eligibilityEnd : string;
+}
+export interface AllMemberResponseWrapperDto {
+   memberResponseDtoList : MemberResponseDto[];
+}

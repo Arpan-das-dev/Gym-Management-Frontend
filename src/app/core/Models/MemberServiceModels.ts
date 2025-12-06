@@ -126,3 +126,7 @@ export interface TrainerInfoResponseDto {
   profileImageUrl: string;
   eligibilityDate: string;
 }
+export interface MemberStatus {
+     memberId : string;
+     active : boolean;
+}
