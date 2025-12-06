@@ -5,7 +5,7 @@ import { TrainerService } from '../../../core/services/trainer-service';
 import { LoadingService } from '../../../core/services/loading-service';
 import { NotifyService } from '../../../core/services/notify-service';
 import { TrainerDashBoardInfoResponseDto } from '../../../core/Models/TrainerServiceModels';
-import { faCogs } from '@fortawesome/free-solid-svg-icons';
+import { faArrowDown, faArrowUp, faCalendar, faChartBar, faCogs, faMinus, faStar, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { erroResponseModel } from '../../../core/Models/errorResponseModel';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -27,6 +27,15 @@ export class DashboardInfo implements OnInit{
   }
   ngOnInit(): void {
       this.getDashboardInfo()
+  }
+  icons = {
+    users : faUsers,
+    arrowUp : faArrowUp,
+    arrowDown : faArrowDown,
+    minus : faMinus,
+    calendar : faCalendar,
+    star : faStar,
+    chart : faChartBar
   }
   dashboardInfo!: TrainerDashBoardInfoResponseDto;
   getDashboardInfo() {
