@@ -422,4 +422,12 @@ export class MemberService {
       .set('sortDirection', sortDirection || 'DESC');
     return this.http.get(url, { params });
   }
+
+  isActiveClients(data : string []) : Observable<any>{
+    const url = `${environment.apiBaseUrl}${environment.microServices.MEMBER_SERVICE.COUNT}/trainer/isActiveClients`;
+    const body = {
+      memberIds : data
+    }
+    return this.http.post(url, body);
+  }
 }
