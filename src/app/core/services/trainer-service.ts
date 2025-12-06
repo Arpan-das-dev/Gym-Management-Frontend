@@ -2,8 +2,9 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
-import { AllPublicTrainerInfoResponseWrapperDto, TrainerDashBoardInfoResponseDto, TrainerResponseDto } from '../Models/TrainerServiceModels';
+import { AllMemberResponseWrapperDto, AllPublicTrainerInfoResponseWrapperDto, TrainerDashBoardInfoResponseDto, TrainerResponseDto } from '../Models/TrainerServiceModels';
 import { GenericResponse, genericResponseMessage } from '../Models/genericResponseModels';
+import { AddSessionRequestDto } from '../Models/SessionServiceModel';
 
 @Injectable({
   providedIn: 'root',
@@ -181,4 +182,59 @@ export class TrainerService {
   }
 
 
+  /**
+   * this section is for trainer dashboard's 
+   * connection with member(clients)
+   * where trainer will get the view of his clients and can add or update or delete or view sessions
+   * but now this url and methods are for connection with clients
+   */
+  private TRAINER_CLIENT_URL = `${environment.apiBaseUrl}${environment.microServices.TRAINER_SERVICE.MEMBERS}`;
+
+  /**
+   * 
+   * @param trainerId 
+   * @returns {AllMemberResponseWrapperDto}
+   */
+  viewAllClients(trainerId : string) : Observable<any> {
+    const url = `${this.TRAINER_CLIENT_URL}/trainer/getMemberList?trainerId=${trainerId}`;
+    return this.http.get(url);
+  }
+
+  /**
+   * now here is the section where the trainer will manage the sessions 
+   * like adding, updating or deleting what ever
+   */
+  private TRAINER_SESSION_URL = `${environment.apiBaseUrl}${environment.microServices.TRAINER_SERVICE.SESSION}`
+
+  /** 
+   * method for add a new session for a member
+   * @param {AddSessionRequestDto}
+   * @param {trainerId}
+   * @returns {GenericResponse}
+   */
+
+  addNewSession(trainerId :string, data : AddSessionRequestDto) : Observable<any> {
+    const url = `${this.TRAINER_SESSION_URL}/trainer/addSessions`;
+    const params = new HttpParams().set('trainerId',trainerId).set('status','UPCOMING');
+    return this.http.post(url,data,{params})
+  }
+  getUpcomingSessions(trainerId :string,pageNo: number, pageSize : number) :Observable<any> {
+    const url = `${this.TRAINER_SESSION_URL}/trainer/getSessions`;
+    const params = new HttpParams().set("trainerId",trainerId).set("pageNo",pageNo).set("pageSize",pageSize);
+    return this.http.get(url,{params})
+  }
+
+  getPastSessions(
+    trainerId: string,
+    pageNo: number,
+    pageSize: number,
+    sortDirection: string
+  ): Observable<any> {
+    const url = `${this.TRAINER_SESSION_URL}/trainer/getSession/${pageSize|| 15}`;
+    const params = new HttpParams()
+      .set('trainerId', trainerId)
+      .set('pageNo', pageNo)
+      .set('sortDirection', sortDirection || 'ASC');
+    return this.http.get(url, { params });
+  }
 }
