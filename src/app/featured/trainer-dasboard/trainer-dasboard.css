@@ -24,7 +24,6 @@
    ------------------------- */
 .dashboard-section {
   width: 100%;
-  /* REMOVE max-width:900px (the main bug) */
   max-width: 100%; 
   margin-left: auto;
   margin-right: auto;

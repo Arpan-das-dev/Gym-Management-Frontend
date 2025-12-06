@@ -9,10 +9,11 @@ import { Navbar } from "../../shared/components/navbar/navbar";
 import { ProfileCard } from "./profile-card/profile-card";
 import { Footer } from "../../shared/components/footer/footer";
 import { DashboardInfo } from "./dashboard-info/dashboard-info";
+import { ManageClients } from "./manage-clients/manage-clients";
 
 @Component({
   selector: 'app-trainer-dasboard',
-  imports: [FontAwesomeModule, NgClass, Navbar, ProfileCard, Footer, DashboardInfo],
+  imports: [FontAwesomeModule, NgClass, Navbar, ProfileCard, Footer, DashboardInfo, ManageClients],
   templateUrl: './trainer-dasboard.html',
   styleUrl: './trainer-dasboard.css',
 })
