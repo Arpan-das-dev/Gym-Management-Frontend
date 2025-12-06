@@ -1,0 +1,108 @@
+@if (clients && clients.length > 0) {
+
+<div
+  class="w-full p-6 rounded-3xl bg-linear-to-br from-[#242424]/80 via-[#1e1e1e]/70 to-[#111]/80
+         border border-gray-700 shadow-xl backdrop-blur-xl text-gray-100
+         transition-all duration-500 hover:shadow-orange-400/30 animate-fadeInSlow"
+>
+
+  <!-- HEADER -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-white">Active Clients</h2>
+      <p class="text-sm text-gray-300">Clients currently assigned to you</p>
+    </div>
+
+    <fa-icon [icon]="icons.users" class="text-3xl text-orange-400"></fa-icon>
+  </div>
+
+  <!-- TABLE -->
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-separate border-spacing-y-4">
+      <thead>
+        <tr class="text-gray-300 text-sm">
+          <th class="pb-2">Client</th>
+          <th class="pb-2">Eligibility</th>
+          <th class="pb-2 text-center">Add Session</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        @for (c of clients; track c.memberId) {
+
+        <tr
+          class="bg-[#1b1b1b]/70 hover:bg-[#262626]/80 transition-all duration-300
+                 rounded-xl shadow-lg hover:shadow-blue-400/20"
+        >
+
+          <!-- CLIENT PROFILE -->
+          <td class="py-4 pl-3 flex items-center gap-4">
+
+            <!-- STATUS DOT -->
+            <div class="relative">
+              <div class="w-12 h-12 rounded-full overflow-hidden border border-gray-700">
+                <div
+                  class="w-full h-full bg-cover bg-center"
+                  [ngStyle]="{ 'background-image': 'url(' + c.memberProfileImageUrl + ')' }"
+                ></div>
+              </div>
+
+              <!-- GREEN / GRAY STATUS INDICATOR -->
+              <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border border-black shadow-md 
+                          transition-all duration-300"
+                   [ngClass]="{
+                     'bg-green-500': isActive(c.memberId),
+                     'bg-gray-500': !isActive(c.memberId)
+                   }">
+              </div>
+            </div>
+
+            <div class="flex flex-col">
+              <span class="font-semibold text-gray-100">{{ c.memberName }}</span>
+              <span class="text-xs text-gray-400">ID: {{ c.memberId }}</span>
+            </div>
+
+          </td>
+
+          <!-- ELIGIBILITY -->
+          <td class="py-4 text-gray-200 text-sm">
+            <span class="text-yellow-400">
+              {{ c.eligibilityEnd | date : 'dd MMM yyyy' }}
+            </span>
+          </td>
+
+          <!-- ADD SESSION BUTTON -->
+          <td class="py-4 text-center">
+            <button
+              (click)="openAddSessionPopup(c)"
+              class="px-3 py-2 rounded-full bg-blue-600/40 border border-blue-500/40
+                     hover:bg-blue-600 hover:border-blue-400 hover:scale-110
+                     transition-all duration-300 shadow-md"
+            >
+              <fa-icon [icon]="icons.plus" class="text-blue-300 text-lg"></fa-icon>
+            </button>
+          </td>
+
+        </tr>
+
+        }
+
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+} @else {
+
+<!-- EMPTY STATE -->
+<div
+  class="w-full p-8 rounded-3xl bg-[#1e1e1e]/70 border border-gray-700 shadow-xl
+         backdrop-blur-xl text-center text-gray-300 animate-fadeInSlow"
+>
+  <fa-icon [icon]="icons.userSlash" class="text-4xl text-gray-500 mb-3"></fa-icon>
+  <p class="text-lg">No active clients found.</p>
+</div>
+
+}
