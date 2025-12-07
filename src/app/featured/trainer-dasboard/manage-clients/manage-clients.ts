@@ -13,7 +13,7 @@ import { TrainerService } from '../../../core/services/trainer-service';
 import { NotifyService } from '../../../core/services/notify-service';
 import { LoadingService } from '../../../core/services/loading-service';
 import { AllMemberResponseWrapperDto, MemberResponseDto } from '../../../core/Models/TrainerServiceModels';
-import { erroResponseModel } from '../../../core/Models/errorResponseModel';
+import { erroResponseModel, errorOutPutMessageModel } from '../../../core/Models/errorResponseModel';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AddSessionRequestDto } from '../../../core/Models/SessionServiceModel';
 import { GenericResponse } from '../../../core/Models/genericResponseModels';
@@ -96,6 +96,8 @@ export class ManageClients implements OnInit {
 addSessionPopup:boolean = false;
 
 openAddSessionPopup(c: MemberResponseDto) {
+  console.log('add session triggred');
+  
   this.memberId = c.memberId;
   this.sessionForm.memberId = c.memberId;
   this.addSessionPopup = true;
@@ -162,12 +164,26 @@ submitSession() {
       this.closeAddSessionPopup()
       this.loader.hide();
       this.notify.showSuccess(res.message);
-    },  error:(err: erroResponseModel & {err: HttpErrorResponse}) => {
-        const message = err.err.message ? err.err.message : 'Failed To Add Session Info';
-        console.log(`An Error Occured due to ${message}`);
-        this.loader.hide();
-        this.notify.showError(message)        
+    },error: (err: HttpErrorResponse) => { 
+      this.loader.hide();
+      
+      // 1. Get the error body (which is your erroResponseModel)
+      const errorBody: erroResponseModel | undefined = err.error;
+
+      let messageToShow = 'Failed To add Session Due to unknown error';
+
+      if (errorBody && errorBody.message) {
+        // 2. Use the specific error message from the backend response body
+        messageToShow = errorBody.message; 
+        console.log("Backend Error Message:", messageToShow);
+      } else {
+        // Fallback for network errors or non-JSON responses
+        messageToShow = err.message || messageToShow;
+        console.error("Unknown error structure:", err);
       }
+
+      this.notify.showError(messageToShow);
+    },
   }) 
 }
 }
