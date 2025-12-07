@@ -10,10 +10,11 @@ import { ProfileCard } from "./profile-card/profile-card";
 import { Footer } from "../../shared/components/footer/footer";
 import { DashboardInfo } from "./dashboard-info/dashboard-info";
 import { ManageClients } from "./manage-clients/manage-clients";
+import { SessionDetails } from "./session-details/session-details";
 
 @Component({
   selector: 'app-trainer-dasboard',
-  imports: [FontAwesomeModule, NgClass, Navbar, ProfileCard, Footer, DashboardInfo, ManageClients],
+  imports: [FontAwesomeModule, NgClass, Navbar, ProfileCard, Footer, DashboardInfo, ManageClients, SessionDetails],
   templateUrl: './trainer-dasboard.html',
   styleUrl: './trainer-dasboard.css',
 })
@@ -27,7 +28,6 @@ ngOnInit(): void {
       this.messageType = data.type;
       this.messageText = data.message;
       this.showMessage = true;
-
       setTimeout(() => {
         this.showMessage = false;
       }, 4000);
