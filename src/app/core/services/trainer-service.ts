@@ -4,7 +4,7 @@ import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import { AllMemberResponseWrapperDto, AllPublicTrainerInfoResponseWrapperDto, TrainerDashBoardInfoResponseDto, TrainerResponseDto } from '../Models/TrainerServiceModels';
 import { GenericResponse, genericResponseMessage } from '../Models/genericResponseModels';
-import { AddSessionRequestDto } from '../Models/SessionServiceModel';
+import { AddSessionRequestDto, UpdateSessionRequestDto } from '../Models/SessionServiceModel';
 
 @Injectable({
   providedIn: 'root',
@@ -236,5 +236,22 @@ export class TrainerService {
       .set('pageNo', pageNo)
       .set('sortDirection', sortDirection || 'ASC');
     return this.http.get(url, { params });
+  }
+
+  updateSession(data:UpdateSessionRequestDto,sessionId:string) : Observable<any>{
+    const url = `${this.TRAINER_SESSION_URL}/trainer/updateSession?sessionId=${sessionId}`;
+    return this.http.put(url,data);
+  }
+
+  deleteSession(sessionId:string,trainerId:string) : Observable<any> {
+    const url = `${this.TRAINER_SESSION_URL}/trainer/deleteSession`;
+    const params = new HttpParams().set('sessionId',sessionId).set('trainerId',trainerId);
+    return this.http.delete(url,{params})
+  }
+
+  updateSessionStatus(sessionId:string,trainerId:string,status:string) : Observable<any> {
+    const url = `${this.TRAINER_SESSION_URL}/trainer/setStatus`;
+    const params = new HttpParams().set('sessionId',sessionId).set('trainerId',trainerId).set('status',status);
+    return this.http.put(url,{},{params})
   }
 }
