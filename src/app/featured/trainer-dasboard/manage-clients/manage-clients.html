@@ -106,3 +106,127 @@
 </div>
 
 }
+@if (addSessionPopup) {
+
+<!-- BACKDROP -->
+<div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center animate-fadeIn">
+
+  <!-- POPUP -->
+  <div
+    class="bg-[#1c1c1c]/90 w-full max-w-lg p-6 rounded-2xl border border-gray-700
+           shadow-2xl animate-softPop text-gray-200"
+  >
+
+    <h2 class="text-xl font-semibold text-white mb-5 flex items-center gap-2">
+      <fa-icon [icon]="icons.plus" class="text-orange-400"></fa-icon>
+      Add Training Session
+    </h2>
+
+    <!-- ====================== -->
+    <!--   SESSION NAME FIELD   -->
+    <!-- ====================== -->
+    <div class="mb-4">
+      <label class="text-sm text-gray-300">Session Name</label>
+
+      <input
+        [(ngModel)]="sessionForm.sessionName"
+        class="w-full mt-1 p-3 rounded-xl bg-black/30 border border-gray-600
+               focus:border-orange-400 outline-none transition text-gray-200"
+        placeholder="e.g., Strength Training"
+      />
+
+      <!-- VALIDATION -->
+      @if (!sessionForm.sessionName || sessionForm.sessionName.trim().length === 0) {
+        <p class="text-red-400 text-xs mt-1">
+          * Session name must not be blank
+        </p>
+      }
+    </div>
+
+    <!-- ====================== -->
+    <!--   SESSION DATE FIELD   -->
+    <!-- ====================== -->
+    <div class="mb-4">
+      <label class="text-sm text-gray-300">Session Date & Time</label>
+
+      <input
+        type="datetime-local"
+        [(ngModel)]="sessionForm.sessionDate"
+        class="w-full mt-1 p-3 rounded-xl bg-black/30 border border-gray-600
+               focus:border-orange-400 outline-none transition text-gray-200"
+      />
+
+      <!-- MISSING DATE -->
+      @if (!sessionForm.sessionDate) {
+        <p class="text-red-400 text-xs mt-1">* Session date must not be null</p>
+      }
+
+      <!-- PAST DATE -->
+      @if (sessionForm.sessionDate && isPastDate(sessionForm.sessionDate)) {
+        <p class="text-red-400 text-xs mt-1">* Session date must be current or future</p>
+      }
+    </div>
+
+    <!-- ====================== -->
+    <!--   DURATION FIELD       -->
+    <!-- ====================== -->
+    <div class="mb-2">
+      <label class="text-sm text-gray-300">Duration (hours)</label>
+
+      <input
+        type="number"
+        min="0.5"
+        max="2.5"
+        step="0.5"
+        [(ngModel)]="sessionForm.duration"
+        class="w-full mt-1 p-3 rounded-xl bg-black/30 border border-gray-600
+               focus:border-orange-400 outline-none transition text-gray-200"
+      />
+
+      <!-- REQUIRED -->
+      @if (!sessionForm.duration) {
+        <p class="text-red-400 text-xs mt-1">* Duration cannot be empty</p>
+      }
+
+      <!-- MIN -->
+      @if (sessionForm.duration && sessionForm.duration < 0.5) {
+        <p class="text-red-400 text-xs mt-1">
+          * Minimum duration is 0.5 hours (30 mins)
+        </p>
+      }
+
+      <!-- MAX -->
+      @if (sessionForm.duration && sessionForm.duration > 2.5) {
+        <p class="text-red-400 text-xs mt-1">
+          * Maximum duration is 2.5 hours (2 hrs 30 mins)
+        </p>
+      }
+    </div>
+
+    <!-- ====================== -->
+    <!--   BUTTONS SECTION      -->
+    <!-- ====================== -->
+    <div class="flex justify-end gap-3 mt-6">
+
+      <button
+        class="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600 transition"
+        (click)="closeAddSessionPopup()"
+      >
+        Cancel
+      </button>
+
+      <button
+        class="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 transition
+               disabled:bg-gray-600 disabled:cursor-not-allowed"
+        [disabled]="!isFormValid()"
+        (click)="submitSession()"
+      >
+        Add Session
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
+}
