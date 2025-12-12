@@ -13,7 +13,7 @@ export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'signup', component: Signup },
   { path: 'plans', component: Plan },
-  { path: 'ourTrainers', component: OurTrainers},
+  { path: 'ourTrainers', component: OurTrainers },
   // path for auths
   {
     path: 'verify-email',
@@ -154,6 +154,11 @@ export const routes: Routes = [
       import('./featured/plan/recent-transactions/recent-transactions').then(
         (m) => m.RecentTransactions
       ),
+  },
+  {
+    path: 'viewReviews',
+    loadComponent: () =>
+      import('./shared/view-reviews/view-reviews').then((v) => v.ViewReviews),
   },
   // path for footer
   {
