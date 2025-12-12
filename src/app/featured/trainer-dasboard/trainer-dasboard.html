@@ -12,13 +12,12 @@
 @if (showMessage) {
   <div class="fixed inset-0 flex justify-center items-start z-99999 pointer-events-none">
     <div
-      class="mt-6 px-5 py-3 rounded-xl shadow-xl text-white pointer-events-auto
-             animate-fadeIn transition-all"
+      class="mt-6 px-5 py-3 rounded-xl shadow-xl text-white pointer-events-auto animate-fadeIn transition-all"
       [ngClass]="{
         'bg-green-600': messageType === 'success',
         'bg-red-600': messageType === 'error'
-      }">
-
+      }"
+    >
       <fa-icon
         [icon]="messageType === 'success' ? icons.checkCircle : icons.exclamationCircle"
         class="mr-2"
@@ -28,34 +27,31 @@
     </div>
   </div>
 }
-<app-navbar/>
-<!-- 
+
+<app-navbar />
+
 <!-- Background -->
 <div class="dashboard-bg"></div>
 
 <!-- MAIN WRAPPER -->
-<div class="w-full flex flex-col items-center min-h-screen pt-10 pb-24 
-            px-4 sm:px-6 lg:px-10 animate-fade-in">
+<div class="dashboard-wrapper">
 
-  <div class="w-full max-w-7xl space-y-10"> 
+  <div class="dashboard-content">
 
     <!-- PROFILE CARD -->
-     <app-profile-cardT class="dashboard-section"/>
-    <br>
-    <app-dashboard-info></app-dashboard-info>
-    <app-manage-clients></app-manage-clients>
-    <app-session-details></app-session-details>
+    <app-profile-cardT class="dashboard-section"></app-profile-cardT>
 
-    <!-- <app-pr-details class="dashboard-section w-full"></app-pr-details> -->
-    <!-- Fitness Details card -->
-    <!-- <app-fit-details class="dashboard-section w-full"></app-fit-details> -->
-    <br>
-    <!-- PR Details card -->
-    
+    <!-- DASHBOARD INFO (TOP CARDS) -->
+    <app-dashboard-info class="dashboard-section"></app-dashboard-info>
+
+    <!-- 2-COLUMN GRID (Clients + Sessions) -->
+    <div class="dashboard-grid">
+      <app-manage-clients class="dashboard-section grid-card"></app-manage-clients>
+
+      <app-session-details class="dashboard-section grid-card"></app-session-details>
+    </div>
 
   </div>
 </div>
 
--->
-
-<app-footer/>
+<app-footer />
