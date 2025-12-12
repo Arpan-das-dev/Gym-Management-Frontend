@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
-import { AllMemberResponseWrapperDto, AllPublicTrainerInfoResponseWrapperDto, TrainerDashBoardInfoResponseDto, TrainerResponseDto } from '../Models/TrainerServiceModels';
+import { AllMemberResponseWrapperDto, AllPublicTrainerInfoResponseWrapperDto, ReviewAddRequestDto, ReviewUpdateRequestDto, TrainerDashBoardInfoResponseDto, TrainerResponseDto } from '../Models/TrainerServiceModels';
 import { GenericResponse, genericResponseMessage } from '../Models/genericResponseModels';
 import { AddSessionRequestDto, UpdateSessionRequestDto } from '../Models/SessionServiceModel';
 
@@ -254,4 +254,47 @@ export class TrainerService {
     const params = new HttpParams().set('sessionId',sessionId).set('trainerId',trainerId).set('status',status);
     return this.http.put(url,{},{params})
   }
+
+  /**
+   * this section is for trainer's review management
+   * 1. add reviews
+   * 2. get all reviews (in paginated forms)
+   * 3. update any review
+   * 4. delete any reviews
+   * 5. mark any review as helpfull
+   * 6. mark any review as not helpfull
+   */
+
+  private TRAINER_REVIEW_URL = `${environment.apiBaseUrl}${environment.microServices.TRAINER_SERVICE.REVIEW}`
+
+  addReviewForTrainer(trainerId:string,data:ReviewAddRequestDto) : Observable<any> {
+    const url = `${this.TRAINER_REVIEW_URL}/user/add?trainerId=${trainerId}`;
+    return this.http.post(url,data)
+  }
+
+  getAllReviews(trainerId:string,pageNo:number,pageSize:number,sortDirection:'ASC'|'DESC') : Observable<any> {
+    const url = `${this.TRAINER_REVIEW_URL}/all/getAll`
+    const params = new HttpParams().set('trainerId',trainerId)
+    .set('pageNo',pageNo).set('pageSize',pageSize)
+    .set('sortDirection',sortDirection)
+    return this.http.get(url,{params})
+  }
+
+  getReviewByUserId(userId:string,pageNo:number,pageSize:number,sortDirection:'ASC'|'DESC' ) : Observable<any> {
+    const url = `${this.TRAINER_REVIEW_URL}/user/getReview?userId=${userId}`
+    const params = new HttpParams().set('pageNo',pageNo).set('pageSize',pageSize).set('sortDirection',sortDirection)
+    return this.http.get(url,{params})
+  }
+
+  updateReviewByUser(reviewId: string, data : ReviewUpdateRequestDto): Observable<any> {
+    const url = `${this.TRAINER_REVIEW_URL}/user/update?reviewId=${reviewId}`;
+    return this.http.put(url,data)
+  }
+
+  deleteReviewByUser(userId:string,reviewId:string,trainerId:string) :Observable<any> {
+    const url = `${this.TRAINER_REVIEW_URL}/user/delete`;
+    const params = new HttpParams().set('userId',userId).set('reviewId',reviewId).set('trainerId',trainerId);
+    return this.http.delete(url,{params})
+  }
+
 }
