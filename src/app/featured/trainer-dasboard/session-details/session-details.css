@@ -1,0 +1,17 @@
+.card-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Header takes natural height */
+.card-wrapper > .header {
+  flex: 0 0 auto;
+}
+
+/* Table area expands to fill remaining height */
+.card-wrapper .content {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+}
