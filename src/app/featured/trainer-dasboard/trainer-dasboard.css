@@ -1,6 +1,6 @@
 /* -------------------------
    Dashboard Background Layer
-   ------------------------- */
+------------------------- */
 .dashboard-bg {
   position: fixed;
   inset: 0;
@@ -20,19 +20,62 @@
 }
 
 /* -------------------------
-   Section Wrapper (same width for all)
-   ------------------------- */
+   MAIN WRAPPER
+------------------------- */
+.dashboard-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  padding: 3rem 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.dashboard-content {
+  width: 100%;
+  max-width: 1350px;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  animation: dashboardFadeIn 0.8s ease;
+}
+
+/* -------------------------
+   Section Wrapper (Equal Height Compatible)
+------------------------- */
 .dashboard-section {
   width: 100%;
-  max-width: 100%; 
-  margin-left: auto;
-  margin-right: auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   animation: softPop 0.4s ease;
 }
 
 /* -------------------------
-   Fade In Animation
-   ------------------------- */
+   Responsive Grid (Clients + Sessions)
+------------------------- */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+/* DESKTOP VIEW */
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch; /* ⭐ Makes both cards equal height */
+  }
+
+  .dashboard-grid > .grid-card {
+    height: 100%;          /* ⭐ Force equal height */
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* -------------------------
+   Animations
+------------------------- */
 @keyframes dashboardFadeIn {
   from {
     opacity: 0;
@@ -44,15 +87,10 @@
   }
 }
 
-.animate-fade-in {
-  animation: dashboardFadeIn 0.9s ease forwards;
-}
-
-/* Optional subtle scale animation */
 @keyframes softPop {
   from {
     opacity: 0;
-    transform: scale(0.98);
+    transform: scale(0.985);
   }
   to {
     opacity: 1;
