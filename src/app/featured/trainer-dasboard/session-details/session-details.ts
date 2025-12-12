@@ -124,7 +124,7 @@ export class SessionDetails implements OnInit {
   PstotalElements: number = 0;
   PstotalPages: number = 0;
   PslastPage: boolean = false;
-  PsSortDirection: string = 'ASC';
+  PsSortDirection: 'ASC'|'DESC' = 'ASC';
   PsSessions: AllSessionResponseDto[] = [];
 
   loadAllPastSessions() {
@@ -159,6 +159,7 @@ export class SessionDetails implements OnInit {
       });
   }
 
+ 
   loadNextPastSessions() {
     if (this.PslastPage) {
       this.notify.showError('Last Page Reached');
