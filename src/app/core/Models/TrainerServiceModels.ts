@@ -59,12 +59,46 @@ export interface RatingMatrixInfo {
 }
 
 export interface MemberResponseDto {
-    memberId : string;
-    trainerId : string;
-    memberName : string;
-    memberProfileImageUrl : string;
-    eligibilityEnd : string;
+  memberId: string;
+  trainerId: string;
+  memberName: string;
+  memberProfileImageUrl: string;
+  eligibilityEnd: string;
 }
 export interface AllMemberResponseWrapperDto {
-   memberResponseDtoList : MemberResponseDto[];
+  memberResponseDtoList: MemberResponseDto[];
+}
+export interface ReviewAddRequestDto {
+  userId: string;
+  userName: string;
+  userRole: string;
+  reviewDate: string;
+  comment: string;
+  review: number;
+}
+export interface ReviewResponseDto {
+  reviewId: string;
+  userId: string;
+  userName: string;
+  userRole: string;
+  reviewDate: string;
+  comment: string;
+  review: number;
+}
+export interface AllReviewResponseWrapperDto {
+  reviewResponseDtoList: ReviewResponseDto[];
+  pageNo: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  lastPage: boolean;
+}
+export interface ReviewUpdateRequestDto {
+  userId: string;
+  userName: string;
+  userRole: string;
+  trainerId: string;
+  reviewDate: string;
+  comment: string;
+  review: number;
 }
