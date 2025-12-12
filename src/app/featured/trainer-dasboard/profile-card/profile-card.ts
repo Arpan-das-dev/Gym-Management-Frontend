@@ -4,6 +4,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCamera,
   faClose,
+  faCog,
   faCogs,
   faDownload,
   faDumbbell,
@@ -439,6 +440,21 @@ export class ProfileCard implements OnInit {
     } else {
       this.notify.showError(defaultMessage);
     }
+  }
+  updateStaus(){
+    console.log("update status triggered");
+    this.loader.show("Updating Staus",faCog)
+    this.trainer.setStatus(this.trainerId,this.trainerStatus).subscribe({
+      next:(res:GenericResponse) => {
+        console.log(`fecthed result from backend as ${res.message}`);
+        this.trainerStatus = res.message;
+        this.loader.hide()
+      }, error:(err: erroResponseModel & {err:HttpErrorResponse}) => {
+      const errorMessage = err?.err?.message;
+        console.log(errorMessage);
+        this.catchError(errorMessage,"Failed To Update Your Status")
+    }
+    })    
   }
   liveMemberCount = 0;
   liveAdminCount = 0;
