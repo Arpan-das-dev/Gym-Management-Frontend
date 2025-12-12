@@ -14,6 +14,7 @@ import {
   faMars,
   faStar,
   faUserPlus,
+  faUsers,
   faVenus,
 } from '@fortawesome/free-solid-svg-icons';
 import { Authservice } from '../../core/services/authservice';
@@ -25,10 +26,10 @@ import {
   TrainerAssignRequestDto,
 } from '../../core/Models/TrainerServiceModels';
 import { erroResponseModel } from '../../core/Models/errorResponseModel';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { GenericResponse } from '../../core/Models/genericResponseModels';
-import { DataTransferService } from '../../core/services/data-transfer-service';
 import { MemberService } from '../../core/services/member-service';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-our-trainers',
@@ -62,8 +63,8 @@ export class OurTrainers implements OnInit {
     private auth: Authservice,
     private trainer: TrainerService,
     private router: Router,
-    private dataTransfer: DataTransferService,
-    private member :MemberService
+    private member :MemberService,
+    private cookie : CookieService
   ) {}
   ngOnInit(): void {
     this.isLoggedIn = this.auth.isLoggedIn();
@@ -75,6 +76,7 @@ export class OurTrainers implements OnInit {
    */
   icons = {
     cogs: faCircle,
+    users: faUsers,
     checkCircle: faCheckCircle,
     exclamationCircle: faExclamationCircle,
     mail: faEnvelope,
@@ -127,9 +129,10 @@ export class OurTrainers implements OnInit {
   }
   handleNavigation(trainer: publicTrainerInfoResponseDtoList) {
     const id = trainer.id;
+    const trainerName = `${trainer.firstName} ${trainer.lastName}`
     console.log(`current trainer's id is --> ${id}`);
-    this.dataTransfer.setTrainerObject(trainer);
-    this.router.navigate(['/do it later']);
+    this.cookie.set('reviewTrainerId',id,{path:'/',sameSite:'Strict'})
+    this.router.navigate(['/viewReviews'],{queryParams:{trainer:trainerName}});
   }
 
   genderThemeMapper(gender: string): any[] {
@@ -212,25 +215,4 @@ requestAsCoach(trainer: publicTrainerInfoResponseDtoList) {
     })
   }
 }
-/**
- * ngOnInit() {
-    this.dataTransferService.currentTrainerId$
-      .pipe(
-        // Filter out the initial null value
-        filter(id => id !== null),
-        // Take only the first ID received, then complete the subscription
-        take(1) 
-      )
-      .subscribe(trainerId => {
-        // 🚨 Use the received ID to call your secure API endpoint
-        console.log('Fetching reviews for hidden ID:', trainerId);
-        this.reviewService.fetchReviews(trainerId).subscribe(reviews => {
-          // ... process reviews
-        });
-        
-        // Optional: Reset the ID to null after use
-        this.dataTransferService.setTrainerId(null);
-      });
-  }
-}
- */
+
