@@ -6,6 +6,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCheckCircle,
   faCircle,
+  faCogs,
   faComment,
   faEnvelope,
   faExclamationCircle,
@@ -75,7 +76,7 @@ export class OurTrainers implements OnInit {
    * with all icons (faCogs)
    */
   icons = {
-    cogs: faCircle,
+    cogs: faCogs,
     users: faUsers,
     checkCircle: faCheckCircle,
     exclamationCircle: faExclamationCircle,
