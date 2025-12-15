@@ -3,11 +3,13 @@ import { Component,  OnInit } from '@angular/core';
 import { Authservice } from '../../../core/services/authservice';
 import { NavigationStart, Router, RouterLink } from '@angular/router';
 import { NgClass } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faBars, faClose } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-navbar',
   standalone:true,
-  imports: [RouterLink,NgClass],
+  imports: [RouterLink,NgClass,FontAwesomeModule],
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.css'],
 })
@@ -16,6 +18,10 @@ export class Navbar implements OnInit {
   isMenuOpen = false;
   isLoggedIn = false;
   userRole: string | null = null;
+  icons = {
+    close : faClose,
+    menu : faBars
+  }
   constructor(private authservice: Authservice, private router: Router){
     
   }
