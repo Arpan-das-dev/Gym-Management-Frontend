@@ -111,6 +111,15 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'viewReports',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] },
+    loadComponent: () =>
+      import('./shared/manage-reports/manage-reports').then(
+        (m) => m.ManageReports
+      ),
+  },
+  {
     path: 'buyPlan',
     canActivate: [authGuard],
     loadComponent: () =>
