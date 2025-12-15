@@ -21,10 +21,11 @@ import { Transactions } from "./transactions/transactions";
 import { ManageCuponCode } from "./manage-cupon-code/manage-cupon-code";
 import { ActiveCountService } from '../../core/services/active-count-service';
 import { WebSocketService } from '../../core/services/web-socket-service';
+import { ManageReports } from "./manage-reports/manage-reports";
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [Navbar, FontAwesomeModule, NgStyle, Footer, NgClass, FormsModule, DatePipe, ManagePlans, ManageProducts, Transactions, ManageCuponCode],
+  imports: [Navbar, FontAwesomeModule, NgStyle, Footer, NgClass, FormsModule, DatePipe, ManagePlans, ManageProducts, Transactions, ManageCuponCode, ManageReports],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css',
 })
