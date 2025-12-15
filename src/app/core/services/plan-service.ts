@@ -18,9 +18,9 @@ export class PlanService {
 
   // plan management service logics 
   //1. get all plans from backend
-  getAllPlans(): Observable<{ responseDtoList: plansResponseModel[] }> {
+  getAllPlans(): Observable<any> {
     const url = `${this.planService_Base_URL}/all/getPlans`
-    return this.httpClient.get<{ responseDtoList: plansResponseModel[] }>(url);
+    return this.httpClient.get(url);
   }
 
   //2. update plans
