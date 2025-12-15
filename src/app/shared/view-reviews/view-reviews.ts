@@ -15,7 +15,6 @@ import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
 import {
   faArrowLeft,
   faCheckCircle,
-  faCircle,
   faExclamationCircle,
   faStar,
   faEdit,
@@ -24,6 +23,8 @@ import {
   faArrowUp,
   faArrowDown,
   faExclamationTriangle,
+  faCogs,
+  faClose,
 } from '@fortawesome/free-solid-svg-icons';
 import { Router, RouterLink } from '@angular/router';
 import { Authservice } from '../../core/services/authservice';
@@ -34,6 +35,8 @@ import { FormsModule } from '@angular/forms';
 import { Navbar } from '../components/navbar/navbar';
 import { Footer } from '../components/footer/footer';
 import { CookieService } from 'ngx-cookie-service';
+import { ReportOrMessageCreationRequestDto } from '../../core/Models/reportServiceModels';
+import { ReportAndMessageService } from '../../core/services/report-and-message-service';
 
 @Component({
   selector: 'app-view-reviews',
@@ -64,7 +67,7 @@ export class ViewReviews implements OnInit , OnDestroy{
 
   /** Icons */
   icons = {
-    cogs: faCircle,
+    cogs: faCogs,
     checkCircle: faCheckCircle,
     warning : faExclamationTriangle,
     exclamationCircle: faExclamationCircle,
@@ -75,6 +78,7 @@ export class ViewReviews implements OnInit , OnDestroy{
     flag: faFlag,
     arrowUp: faArrowUp,
     arrowDown: faArrowDown,
+    close : faClose
   };
 
   /** Trainer model for header section */
@@ -94,7 +98,8 @@ export class ViewReviews implements OnInit , OnDestroy{
     private trainer: TrainerService, 
     private auth: Authservice,
     private cookie: CookieService,
-    private router: Router
+    private router: Router,
+    private report : ReportAndMessageService
   ) {
     this.userId = this.auth.getUserId();
     this.userRole = this.auth.getRole() || this.auth.getUserRole() || 'USER';
@@ -421,9 +426,36 @@ export class ViewReviews implements OnInit , OnDestroy{
 
   closeReportPopup() {
     this.showReportPopup = false;
+    this.reportReviewId = ''
+    this.reportSubject = '';
+    this.reportMessage = '';
   }
 
-  submitReport() {}
+  submitReport() {
+    this.loading = true;
+    this.globalLoadinText = "Submitting Report"
+    const data: ReportOrMessageCreationRequestDto = {
+      userId : this.userId,
+      userRole : this.userRole,
+      userName : this.userName,
+      emailId : this.auth.getUserMail(),
+      message : this.reportMessage,
+      subject : this.reportSubject,
+      messageTime : new Date().toISOString()
+    }
+    console.log(`sending request dto as ${data}`);
+    this.report.createRequest(data).subscribe({
+      next:(res:GenericResponse) => {
+        console.log(`fetched repose from backend as ${res.message}`);
+        this.closeReportPopup()
+        this.loading = false;
+        this.showSuccess(res.message)
+      }, error :(err: HttpErrorResponse) => {
+        console.log(err);
+        this.catchError(err,"Falied To create Request Due to Internal Error")
+      }
+    })
+  }
   /** ───────────────────────────────────────────────
    *  🔥 GLOBAL ERROR HANDLING
    *────────────────────────────────────────────────*/
