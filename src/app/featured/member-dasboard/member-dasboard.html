@@ -1,6 +1,6 @@
 <!-- 🌐 GLOBAL LOADER -->
 @if (loading) {
-  <div class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-99998">
+  <div class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-[99998]">
     <div class="text-center animate-pulse">
       <fa-icon [icon]="icons.loading" class="text-5xl text-white mb-2"></fa-icon>
       <p class="text-base font-semibold text-white">{{ globalLoadinText }}...</p>
@@ -10,17 +10,19 @@
 
 <!-- 🌐 GLOBAL TOAST -->
 @if (showMessage) {
-  <div class="fixed inset-0 flex justify-center items-start z-99999 pointer-events-none">
+  <div class="fixed top-20 left-0 right-0 flex justify-center z-[99999] pointer-events-none">
     <div
-      class="mt-6 px-5 py-3 rounded-xl shadow-xl text-white pointer-events-auto
-             animate-fadeIn transition-all"
+      class="px-5 py-3 rounded-xl shadow-xl text-white
+             pointer-events-auto animate-fadeIn transition-all"
       [ngClass]="{
         'bg-green-600': messageType === 'success',
         'bg-red-600': messageType === 'error'
-      }">
-
+      }"
+    >
       <fa-icon
-        [icon]="messageType === 'success' ? icons.checkCircle : icons.exclamationCircle"
+        [icon]="messageType === 'success'
+          ? icons.checkCircle
+          : icons.exclamationCircle"
         class="mr-2"
       ></fa-icon>
 
