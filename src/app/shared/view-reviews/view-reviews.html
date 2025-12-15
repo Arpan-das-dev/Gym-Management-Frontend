@@ -1,6 +1,6 @@
 <!-- 🌐 GLOBAL LOADER -->
 @if (loading) {
-  <div class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-9999">
+  <div class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-[99998]">
     <div class="text-center animate-pulse">
       <fa-icon [icon]="icons.cogs" class="text-5xl text-white mb-2"></fa-icon>
       <p class="text-base font-semibold text-white">{{ globalLoadinText }}...</p>
@@ -10,18 +10,22 @@
 
 <!-- 🌐 GLOBAL TOAST -->
 @if (showMessage) {
-  <div class="fixed inset-0 flex justify-center items-start z-99999 pointer-events-none">
+  <div class="fixed top-20 left-0 right-0 flex justify-center z-[99999] pointer-events-none">
     <div
-      class="mt-6 px-5 py-3 rounded-xl shadow-xl text-white pointer-events-auto animate-fadeIn transition-all"
+      class="px-5 py-3 rounded-xl shadow-xl text-white
+             pointer-events-auto animate-fadeIn transition-all"
       [ngClass]="{
         'bg-green-600': messageType === 'success',
         'bg-red-600': messageType === 'error'
       }"
     >
       <fa-icon
-        [icon]="messageType === 'success' ? icons.checkCircle : icons.exclamationCircle"
+        [icon]="messageType === 'success'
+          ? icons.checkCircle
+          : icons.exclamationCircle"
         class="mr-2"
       ></fa-icon>
+
       <span class="font-medium">{{ messageText }}</span>
     </div>
   </div>
@@ -449,6 +453,105 @@
           Cancel
         </button>
 
+      </div>
+
+    </div>
+  </div>
+}
+@if (showReportPopup) {
+  <div class="fixed inset-0 z-[99990] flex items-center justify-center animate-fadeIn">
+
+    <!-- Backdrop -->
+    <div
+      class="absolute inset-0 bg-black/70 backdrop-blur-sm"
+      (click)="closeReportPopup()">
+    </div>
+
+    <!-- Popup Card -->
+    <div
+      class="relative w-[95%] sm:w-[460px]
+             rounded-2xl p-6
+             bg-[#1a1f2b]/90 backdrop-blur-xl
+             border border-white/20
+             shadow-2xl text-gray-200
+             animate-popIn">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold flex items-center gap-2">
+          <fa-icon [icon]="icons.warning" class="text-orange-400"></fa-icon>
+          Report Review
+        </h3>
+
+        <button
+          class="text-gray-400 hover:text-red-400 transition"
+          (click)="closeReportPopup()">
+          <fa-icon [icon]="icons.close"></fa-icon>
+        </button>
+      </div>
+
+      <!-- Subject -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">
+          Subject <span class="text-red-400">*</span>
+        </label>
+
+        <input
+          type="text"
+          maxlength="150"
+          [(ngModel)]="reportSubject"
+          placeholder="Enter report subject"
+          class="w-full px-4 py-2 rounded-lg
+                 bg-black/40 border border-white/20
+                 focus:ring-2 focus:ring-orange-400
+                 outline-none transition"/>
+
+        <div class="text-xs text-gray-400 text-right mt-1">
+          {{ 150 - reportSubject.length }} characters left
+        </div>
+      </div>
+
+      <!-- Message -->
+      <div class="mb-5">
+        <label class="block text-sm font-medium mb-1">
+          Message <span class="text-red-400">*</span>
+        </label>
+
+        <textarea
+          rows="4"
+          maxlength="2000"
+          [(ngModel)]="reportMessage"
+          placeholder="Describe the issue clearly"
+          class="w-full px-4 py-2 rounded-lg resize-none
+                 bg-black/40 border border-white/20
+                 focus:ring-2 focus:ring-orange-400
+                 outline-none transition">
+        </textarea>
+
+        <div class="text-xs text-gray-400 text-right mt-1">
+          {{ 2000 - reportMessage.length }} characters left
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end gap-3">
+        <button
+          class="px-4 py-2 rounded-md
+                 bg-slate-600 hover:bg-slate-500
+                 transition"
+          (click)="closeReportPopup()">
+          Cancel
+        </button>
+
+        <button
+          class="px-5 py-2 rounded-md font-semibold
+                 bg-orange-500 hover:bg-orange-600
+                 transition
+                 disabled:opacity-40 disabled:cursor-not-allowed"
+          [disabled]="!reportSubject.trim() || !reportMessage.trim()"
+          (click)="submitReport()">
+          Submit
+        </button>
       </div>
 
     </div>
