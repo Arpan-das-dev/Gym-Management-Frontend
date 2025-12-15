@@ -2,32 +2,38 @@
 
 <body class="min-h-screen text-white">
 
-  <!-- ========================================================= -->
-  <!-- GLOBAL LOADER -->
-  <!-- ========================================================= -->
-  @if (loading) {
-  <div class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
+<!-- 🌐 GLOBAL LOADER -->
+@if (loading) {
+  <div class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-[99998]">
     <div class="text-center animate-pulse">
-      <fa-icon [icon]="icons.cogs" class="text-5xl mb-2"></fa-icon>
-      <p class="text-base font-semibold">Processing...</p>
+      <fa-icon [icon]="icons.cogs" class="text-5xl text-white mb-2"></fa-icon>
+      <p class="text-base font-semibold text-white">{{ messageText }}...</p>
     </div>
   </div>
-  }
+}
 
-  <!-- ========================================================= -->
-  <!-- SUCCESS / ERROR MESSAGE -->
-  <!-- ========================================================= -->
-  @if (showMessage) {
-  <div
-    class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-5 py-2.5 rounded-lg shadow text-white animate-fade"
-    [ngClass]="{
+<!-- 🌐 GLOBAL TOAST -->
+@if (showMessage) {
+  <div class="fixed top-20 left-0 right-0 flex justify-center z-[99999] pointer-events-none">
+    <div
+      class="px-5 py-3 rounded-xl shadow-xl text-white
+             pointer-events-auto animate-fadeIn transition-all"
+      [ngClass]="{
         'bg-green-600': messageType === 'success',
         'bg-red-600': messageType === 'error'
-      }">
-    <fa-icon [icon]="messageType === 'success' ? icons.checkCircle : icons.exclamationCircle"></fa-icon>
-    <span class="text-sm font-medium">{{ messageText }}</span>
+      }"
+    >
+      <fa-icon
+        [icon]="messageType === 'success'
+          ? icons.checkCircle
+          : icons.exclamationCircle"
+        class="mr-2"
+      ></fa-icon>
+
+      <span class="font-medium">{{ messageText }}</span>
+    </div>
   </div>
-  }
+}
 
   <!-- ========================================================= -->
   <!-- MAIN CONTENT -->
