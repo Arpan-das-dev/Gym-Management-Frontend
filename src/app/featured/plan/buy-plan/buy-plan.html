@@ -1,29 +1,37 @@
-<app-navbar></app-navbar>
-
-<section class="page-container py-10">
-  <!-- GLOBAL LOADER -->
-  @if (loading) {
-    <div class="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div class="text-center animate-pulse">
-        <fa-icon [icon]="icons.cogs" class="text-5xl mb-2"></fa-icon>
-        <p class="text-base font-semibold">Processing...</p>
-      </div>
+<!-- 🌐 GLOBAL LOADER -->
+@if (loading) {
+  <div class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-[99998]">
+    <div class="text-center animate-pulse">
+      <fa-icon [icon]="icons.cogs" class="text-5xl text-white mb-2"></fa-icon>
+      <p class="text-base font-semibold text-white">{{ messageText }}...</p>
     </div>
-  }
+  </div>
+}
 
-  <!-- TOAST -->
-  @if (showMessage) {
+<!-- 🌐 GLOBAL TOAST -->
+@if (showMessage) {
+  <div class="fixed top-20 left-0 right-0 flex justify-center z-[99999] pointer-events-none">
     <div
-      class="toast"
+      class="px-5 py-3 rounded-xl shadow-xl text-white
+             pointer-events-auto animate-fadeIn transition-all"
       [ngClass]="{
-        'toast-success': messageType === 'success',
-        'toast-error': messageType === 'error'
+        'bg-green-600': messageType === 'success',
+        'bg-red-600': messageType === 'error'
       }"
     >
-      <fa-icon [icon]="messageType === 'success' ? icons.checkCircle : icons.exclamationCircle"></fa-icon>
-      <span class="ml-2">{{ messageText }}</span>
+      <fa-icon
+        [icon]="messageType === 'success'
+          ? icons.checkCircle
+          : icons.exclamationCircle"
+        class="mr-2"
+      ></fa-icon>
+
+      <span class="font-medium">{{ messageText }}</span>
     </div>
-  }
+  </div>
+}
+<app-navbar></app-navbar>
+
 
 <div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6">
   <div class="w-full max-w-md bg-white shadow-2xl rounded-2xl p-6">
