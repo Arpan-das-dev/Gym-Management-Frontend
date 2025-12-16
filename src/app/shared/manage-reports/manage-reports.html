@@ -1,33 +1,279 @@
-<!-- 🌐 GLOBAL LOADER -->
-@if (loading) {
-  <div class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-[99998]">
-    <div class="text-center animate-pulse">
-      <fa-icon [icon]="icons.cogs" class="text-5xl text-white mb-2"></fa-icon>
-      <p class="text-base font-semibold text-white">{{ globalLoadinText }}...</p>
-    </div>
-  </div>
-}
+<app-navbar />
 
-<!-- 🌐 GLOBAL TOAST -->
-@if (showMessage) {
-  <div class="fixed top-20 left-0 right-0 flex justify-center z-[99999] pointer-events-none">
+<!-- BACKGROUND -->
+<div class="fixed inset-0 -z-10">
+  <img src="allMembersBg.jpg" class="w-full h-full object-cover brightness-90" />
+  <div class="absolute inset-0 bg-black/20"></div>
+</div>
+
+<section class="page-container py-10">
+
+  <!-- LOADER -->
+  @if (loading) {
+    <div class="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+      <div class="text-center animate-pulse">
+        <fa-icon [icon]="icons.cogs" class="text-5xl mb-2"></fa-icon>
+        <p class="font-semibold">Processing...</p>
+      </div>
+    </div>
+  }
+
+  <!-- TOAST -->
+  @if (showMessage) {
     <div
-      class="px-5 py-3 rounded-xl shadow-xl text-white
-             pointer-events-auto animate-fadeIn transition-all"
-      [ngClass]="{
-        'bg-green-600': messageType === 'success',
-        'bg-red-600': messageType === 'error'
-      }"
+      class="toast"
+      [class.toast-success]="messageType === 'success'"
+      [class.toast-error]="messageType === 'error'"
     >
       <fa-icon
         [icon]="messageType === 'success'
           ? icons.checkCircle
-          : icons.exclamationCircle"
-        class="mr-2"
-      ></fa-icon>
+          : icons.exclamationCircle">
+      </fa-icon>
+      <span>{{ messageText }}</span>
+    </div>
+  }
 
-      <span class="font-medium">{{ messageText }}</span>
+  <!-- FILTER BAR (ONLY DROPDOWNS) -->
+  <div class="filters glass-input p-4 rounded-2xl mb-6 flex gap-3 items-center">
+    <select [(ngModel)]="role" class="glass-input">
+      <option value="ALL" class="glass-input" >All Roles</option>
+      <option value="MEMBER" class="glass-input" >Member</option>
+      <option value="TRAINER" class="glass-input" >Trainer</option>
+    </select>
+
+    <select [(ngModel)]="status" class="glass-input" >
+      <option value="ALL" class="glass-input" >All Status</option>
+      <option value="PENDING" class="glass-input" >Pending</option>
+      <option value="RESOLVED" class="glass-input" >Resolved</option>
+      <option value="DECLINED" class="glass-input" >Declined</option>
+    </select>
+
+    <select [(ngModel)]="sortDirection" class="glass-input" >
+      <option value="DESC" class="glass-input" >Newest First</option>
+      <option value="ASC" class="glass-input" >Oldest First</option>
+    </select>
+
+    <button class="glass-button ml-auto" (click)="applyFilters()">
+      Apply
+    </button>
+
+    <button class="glass-button-secondary" (click)="restParameters()">
+      Reset
+    </button>
+  </div>
+
+  <!-- REPORT CARDS -->
+  <main class="cards-wrapper">
+    @for (r of allReports; track r.requestId) {
+      <article class="glass-card group">
+
+        <!-- COLLAPSED HEADER -->
+        <div class="card-top flex items-center justify-between">
+
+  <div class="flex items-center gap-4">
+    <img
+      class="avatar"
+      [src]="r.userRole === 'MEMBER'
+        ? mapProfileImageUrl(r.userId)
+        : mapProfileImage(r.userId)"
+    />
+
+    <div class="space-y-0.5">
+      <h3 class="name">{{ r.userName }}</h3>
+
+      <p class="sub text-xs">
+        {{ r.messageTime | date:'dd MMM yyyy, hh:mm a' }}
+      </p>
+
+      <!-- ROLE -->
+      <p
+        class="text-xs font-semibold inline-flex items-center gap-1 px-2 py-[2px] rounded-full"
+        [class.role-member]="r.userRole === 'MEMBER'"
+        [class.role-trainer]="r.userRole === 'TRAINER'"
+        [class.role-admin]="r.userRole === 'ADMIN'"
+      >
+        <fa-icon [icon]="icons.user" class="text-[10px]"></fa-icon>
+        {{ r.userRole }}
+      </p>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+
+    <!-- STATUS -->
+    <span
+      class="status-badge"
+      [class.status-pending]="r.messageStatus.toUpperCase() === 'PENDING'"
+      [class.status-resolved]="r.messageStatus.toUpperCase() === 'RESOLVED'"
+      [class.status-declined]="r.messageStatus.toUpperCase() === 'DECLINED'"
+    >
+      {{ r.messageStatus.toUpperCase() }}
+    </span>
+
+    <!-- TOGGLE -->
+    <button class="action-btn" (click)="r.show = !r.show">
+      <fa-icon [icon]="r.show ? icons.eyeSlash : icons.eye"></fa-icon>
+    </button>
+
+  </div>
+
+</div>
+
+
+        <!-- EXPANDED BODY -->
+        @if (r.show) {
+  <div class="card-body animate-expand space-y-4">
+
+    <!-- REQUEST ID -->
+    <div class="flex items-center gap-2 text-xs text-slate-300/80">
+      <fa-icon [icon]="icons.hash" class="text-blue-400"></fa-icon>
+      <span class="tracking-wide">Request ID:</span>
+      <span class="font-mono text-slate-200">{{ r.requestId }}</span>
+    </div>
+
+    <!-- SUBJECT -->
+    <div>
+      <p class="text-sm font-semibold text-orange-200 mb-1 flex items-center gap-2">
+        <fa-icon [icon]="icons.bookmark" class="text-orange-200"></fa-icon>
+        Subject
+      </p>
+      <p class="text-slate-200/90 leading-relaxed">
+        {{ r.subject }}
+      </p>
+    </div>
+
+    <!-- MESSAGE -->
+    <div>
+      <p class="text-sm font-semibold text-blue-200 mb-1 flex items-center gap-2">
+        <fa-icon [icon]="icons.commentDots" class="text-blue-200"></fa-icon>
+        Message
+      </p>
+      <p class="text-slate-200/80 leading-relaxed">
+        {{ r.message }}
+      </p>
+    </div>
+
+    <!-- ACTION -->
+    @if (r.messageStatus.toUpperCase() === 'PENDING') {
+      <div class="flex justify-end pt-2">
+        <button class="glass-button flex items-center gap-2" (click)="openPopup(r)">
+          <fa-icon [icon]="icons.checkCircle"></fa-icon>
+          Resolve
+        </button>
+      </div>
+    }
+
+  </div>
+}
+
+      </article>
+    }
+
+    <!-- PAGINATION -->
+    <div class="pagination mt-8">
+      <button class="glass-button" [disabled]="pageNo === 0" (click)="prevPage()">← Previous</button>
+      <span class="page-indicator">Page {{ pageNo + 1 }} of {{ totalPages }}</span>
+      <button class="glass-button" [disabled]="lastPage" (click)="nextPage()">Next →</button>
+    </div>
+  </main>
+
+</section>
+@if (showPopup) {
+  <div class="modal-backdrop">
+
+    <div class="resolve-modal animate-expand">
+
+      <!-- HEADER -->
+      <div class="modal-header">
+        <div class="flex items-center gap-2">
+          <fa-icon
+            [icon]="decline ? icons.exclamationTriangle : icons.checkCircle"
+            class="text-yellow-400"
+          ></fa-icon>
+          <h3>{{ decline ? 'Decline Report' : 'Resolve Report' }}</h3>
+        </div>
+
+        <button class="close-btn" (click)="closePopup()">
+          <fa-icon [icon]="icons.xmark"></fa-icon>
+        </button>
+      </div>
+
+      <!-- REQUEST ID -->
+      <div class="request-id">
+        <fa-icon [icon]="icons.hash"></fa-icon>
+        <span>Request ID:</span>
+        <span class="mono">{{ selectedRequestId }}</span>
+      </div>
+
+      <!-- ACTION TYPE -->
+      <div class="action-toggle">
+        <label>
+          <input type="radio" [(ngModel)]="decline" [value]="false" />
+          <span class="resolve">Resolve</span>
+        </label>
+
+        <label>
+          <input type="radio" [(ngModel)]="decline" [value]="true" />
+          <span class="decline">Decline</span>
+        </label>
+      </div>
+
+      <!-- NOTIFY -->
+      <label class="notify-checkbox">
+        <input type="checkbox" [(ngModel)]="notify" />
+        Notify user via email
+      </label>
+
+      <!-- MESSAGE -->
+      @if (notify) {
+        <div class="message-box">
+          <textarea
+            [(ngModel)]="mailMessage"
+            maxlength="500"
+            placeholder="Write message to user..."
+          ></textarea>
+
+          <div class="message-footer">
+            <span
+              class="char-count"
+              [class.limit-reached]="mailMessage.length >= 500"
+            >
+              {{ 500 - mailMessage.length }} characters left
+            </span>
+
+            @if (mailMessage.length === 0) {
+              <span class="error-text">
+                <fa-icon [icon]="icons.exclamationCircle"></fa-icon>
+                Message is required when notify is enabled
+              </span>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ACTIONS -->
+      <div class="modal-actions">
+        <button class="glass-button-secondary" (click)="closePopup()">
+          Cancel
+        </button>
+
+        <button
+          class="glass-button"
+          [disabled]="notify && mailMessage.length === 0"
+          (click)="resolveOrDecline()"
+        >
+          <fa-icon
+            [icon]="decline ? icons.exclamationTriangle : icons.checkCircle"
+          ></fa-icon>
+          {{ decline ? 'Decline' : 'Resolve' }}
+        </button>
+      </div>
+
     </div>
   </div>
 }
-<app-navbar></app-navbar>
+
+
+
+<app-footer />
