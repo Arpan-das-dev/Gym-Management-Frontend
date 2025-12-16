@@ -8,6 +8,7 @@ export interface ReportOrMessageCreationRequestDto {
   messageTime: string;
 }
 export interface AllReportsList {
+  requestId : string;
   userId: string;
   userName: string;
   userRole: string;
@@ -15,6 +16,7 @@ export interface AllReportsList {
   message: string;
   messageTime: string; 
   messageStatus: string;
+  show:boolean
 }
 
 export interface AllMessageWrapperResponseDto {
@@ -24,4 +26,11 @@ export interface AllMessageWrapperResponseDto {
   totalElements: number;
   totalPages: number;
   lastPage: boolean;
+}
+
+export interface ResolveMessageRequestDto {
+    requestId :string| null;
+    notify :boolean;
+    mailMessage :string| null;
+    decline :boolean;
 }
