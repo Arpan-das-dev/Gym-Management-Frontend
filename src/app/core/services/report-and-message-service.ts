@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { ReportOrMessageCreationRequestDto } from '../Models/reportServiceModels';
+import { ReportOrMessageCreationRequestDto, ResolveMessageRequestDto } from '../Models/reportServiceModels';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -29,5 +29,10 @@ export class ReportAndMessageService {
     .set('role',role|| 'ALL')
     .set('status',status|| 'ALL')
     return this.http.get(url,{params})
+  }
+
+  markAsResolveOrDecline(userId:string,data:ResolveMessageRequestDto) :Observable<any>{
+    const url = `${this.URL}/administrator/{userId}`;
+    return this.http.post(url,data);
   }
 }
