@@ -140,6 +140,10 @@ export class MemberService {
       );
   }
 
+  getChunksOfMembersProfileImage(data:string[]) :Observable<any> {
+    const url = `${this.memberProfileBaseUrl}/admin/getProfileUrls`
+    return this.http.post(url,data);
+  }
   // delete member's profile image by member id
   deleteMemberProfileImage(memberId: string): Observable<any> {
     const url = `${this.memberProfileBaseUrl}/member/delete?memberId=${memberId}`;
@@ -430,4 +434,5 @@ export class MemberService {
     }
     return this.http.post(url, body);
   }
+  
 }
