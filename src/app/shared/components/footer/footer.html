@@ -6,25 +6,28 @@
       <h3 class="text-xl font-semibold text-orange-400 mb-4">Developer</h3>
 
       <p class="text-sm mb-3">
-        Built & Maintained by 
+        Built & Maintained by
         <span class="text-blue-400 font-semibold hover:text-orange-400 transition ">
           Arpan Das
         </span>
       </p>
 
       <div class="flex flex-col gap-2">
-        <a class="hover:text-orange-400 transition cursor-pointer flex items-center gap-2" 
-        href="https://www.linkedin.com/in/arpan-das-b47050332/">
+        <a class="hover:text-orange-400 transition cursor-pointer flex items-center gap-2"
+          href="https://www.linkedin.com/in/arpan-das-b47050332/" target="_blank" rel="noopener noreferrer">
+
           <fa-icon [icon]="icons.linkedin" class="text-blue-400"></fa-icon>
           LinkedIn Profile
         </a>
 
         <a class="hover:text-orange-400 transition cursor-pointer flex items-center gap-2"
-        href="https://github.com/Arpan-das-dev">
+          href="https://github.com/Arpan-das-dev" target="_blank" rel="noopener noreferrer">
+
           <fa-icon [icon]="icons.briefcase" class="text-orange-400"></fa-icon>
           GitHub
         </a>
       </div>
+
     </div>
 
     <!-- Product -->
@@ -35,7 +38,6 @@
         <a class="hover:text-blue-400 transition cursor-pointer" routerLink="/plans">Pricing Plans</a>
         <a class="hover:text-blue-400 transition cursor-pointer" routerLink="/ourTrainers">Our Trainers</a>
         <a class="hover:text-blue-400 transition cursor-pointer">Features</a>
-        <a class="hover:text-blue-400 transition cursor-pointer">Testimonials</a>
       </div>
     </div>
 
@@ -66,14 +68,14 @@
       <h3 class="text-xl font-semibold text-orange-400 mb-4">Support & Legal</h3>
 
       <div class="flex flex-col gap-2">
-        <a class="hover:text-blue-400 transition cursor-pointer flex items-center gap-2">
+        <a class="hover:text-blue-400 transition cursor-pointer flex items-center gap-2" routerLink="/help-center">
           <fa-icon [icon]="icons.help" class="text-blue-400"></fa-icon>
           Help Center
         </a>
 
-        <a class="hover:text-blue-400 transition cursor-pointer">Privacy Policy</a>
+        <a class="hover:text-blue-400 transition cursor-pointer" routerLink="/privacy-policy">Privacy Policy</a>
         <a class="hover:text-blue-400 transition cursor-pointer" routerLink="/terms-of-service">Terms of Service</a>
-        <a class="hover:text-blue-400 transition cursor-pointer">Cookie Policy</a>
+        <a class="hover:text-blue-400 transition cursor-pointer" routerLink="/cookie-policy">Cookie Policy</a>
       </div>
     </div>
 
