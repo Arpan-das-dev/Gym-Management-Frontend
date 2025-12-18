@@ -1,0 +1,139 @@
+<div class="min-h-screen bg-gradient-to-br from-white via-orange-50 to-blue-50">
+
+  <!-- NAVBAR -->
+  <app-navbar></app-navbar>
+
+  <main class="max-w-5xl mx-auto px-4 py-14">
+
+    <!-- HEADER -->
+    <div class="text-center mb-14">
+      <div
+        class="w-20 h-20 mx-auto flex items-center justify-center
+               rounded-full bg-gradient-to-br from-orange-400 to-yellow-400
+               shadow-xl mb-6">
+        <fa-icon [icon]="icons.cookie" class="text-4xl text-white"></fa-icon>
+      </div>
+
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
+        Cookie Policy
+      </h1>
+
+      <p class="text-gray-600 max-w-2xl mx-auto text-lg">
+        Learn how FitStudio uses cookies to keep your fitness journey secure,
+        smooth, and personalized.
+      </p>
+
+      <p class="text-sm text-gray-400 mt-4">
+        Last Updated: {{ lastUpdated }}
+      </p>
+    </div>
+
+    <!-- QUICK SUMMARY -->
+    <div
+      class="mb-10 rounded-2xl border border-orange-200
+             bg-gradient-to-br from-orange-50 to-yellow-50
+             p-6 shadow-lg hover:shadow-xl transition">
+
+      <h2 class="flex items-center gap-2 font-semibold text-orange-600 mb-3">
+        <fa-icon [icon]="icons.info"></fa-icon>
+        Quick Summary
+      </h2>
+
+      <ul class="space-y-2 text-sm text-gray-700">
+        <li>• Essential cookies keep you logged in securely</li>
+        <li>• Session storage handles verification states</li>
+        <li>• All cookies use Strict SameSite policy</li>
+        <li>• We never sell cookie data</li>
+      </ul>
+    </div>
+
+    <!-- TABLE OF CONTENTS -->
+    <div
+      class="mb-12 rounded-2xl border bg-white shadow-lg p-6
+             hover:shadow-xl transition">
+
+      <h2 class="font-semibold text-gray-800 mb-4">
+        Table of Contents
+      </h2>
+
+      <div class="grid md:grid-cols-2 gap-2">
+        @for (section of sections; track section.id) {
+          <a
+            [href]="'#' + section.id"
+            class="flex items-center gap-2 text-sm
+                   text-gray-600 hover:text-orange-500
+                   transition">
+            <fa-icon [icon]="section.icon"></fa-icon>
+            {{ section.title }}
+          </a>
+        }
+      </div>
+    </div>
+
+    <!-- POLICY SECTIONS -->
+    <div class="space-y-8">
+      @for (section of sections; track section.id) {
+
+        <div
+          [id]="section.id"
+          class="scroll-mt-24 rounded-2xl
+                 bg-white border shadow-lg
+                 hover:shadow-xl transition">
+
+          <div class="flex items-center gap-4 px-6 py-5 border-b">
+            <div
+              class="w-11 h-11 flex items-center justify-center
+                     rounded-lg bg-orange-100 text-orange-500">
+              <fa-icon [icon]="section.icon"></fa-icon>
+            </div>
+
+            <h3 class="font-semibold text-gray-900 text-lg">
+              {{ section.title }}
+            </h3>
+          </div>
+
+          <div class="px-6 py-5 text-gray-700 leading-relaxed">
+            {{ section.content }}
+          </div>
+        </div>
+
+      }
+    </div>
+
+    <!-- CONSENT NOTE -->
+    <div
+      class="mt-14 rounded-2xl border border-yellow-300
+             bg-gradient-to-br from-yellow-50 to-orange-50
+             p-6 shadow-lg">
+
+      <div class="flex items-start gap-4">
+        <fa-icon
+          [icon]="icons.warning"
+          class="text-yellow-500 text-3xl mt-1">
+        </fa-icon>
+
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-1">
+            Managing Your Consent
+          </h3>
+
+          <p class="text-sm text-gray-700">
+            You can change cookie preferences anytime via browser settings
+            or our cookie management tools.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER NOTE -->
+    <div class="mt-12 text-center text-sm text-gray-500">
+      <p>
+        © 2025 FitStudio. All rights reserved.
+      </p>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <app-footer></app-footer>
+</div>
