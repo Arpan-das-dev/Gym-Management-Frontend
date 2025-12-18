@@ -42,7 +42,7 @@ export class Authservice {
               }
             } 
           })
-        localStorage.setItem('token', response.token);
+        sessionStorage.setItem('token', response.token);
       }), catchError(error => {
         console.error("Login error:", error);
         return throwError(() => new Error("Login failed"));
@@ -64,11 +64,11 @@ export class Authservice {
         this.activeCount.adminDecrement(userId).subscribe();
         break;
     }
-    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     this.router.navigate(['/login'])
   }
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return sessionStorage.getItem('token');
   }
   // utility methods
   isLoggedIn(): boolean {
