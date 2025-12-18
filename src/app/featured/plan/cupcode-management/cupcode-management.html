@@ -1,5 +1,3 @@
-<app-navbar/>
-<body>
 
 <!-- 🌐 GLOBAL LOADER -->
 @if (loading) {
@@ -33,6 +31,9 @@
     </div>
   </div>
 }
+<app-navbar/>
+<body>
+
 
   <!-- ========================================================= -->
   <!-- MAIN LAYOUT -->
@@ -83,7 +84,7 @@
             <label class="font-semibold text-sm flex items-center gap-2">
               <fa-icon [icon]="icons.percent" class="text-yellow-600"></fa-icon> Discount (%)
             </label>
-            <input type="number" formControlName="discount"
+            <input type="number" step=".1" formControlName="discount"
               class="w-full border p-2 rounded-md text-sm bg-gray-50 focus:ring-2 focus:ring-blue-600"
               placeholder="10, 20 etc." />
           </div>
@@ -244,8 +245,7 @@
       </div>
 
     </div>
-  </div>
-
+    
   <!-- ========================================================= -->
   <!-- DELETE POPUP -->
   <!-- ========================================================= -->
@@ -261,6 +261,8 @@
     </div>
   </div>
   }
+  </div>
+
 
 </body>
 <app-footer/>
