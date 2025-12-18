@@ -177,6 +177,25 @@ export const routes: Routes = [
         (t) => t.TermsOfService
       ),
   },
+  {
+    path: 'cookie-policy',
+    loadComponent: () =>
+      import('./shared/cookie-policy/cookie-policy').then(
+        (c) => c.CookiePolicy
+      ),
+  },
+  {
+    path: 'help-center',
+    loadComponent: () =>
+      import('./shared/help-center/help-center').then((h) => h.HelpCenter),
+  },
 
+  {
+    path: 'privacy-policy',
+    loadComponent: () =>
+      import('./shared/privacy-policy/privacy-policy').then(
+        (p) => p.PrivacyPolicy
+      ),
+  },
   { path: '**', redirectTo: '/error' },
 ];
