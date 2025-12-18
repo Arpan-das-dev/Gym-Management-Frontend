@@ -31,8 +31,19 @@ export class ReportAndMessageService {
     return this.http.get(url,{params})
   }
 
-  markAsResolveOrDecline(userId:string,data:ResolveMessageRequestDto) :Observable<any>{
+  markAsResolveOrDecline(userId:string,data:ResolveMessageRequestDto) :Observable<any> {
     const url = `${this.URL}/administrator/{userId}`;
     return this.http.post(url,data);
+  }
+
+  fetchReportsOrMessageByUserId(userId : string) : Observable<any> {
+    const url = `${this.URL}/users/status?userId=${userId}`
+    return this.http.get(url)
+  }
+
+  deleteReportByUser(userId : string, requestId : string) :Observable<any> {
+    const url = `${this.URL}/users/deleteReport`;
+    const params = new HttpParams().set('userId',userId).set('requestId',requestId);
+    return this.http.delete(url,{params})
   }
 }
