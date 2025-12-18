@@ -109,13 +109,17 @@ export class CupcodeManagement implements OnInit {
 
   cuponCodes: CuponCodeResponseDto[] = []
   loadAllCupons() {
+    this.loading = true
     this.adminService.getAllCuponCodes().subscribe({
       next: (res: { responseDtoList: CuponCodeResponseDto[] }) => {
         this.cuponCodes = res.responseDtoList || [];
         console.log("cupon list:", this.cuponCodes);
         console.log("cupon codes fetched from backend of size " + this.cuponCodes.length);
+        this.loading = false;
+        this.showFullScreenMessage( 'success',"Fetched All Cupon Codes")
       },
       error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
+        this.loading = false;
         const message = error.error?.message || 'Failed to load cupon codes';
         this.showFullScreenMessage('error', message);
       }
@@ -238,9 +242,7 @@ onSubmit() {
       console.error("Delete IDs missing!");
       console.log(this.pendingDeleteId);
       console.log("++++++++++++++++++");
-
       console.log(this.pendingDeletedPlanId);
-
       return;
     }
 
