@@ -64,6 +64,9 @@ export class ProfileCard implements OnInit {
       this.loadTrainerInfo();
     }, 500);
     console.log('role class is ==> ', this.roleClass);
+    this.loadLiveUsersCount()
+    console.log(this.loadLiveUsersCount());
+    
   }
   // global icons for profile card
   icons = {
@@ -461,7 +464,7 @@ export class ProfileCard implements OnInit {
   liveTrainerCount = 0;
 
   loadLiveUsersCount() {
-    this.websocket.connect('ws://localhost:8080/ws');
+    this.websocket.connect('ws://localhost:8080/ws/trainers');
 
     this.websocket.subscribe('/topic/activeMembers', (count) => {
       this.liveMemberCount = count;
