@@ -17,9 +17,11 @@ export class WebSocketService {
   connect(wsUrl: string): void {
     if (this.connected) return;
     const token  =this.auth.getToken()
+    console.log("connected");
     this.stompClient = new Client({
       brokerURL: wsUrl, // e.g., ws://localhost:8080/ws
       reconnectDelay: 5000,
+      
       // connectHeaders:{
       //   Authorization: `Bearer ${token}`
       // },
