@@ -1,0 +1,392 @@
+<!-- 🌐 GLOBAL LOADER -->
+@if (loading) {
+<div class="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-[99998]">
+    <div class="text-center animate-pulse">
+        <fa-icon [icon]="icons.cogs" class="text-5xl text-orange-400 mb-2"></fa-icon>
+        <p class="text-base font-semibold text-white tracking-wide">
+            {{ globalLoadinText }}...
+        </p>
+    </div>
+</div>
+}
+
+<!-- 🌐 GLOBAL TOAST -->
+@if (showMessage) {
+<div class="fixed top-20 left-0 right-0 flex justify-center z-[99999] pointer-events-none">
+    <div class="px-5 py-3 rounded-xl shadow-2xl text-white
+             pointer-events-auto animate-fadeIn transition-all" [ngClass]="{
+        'bg-green-600': messageType === 'success',
+        'bg-red-600': messageType === 'error'
+      }">
+        <fa-icon [icon]="messageType === 'success'
+          ? icons.checkCircle
+          : icons.exclamationCircle" class="mr-2"></fa-icon>
+
+        <span class="font-medium">{{ messageText }}</span>
+    </div>
+</div>
+}
+
+<div class="min-h-screen bg-gradient-to-br from-white via-orange-50 to-blue-50 px-4 py-10 max-w-7xl mx-auto">
+
+    <!-- ================= HEADER ================= -->
+    <div class="mb-10">
+        <a routerLink="/" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg
+             bg-black text-white hover:bg-orange-500 transition shadow-md">
+            <fa-icon [icon]="icons.arrowLeft"></fa-icon>
+            Back to Home
+        </a>
+    </div>
+
+    <!-- ================= PAGE INTRO ================= -->
+    <div class="text-center mb-14">
+        <div class="w-16 h-16 mx-auto flex items-center justify-center
+             rounded-full bg-gradient-to-br from-orange-400 to-yellow-400
+             text-white shadow-lg mb-4">
+            <fa-icon [icon]="icons.exclamationCircle" class="text-2xl"></fa-icon>
+        </div>
+
+        <h1 class="text-4xl font-bold text-gray-900 mb-2">
+            Help Center
+        </h1>
+
+        <p class="text-gray-600 max-w-xl mx-auto">
+            Need assistance? Browse your request status, contact our admin,
+            or check common questions below.
+        </p>
+    </div>
+
+    <!-- ================= CONTACT CARDS ================= -->
+    <div class="grid md:grid-cols-3 gap-6 mb-14">
+
+        <div class="border rounded-xl p-6 text-center bg-white hover:shadow-xl transition">
+            <div class="w-12 h-12 mx-auto rounded-full bg-blue-100 flex items-center justify-center mb-3">
+                <fa-icon [icon]="icons.envelope" class="text-blue-600"></fa-icon>
+            </div>
+            <h3 class="font-semibold mb-1">Email Support</h3>
+            <p class="text-sm text-gray-500 mb-2">Get help via email</p>
+            <span class="text-orange-500 font-medium">dasarpan915@gmail.com</span>
+        </div>
+
+        <div class="border rounded-xl p-6 text-center bg-white hover:shadow-xl transition">
+            <div class="w-12 h-12 mx-auto rounded-full bg-blue-100 flex items-center justify-center mb-3">
+                <fa-icon [icon]="icons.phone" class="text-blue-600"></fa-icon>
+            </div>
+            <h3 class="font-semibold mb-1">Helpline</h3>
+            <p class="text-sm text-gray-500 mb-2">Call us anytime</p>
+            <span class="text-orange-500 font-medium">+91 81454515374</span>
+        </div>
+
+        <div class="border rounded-xl p-6 text-center bg-white hover:shadow-xl transition">
+            <div class="w-12 h-12 mx-auto rounded-full bg-blue-100 flex items-center justify-center mb-3">
+                <fa-icon [icon]="icons.clock" class="text-blue-600"></fa-icon>
+            </div>
+            <h3 class="font-semibold mb-1">Support Hours</h3>
+            <p class="text-sm text-gray-500 mb-2">We're available</p>
+            <span class="text-orange-500 font-medium">24 / 7 Support</span>
+        </div>
+
+    </div>
+
+    <!-- ================= MY REQUEST STATUS ================= -->
+    <div class="border rounded-2xl p-6 mb-12 bg-white shadow-lg">
+
+        <h2 class="font-semibold text-lg mb-6 flex items-center gap-2">
+            <fa-icon [icon]="icons.fileLines" class="text-orange-500"></fa-icon>
+            My Request Status
+        </h2>
+
+        @if (!isLoggedIn) {
+        <div class="flex flex-col items-center text-center py-12
+               border-2 border-dashed border-orange-300 rounded-xl
+               bg-orange-50">
+            <fa-icon [icon]="icons.lock" class="text-4xl text-orange-400 mb-3"></fa-icon>
+            <p class="text-lg font-semibold text-gray-800">
+                You are not logged in
+            </p>
+            <p class="text-sm text-gray-600 mb-5">
+                Login to see your report status and admin responses
+            </p>
+
+            <button routerLink="/login" class="inline-flex items-center gap-2 px-6 py-2 rounded-lg
+                 bg-orange-500 text-white font-semibold
+                 hover:bg-orange-600 transition shadow-md">
+                Login Now
+                <fa-icon [icon]="icons.arrowRight"></fa-icon>
+            </button>
+        </div>
+        }
+
+        @else {
+
+        @if (loading) {
+        <div class="text-center py-10 text-gray-500">
+            {{ globalLoadinText }}...
+        </div>
+        }
+        @else if (userReports.length <= 0) { <div class="text-center py-10 text-gray-400">
+            <fa-icon [icon]="icons.fileLines" class="text-4xl mb-2"></fa-icon>
+            <p>No help requests found.</p>
+    </div>
+    }
+    @else {
+    <div class="space-y-4">
+        @for (r of userReports; track r.requestId) {
+        <div class="border rounded-lg p-4 bg-gradient-to-br from-white to-orange-50">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-semibold text-gray-900">{{ r.subject }}</h3>
+
+                    <span class="inline-block mt-1 px-3 py-1 text-xs rounded-full font-medium" [ngClass]="{
+                      'bg-yellow-100 text-yellow-700': r.messageStatus.toUpperCase() === 'PENDING',
+                      'bg-green-100 text-green-700': r.messageStatus.toUpperCase() === 'RESOLVED',
+                      'bg-red-100 text-red-700': r.messageStatus.toUpperCase() === 'DECLINED'
+                    }">
+                        {{ r.messageStatus }}
+                    </span>
+
+                    <div class="text-xs text-gray-500 mt-1">
+                        {{ r.messageTime | date:'MMM dd, yyyy HH:mm' }}
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button class="text-blue-600 text-sm" (click)="r.show = !r.show">
+                        {{ r.show ? 'Hide' : 'Show' }}
+                    </button>
+
+                    @if (r.messageStatus.toUpperCase() === 'PENDING') {
+                    <button class="text-red-500 text-sm" (click)="openDeletePopup(r.requestId)">
+                        Delete <fa-icon [icon]="icons.trash"></fa-icon>
+                    </button>
+                    }
+                </div>
+            </div>
+
+            @if (r.show) {
+            <div class="mt-4 border-t pt-3 text-gray-700">
+                {{ r.message }}
+            </div>
+            }
+        </div>
+        }
+    </div>
+    }
+    }
+</div>
+
+<!-- ================= FORM + FAQ ================= -->
+<div class="grid lg:grid-cols-2 gap-8">
+
+    <!-- CONTACT ADMIN -->
+    <div class="border rounded-2xl p-6 bg-white shadow-lg">
+        <h2 class="font-semibold text-lg mb-4 flex items-center gap-2">
+            <fa-icon [icon]="icons.paperPlane" class="text-orange-500"></fa-icon>
+            Contact Admin
+        </h2>
+
+        @if (!isLoggedIn) {
+        <div class="flex flex-col items-center text-center py-10
+                 bg-gradient-to-br from-orange-50 to-blue-50
+                 border border-orange-200 rounded-xl">
+            <fa-icon [icon]="icons.userLock" class="text-4xl text-orange-400 mb-3"></fa-icon>
+            <p class="font-semibold text-gray-800">You are not logged in</p>
+            <p class="text-sm text-gray-600 mb-5">
+                Login first to create a help request
+            </p>
+
+            <button routerLink="/login" class="inline-flex items-center gap-2 px-6 py-2
+                   bg-blue-600 text-white rounded-lg font-semibold
+                   hover:bg-blue-700 transition shadow-md">
+                Go to Login
+                <fa-icon [icon]="icons.arrowRight"></fa-icon>
+            </button>
+        </div>
+        }
+
+        @else {
+  <div class="space-y-6">
+
+    <!-- SUBJECT FIELD -->
+    <div
+      class="rounded-xl border border-orange-300
+             bg-orange-50/60 p-4
+             focus-within:border-orange-500
+             focus-within:ring-2 focus-within:ring-orange-200
+             transition">
+
+      <label class="block text-sm font-semibold text-gray-800 mb-1">
+        Subject
+      </label>
+
+      <input
+        class="w-full bg-transparent outline-none
+               text-gray-900 placeholder-gray-400"
+        placeholder="Enter a short subject (e.g. Payment issue, Trainer issue)"
+        [(ngModel)]="subject"
+        maxlength="150" />
+
+      <p class="text-xs text-right text-gray-500 mt-1">
+        {{ 150 - subject.length }} characters left
+      </p>
+    </div>
+
+    <!-- MESSAGE FIELD -->
+    <div
+      class="rounded-xl border border-blue-300
+             bg-blue-50/60 p-4
+             focus-within:border-blue-500
+             focus-within:ring-2 focus-within:ring-blue-200
+             transition">
+
+      <label class="block text-sm font-semibold text-gray-800 mb-1">
+        Message
+      </label>
+
+      <textarea
+        class="w-full bg-transparent outline-none resize-none
+               text-gray-900 placeholder-gray-400"
+        rows="6"
+        placeholder="Describe your issue in detail so our admin can help you faster…"
+        [(ngModel)]="message"
+        maxlength="2000">
+      </textarea>
+
+      <p class="text-xs text-right text-gray-500 mt-1">
+        {{ 2000 - message.length }} characters left
+      </p>
+    </div>
+
+    <!-- SUBMIT BUTTON -->
+    <button
+      class="w-full py-3 rounded-xl font-semibold text-lg
+             bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500
+             text-white
+             shadow-lg shadow-orange-400/30
+             hover:scale-[1.01] hover:shadow-orange-500/40
+             active:scale-[0.98]
+             transition-all duration-200"
+      [disabled]="loading"
+      (click)="submitReport()">
+
+      <fa-icon [icon]="icons.paperPlane" class="mr-2"></fa-icon>
+      Send Message
+    </button>
+
+  </div>
+}
+
+    </div>
+
+    <!-- FAQ -->
+    <div class="border rounded-2xl p-6 bg-white shadow-lg">
+        <h2 class="font-semibold text-lg mb-4">Frequently Asked Questions</h2>
+
+        <div class="space-y-2">
+            @for (faq of faqs; track faq.question) {
+            <details class="border rounded-lg p-3 bg-orange-50">
+                <summary class="cursor-pointer font-medium text-gray-800">
+                    {{ faq.question }}
+                </summary>
+                <p class="text-gray-600 mt-2">{{ faq.answer }}</p>
+            </details>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- ================= FOOTER CTA ================= -->
+<div class="mt-14 bg-gradient-to-r from-orange-100 to-blue-100 border rounded-2xl p-8 text-center">
+    <h3 class="text-xl font-semibold mb-2">Still need help?</h3>
+    <p class="text-gray-600 mb-4">
+        Our support team typically responds within 24 hours.
+    </p>
+
+    <div class="flex justify-center gap-4 flex-wrap">
+        <a routerLink="/terms-of-service">
+            <button class="border px-4 py-2 rounded hover:bg-black hover:text-white transition">
+                Terms of Service
+            </button>
+        </a>
+        <a routerLink="/privacy-policy">
+            <button class="border px-4 py-2 rounded hover:bg-black hover:text-white transition">
+                Privacy Policy
+            </button>
+        </a>
+        <a routerLink="/cookie-policy">
+            <button class="border px-4 py-2 rounded hover:bg-black hover:text-white transition">
+                Cookie Policy
+            </button>
+        </a>
+
+    </div>
+</div>
+
+<!-- ================= DELETE CONFIRMATION POPUP ================= -->
+@if (openPopup) {
+<div class="fixed inset-0 z-[99999]
+           flex items-center justify-center
+           bg-black/70 backdrop-blur-sm">
+
+    <!-- POPUP CARD -->
+    <div class="w-full max-w-md mx-4
+             rounded-2xl shadow-2xl
+             bg-gradient-to-br from-white via-orange-50 to-blue-50
+             border border-orange-200
+             animate-scaleIn">
+
+        <!-- HEADER -->
+        <div class="flex items-center gap-3 px-6 py-4 border-b">
+            <div class="w-10 h-10 rounded-full
+                 bg-gradient-to-br from-orange-500 to-yellow-400
+                 flex items-center justify-center
+                 text-white shadow-md">
+                <fa-icon [icon]="icons.trash"></fa-icon>
+            </div>
+
+            <h3 class="text-lg font-semibold text-gray-900">
+                Delete Request
+            </h3>
+        </div>
+
+        <!-- BODY -->
+        <div class="px-6 py-5 text-center">
+            <p class="text-gray-700 font-medium mb-2">
+                Are you sure you want to delete this request?
+            </p>
+
+            <p class="text-sm text-gray-500">
+                This action is <span class="font-semibold text-red-500">permanent</span>
+                and cannot be undone.
+            </p>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="flex justify-end gap-3 px-6 py-4
+               border-t bg-black/5">
+
+            <!-- CANCEL -->
+            <button class="px-4 py-2 rounded-lg
+                 border border-gray-300
+                 text-gray-700 font-medium
+                 hover:bg-gray-100 transition" (click)="closeDeletePopup()" [disabled]="loading">
+                Cancel
+            </button>
+
+            <!-- DELETE -->
+            <button class="px-5 py-2 rounded-lg font-semibold
+                 text-white
+                 bg-gradient-to-r from-red-500 to-red-600
+                 hover:opacity-90 transition
+                 shadow-md" (click)="deleteReportByUser()" [disabled]="loading">
+
+                <fa-icon [icon]="icons.trash" class="mr-2"></fa-icon>
+                Delete
+            </button>
+        </div>
+
+    </div>
+</div>
+}
+
+</div>
