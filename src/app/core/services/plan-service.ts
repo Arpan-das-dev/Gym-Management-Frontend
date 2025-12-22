@@ -6,15 +6,16 @@ import { plansResponseModel, PlanUpdateRequestDto } from '../Models/planModel';
 import { Authservice } from './authservice';
 import { genericResponseMessage } from '../Models/genericResponseModels';
 import { CuponValidationResponse } from '../Models/cuponCodeModels';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlanService {
   constructor(private httpClient: HttpClient, private router: Router, private authservice: Authservice) { }
-  planService_Base_URL: string = "http://localhost:8080/fitStudio/plan-service/plan"
+  planService_Base_URL: string = `${environment.apiBaseUrl}${environment.microServices.PLAN_SERVICE.BASE}`;
 
-  planService_Base_Url_cuponCodeManagement: string = "http://localhost:8080/fitStudio/plan-service/cupon"
+  planService_Base_Url_cuponCodeManagement: string = `${environment.apiBaseUrl}${environment.microServices.PLAN_SERVICE.CUPONCODE}`;
 
   // plan management service logics 
   //1. get all plans from backend
@@ -33,7 +34,7 @@ export class PlanService {
 
 
 
-  private payementUrl = 'http://localhost:8080/fitStudio/payment-service'
+  private payementUrl = `${environment.apiBaseUrl}${environment.microServices.PLAN_SERVICE.PAYMENT}`;
 
   buyPlan(request: any): Observable<genericResponseMessage> {
     const url = `${this.payementUrl}/all/createOrder`
