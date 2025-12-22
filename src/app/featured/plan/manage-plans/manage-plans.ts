@@ -80,18 +80,25 @@ export class ManagePlans implements OnInit {
   // methods are defined in admin service's plan managment section
 
   plans: UiPlan[] = []
-
+  planUserCounts : planUserCount[] = []
   // 1. populating all plans from backend 
   loadAllPlans() {
     this.planService.getAllPlans().subscribe({
       next: (res) => {
         console.log("✔️ response ", res);
         this.plans = res.responseDtoList || []
+        
         console.log('Plans:', this.plans);
       }
     })
   }
 
+  getActiveUsersCount(planId : string){
+
+  }
+getTotalUsersCount(planId: string){
+
+}
 
   // ** remove feature during plan editon
   removeFeature(planId: string, index: number) {
@@ -237,4 +244,9 @@ confirmDelete() {
 
 interface UiPlan extends plansResponseModel {
   editMode?: boolean; // local UI state only
+}
+
+interface planUserCount{
+  planId : string;
+  totalUsers : number;
 }
