@@ -6,6 +6,7 @@ import { genericResponseMessage, UserCreationResponseDto } from '../Models/gener
 import { AllRecentTransactionsResponseWrapperDto, PlanCreateRequestDto, PlanUpdateRequestDto, UpdateResponseDto } from '../Models/planModel';
 import { ApprovalRequestDto } from '../Models/adminServiceModels';
 import { CreateCuponCodeRequestDto, UpdateCuponRequestDto } from '../Models/cuponCodeModels';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class AdminService {
 
   constructor(private httpClient: HttpClient) { }
 
-  userManageMentUrl = "http://localhost:8080/fitStudio/admin/auth-management";
+  userManageMentUrl = `${environment.apiBaseUrl}${environment.microServices.ADMIN_SERVICE.AUTH_MANAGEMENT}`;
 
   createMember(data: signupModel): Observable<UserCreationResponseDto> {
     const url: string = `${this.userManageMentUrl}/addMember`;
@@ -43,7 +44,7 @@ export class AdminService {
   }
 
   // managing plans via admin service
-  planManagementUrl = "http://localhost:8080/fitStudio/admin/plans"
+  planManagementUrl = `${environment.apiBaseUrl}${environment.microServices.ADMIN_SERVICE.PLAN_MANAGEMENT}`;
 
   // 1. create plan
   createPlan(data: PlanCreateRequestDto): Observable<any> {
