@@ -15,6 +15,7 @@ import { genericResponseMessage } from '../../../core/Models/genericResponseMode
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCheckCircle, faCircle, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { erroResponseModel } from '../../../core/Models/errorResponseModel';
+import { environment } from '../../../../environments/environment.development';
 
 @Component({
   selector: 'app-buy-plan',
@@ -182,7 +183,7 @@ export class BuyPlan implements OnInit {
   // ✅ Razorpay payment window handler
   openRazorpay(orderId: string, amount: number) {
     const options: any = {
-      key: 'rzp_test_RVFTNhMjk9323S', // ⚠️ Replace with live key in production
+      key: environment.microServices.PLAN_SERVICE.RZP_KEY, // ⚠️ Replace with live key in production
       amount: Math.round(amount * 100), // Amount in paise
       currency: 'INR',
       name: 'FitStudio Gym',
