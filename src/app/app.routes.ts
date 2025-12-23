@@ -84,6 +84,15 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'monthly-revenue',
+    canActivate: [roleGuard, authGuard],
+    data: { roles: ['ADMIN'] },
+    loadComponent: () =>
+      import('./featured/admin-dashboard/monthly-revenue/monthly-revenue').then(
+        (m) => m.MonthlyRevenue
+      ),
+  },
+  {
     path: 'allMembers',
     canActivate: [roleGuard, authGuard],
     data: { roles: ['ADMIN'] },
