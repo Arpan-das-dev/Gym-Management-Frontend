@@ -41,7 +41,7 @@ export class Plan implements OnInit {
   errorMessage: string = '';
 
   ngOnInit(): void {
-    this.loadAllPlans()
+    this.loadAllPlans();
   }
   private loadAllPlans() {
     this.loading = true;
@@ -53,12 +53,36 @@ export class Plan implements OnInit {
         console.log('Plans:', this.plans);
         this.loading = false;
         this.showSuccess("Successfully Fetched all Plans")
+        this.fetchMostPopularPlans();
       }, error:(err:HttpErrorResponse) =>{
         this.loading = false
         console.log(err);
         this.catchError(err,"Failed to Load All PLans Due to Internal Server Error")
       }
     })
+  }
+  popularPlans : string[] = []
+  private fetchMostPopularPlans(){
+    this.loading = true;
+    this.globalLoadinText = "Loading Most Popular Plan's Info"
+    this.planService.getMostPopularPlan().subscribe({
+      next: (res:MostPopularPlanIds) => {
+        console.log("✔️ response for most popular plans", res);
+        this.loading = false;
+        res.planIds.forEach((item)=> this.popularPlans.push(item));
+        console.log(this.popularPlans);
+        
+      },
+        error: (err: erroResponseModel & { err: HttpErrorResponse }) => {
+          // console.log('Error Occured ::=>');
+          // console.log(err);
+          const errorMessage = err?.err?.message
+            ? err?.err?.message
+            : 'Failed To Load All users count for each plan Due to Internal Error';
+          this.loading = false;
+          this.showError(errorMessage)
+        },
+    });
   }
   buyPlan(planId: string) { 
     const plan : plansResponseModel | undefined = this.plans.find(p => p.planId === planId);
@@ -70,7 +94,7 @@ export class Plan implements OnInit {
     }
   }
   isPopular(planId: string): boolean {
-    return true;
+    return this.popularPlans.includes(planId);
   }
     catchError(err: HttpErrorResponse, defaultMsg: string) {
     this.loading = false;
@@ -99,4 +123,7 @@ export class Plan implements OnInit {
     this.showMessage = true;
     setTimeout(() => (this.showMessage = false), 2500);
   }
+}
+export interface MostPopularPlanIds {
+    planIds: string[];
 }
