@@ -128,7 +128,7 @@ export class AdminDashboard implements OnInit,OnDestroy {
   totalRevenue = 0;
   revenueGrowth = 0;
   viewRevenueDetails() {
-    this.router.navigate(['']); // navigate to view all revenue details page
+    this.router.navigate(['monthly-revenue']); // navigate to view all revenue details page
   }
   managePlans() {
     this.router.navigate(['managePlans']);
