@@ -217,7 +217,7 @@
                 Duration: {{ plan.duration }} days
             </span>
             <span class="bg-orange-100 text-blue-500 text-sm px-3 py-1 rounded-full mb-4 inline-block">
-                Duration: {{ getTotalUsersCount(plan.planId) }} days
+                TotalUsers: {{ getTotalUsersCount(plan.planId) }} 
             </span>
             } @else {
             <input type="text" [(ngModel)]="plan.planName" class="w-full border px-3 py-2 rounded-lg mb-2 font-bold"
