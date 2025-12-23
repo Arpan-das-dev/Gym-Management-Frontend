@@ -8,7 +8,7 @@ import { faCheck, faCheckCircle, faCogs, faEdit, faExclamationCircle, faPlus, fa
 import { FormsModule } from '@angular/forms';
 import { CreateCuponCodeRequestDto } from '../../../core/Models/cuponCodeModels';
 import { NgClass } from '@angular/common';
-import { genericResponseMessage } from '../../../core/Models/genericResponseModels';
+import { GenericResponse, genericResponseMessage } from '../../../core/Models/genericResponseModels';
 import { erroResponseModel } from '../../../core/Models/errorResponseModel';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -87,17 +87,52 @@ export class ManagePlans implements OnInit {
       next: (res) => {
         console.log("✔️ response ", res);
         this.plans = res.responseDtoList || []
-        
+        res.responseDtoList.forEach((plan: plansResponseModel) => {
+          this.getActiveUsersCount(plan.planId);
+        });
+        console.log(this.planUserCounts);
+        this.loading = false;
+      },
+      error: (err: erroResponseModel & { err: HttpErrorResponse }) => {
+        console.log('Error Occured ::=>');
+        console.log(err);
+        const errorMessage = err?.err?.message
+          ? err?.err?.message
+          : 'Failed To Load All Plans Due to Internal Error';
+        this.loading = false;
+        this.showFullScreenMessage('error', errorMessage);
+      },
+      complete: () => {
         console.log('Plans:', this.plans);
       }
     })
   }
 
   getActiveUsersCount(planId : string){
-
+    this.planService.getActivePlanUserCount(planId).subscribe({
+      next:(res:GenericResponse) => {
+        console.log("✔️ response for user count ", res);
+        const data : planUserCount = {
+          planId : planId,
+          totalUsers : res.message ? parseInt(res.message) : 0
+        }
+        this.planUserCounts.push(data);
+      },
+        error: (err: erroResponseModel & { err: HttpErrorResponse }) => {
+          // console.log('Error Occured ::=>');
+          // console.log(err);
+          const errorMessage = err?.err?.message
+            ? err?.err?.message
+            : 'Failed To Load All users count for each plan Due to Internal Error';
+          this.loading = false;
+          this.showFullScreenMessage('error', errorMessage);
+        },
+    })
   }
 getTotalUsersCount(planId: string){
-
+ const count = this.planUserCounts.find((p)=> p.planId === planId)?.totalUsers || 0;
+//  console.log(count);
+ return count 
 }
 
   // ** remove feature during plan editon
