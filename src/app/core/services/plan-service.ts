@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { plansResponseModel, PlanUpdateRequestDto } from '../Models/planModel';
 import { Authservice } from './authservice';
 import { genericResponseMessage } from '../Models/genericResponseModels';
@@ -26,9 +26,9 @@ export class PlanService {
 
   //2. update plans
 
-  getDiscount(cuponCode: string): Observable<CuponValidationResponse> {
+  getDiscount(cuponCode: string, planId: string): Observable<CuponValidationResponse> {
     const url = `${this.planService_Base_Url_cuponCodeManagement}/all/validateCuponCode`;
-    const params = { cuponCode: cuponCode };
+    const params = new HttpParams().set('cuponCode', cuponCode).set('planId', planId);
     return this.httpClient.post<CuponValidationResponse>(url, null, { params });
   }
 
@@ -56,7 +56,14 @@ export class PlanService {
 
   getMostPopularPlan(): Observable<any> {
     const url = `${this.planMatricesUrl}/all/mostPopular`;
-    return this.httpClient.get<any>(url);
+    return this.httpClient.get<any>(url).pipe(
+      tap(response => {
+
+        console.log('Most popular plans response:');
+        console.log(response.planIds);
+        
+      }   
+    ));
   }
 
   getTotalUserForAllPlans(): Observable<any> {
