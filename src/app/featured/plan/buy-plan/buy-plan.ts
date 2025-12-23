@@ -109,9 +109,12 @@ export class BuyPlan implements OnInit {
       this.errorMessage = 'Please enter a coupon code.';
       return;
     }
-    
+    if(!this.plan){
+      this.errorMessage = 'Plan details are missing. kindly rolback and try again.';
+      return;
+    }
 
-    this.planService.getDiscount(this.cuponCode).subscribe({
+    this.planService.getDiscount(this.cuponCode,this.plan.planId).subscribe({
       next: (res: CuponValidationResponse) => {
         if (res.valid) {
           this.offPercentage = res.offPercentage;
