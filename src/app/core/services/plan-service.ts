@@ -46,6 +46,10 @@ export class PlanService {
     return this.httpClient.post<genericResponseMessage>(url, request);
   }
 
+  /**
+   * this below section is for admin to get 
+   * all stats and data related to monthly revenue
+   */
   private planMatricesUrl = "http://localhost:8080/fitStudio/payment-service/matrices";
 
   getActivePlanUserCount(planId: string): Observable<any> {
@@ -77,16 +81,33 @@ export class PlanService {
     return this.httpClient.get<any>(url);
   }
 
-  getRevenewPerMonth(pageSize: number, pageNo: number): Observable<any> {
-    const url = `${this.planMatricesUrl}/admin/revenuePerMonth`
-    const params = { pageSize, pageNo }
-    return this.httpClient.get(url, { params })
+  getYearList () : Observable <any> {
+    const url = `${this.planMatricesUrl}/admin/yearRange`;
+    return this.httpClient.get<any>(url)
+  }
+  getRevenuePerMonth(year : number): Observable<any> {
+    const url = `${this.planMatricesUrl}/admin/revenuePerMonth/${year}`
+    return this.httpClient.get(url)
   }
 
+  getReveneueGeneratedByEachePlan() : Observable<any> {
+    const url = `${this.planMatricesUrl}/admin/getAllPlanRevenue`;
+    return this.httpClient.get(url)
+  }
+  getLifetimeIncome() : Observable<any> {
+    const url = `${this.planMatricesUrl}/admin/LifeTimeIncome`;
+    return this.httpClient.get(url)
+  }
+  getQuickStats() : Observable<any> {
+    const url = `${this.planMatricesUrl}/admin/quickStats`;
+    return this.httpClient.get(url)
+  }
   // get all public cupons
   getAllPublicCupons(): Observable<any> {
     const url = `${this.planService_Base_Url_cuponCodeManagement}/all/getAll`;
     return this.httpClient.get<any>(url);
   }
+
+  
   
 }
