@@ -2,10 +2,22 @@ import { DatePipe, NgClass } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import {faCheckCircle, faChevronDown,faChevronUp,faCogs,faExclamationCircle,faEye,faSearch,faSort} from '@fortawesome/free-solid-svg-icons';
+import {
+  faCheckCircle,
+  faChevronDown,
+  faChevronUp,
+  faCogs,
+  faExclamationCircle,
+  faEye,
+  faSearch,
+  faSort,
+} from '@fortawesome/free-solid-svg-icons';
 import { AdminService } from '../../../core/services/admin-service';
-import { AllRecentTransactionsResponseWrapperDto, RecentTransactionsResponseDto } from '../../../core/Models/planModel';
-import { Navbar } from "../../../shared/components/navbar/navbar";
+import {
+  AllRecentTransactionsResponseWrapperDto,
+  RecentTransactionsResponseDto,
+} from '../../../core/Models/planModel';
+import { Navbar } from '../../../shared/components/navbar/navbar';
 import { erroResponseModel } from '../../../core/Models/errorResponseModel';
 @Component({
   selector: 'app-recent-transactions',
@@ -15,24 +27,25 @@ import { erroResponseModel } from '../../../core/Models/errorResponseModel';
 })
 export class RecentTransactions implements OnInit {
   icons = {
-    search : faSearch,
-    sort : faSort,
+    search: faSearch,
+    sort: faSort,
     up: faChevronUp,
     down: faChevronDown,
     // global fa icons
     cogs: faCogs,
     checkCircle: faCheckCircle,
-    exclamationCircle : faExclamationCircle,
-    eye : faEye
-  }
+    exclamationCircle: faExclamationCircle,
+    eye: faEye,
+  };
   searchTerm: string = '';
   sortOption: string = 'date_desc';
   sortDirection: string = 'desc';
-  pageNo : number = 0;
-  pageSize : number = 20;
-  totalPages : number = 0
+  pageNo: number = 0;
+  pageSize: number = 20;
+  totalPages: number = 0;
+  isLast: boolean = false;
   // global boolean and message variables for better ui and animations
-   loading = false;
+  loading = false;
   showMessage = false;
   messageText = '';
   messageType: 'success' | 'error' = 'success';
@@ -45,7 +58,7 @@ export class RecentTransactions implements OnInit {
       this.showMessage = false;
     }, 3000);
   }
-  transactions:TransactionWithToggle[] = [];
+  transactions: TransactionWithToggle[] = [];
 
   constructor(private adminService: AdminService) {}
 
@@ -53,31 +66,56 @@ export class RecentTransactions implements OnInit {
     this.fetchTransactions();
   }
 
-  fetchTransactions(){
+  fetchTransactions() {
+    if(this.isLast) {
+      this.showFullScreenMessage('error', 'No more pages to load');
+      return;
+    } 
+    if (this.pageNo < 0) {
+      this.pageNo = 0;
+    }
     this.loading = true;
-    this.adminService.getRecentTransactions(this.searchTerm,this.sortOption,this.sortDirection,this.pageNo,this.pageSize).subscribe({
-      next:(res: AllRecentTransactionsResponseWrapperDto) =>{
-        console.log(res);
-        this.transactions = res.responseDtoList.map(t => ({ ...t, show: false }));
-        this.pageNo = res.pageNo;
-        this.pageSize = res.pageSize;
-        this.totalPages = res.totalPages;
-        this.loading = false;
-        this.showFullScreenMessage('success',"Fetched transactions successfully");
-      },
-      error:(err: erroResponseModel) =>{
-        console.log(err);
-        this.loading = false;
-        this.showFullScreenMessage('error',"Failed to fetch transactions: "+err.message);
-      }
-    })
+    this.adminService
+      .getRecentTransactions(
+        this.searchTerm,
+        this.sortOption,
+        this.sortDirection,
+        this.pageNo,
+        this.pageSize
+      )
+      .subscribe({
+        next: (res: AllRecentTransactionsResponseWrapperDto) => {
+          console.log(res);
+          this.transactions = res.responseDtoList.map((t) => ({
+            ...t,
+            show: false,
+          }));
+          this.pageNo = res.pageNo;
+          this.pageSize = res.pageSize;
+          this.totalPages = res.totalPages;
+          this.isLast = res.lastPage;
+          this.loading = false;
+          this.showFullScreenMessage(
+            'success',
+            'Fetched transactions successfully'
+          );
+        },
+        error: (err: erroResponseModel) => {
+          console.log(err);
+          this.loading = false;
+          this.showFullScreenMessage(
+            'error',
+            'Failed to fetch transactions: ' + err.message
+          );
+        },
+      });
   }
 
-  onSearch(){
+  onSearch() {
     this.pageNo = 0;
     this.fetchTransactions();
   }
-  onSort(){
+  onSort() {
     const [sortBy, direction] = this.sortOption.split('_');
     this.sortOption = sortBy;
     this.sortDirection = direction;
