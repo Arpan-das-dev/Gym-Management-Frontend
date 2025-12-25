@@ -60,7 +60,7 @@ export interface TotalUserResponseDto {
 }
 
 export interface PlanUpdateRequestDto {
-  id: string
+  id: string;
   planName: string;
   price: number;
   duration: number;
@@ -94,7 +94,30 @@ export interface RecentTransactionsResponseDto {
   paidPrice: number;
   paymentStatus: string;
   paymentMethod: string;
-  paymentTime: string; 
+  paymentTime: string;
   paymentDate: string;
   receiptUrl: string;
 }
+export interface QuickStatsResponseDto {
+  yearlyIncome: number;
+  monthlyIncome: number;
+  todayIncome: number;
+}
+
+export interface MonthlyReviewResponseDto {
+  year: number;
+  month: string;
+  revenue: number;
+  change: number;
+}
+export interface AllMonthlyRevenueWrapperResponseDto {
+  reviewResponseDtoList: MonthlyReviewResponseDto[];
+}
+
+export interface PlanLifeTimeIncome {
+  revenue: number;
+  usage: number;
+  planName : string;
+}
+
+export type AllPlanIncomes = Record<string, PlanLifeTimeIncome>;
