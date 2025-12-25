@@ -162,7 +162,7 @@
         (click)="pageNo = pageNo - 1; fetchTransactions()"> Prev </button> <!-- Page Indicator -->
       <p class="text-gray-300"> Page <span class="font-semibold text-white">{{ pageNo + 1 }}</span> of <span
           class="font-semibold text-white">{{ totalPages }}</span> </p> <!-- Next --> <button
-        class="glass-btn px-5 py-2 disabled:opacity-40" [disabled]="pageNo >= totalPages - 1"
+        class="glass-btn px-5 py-2 disabled:opacity-40" [disabled]="isLast"
         (click)="pageNo = pageNo + 1; fetchTransactions()"> Next </button>
     </div>
 
