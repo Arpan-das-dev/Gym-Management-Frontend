@@ -25,12 +25,19 @@ import {
 import { AdminService } from '../../../core/services/admin-service';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Chart,registerables } from 'chart.js';
+import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 @Component({
   selector: 'app-monthly-revenue',
-  imports: [FontAwesomeModule, NgClass, FormsModule, DecimalPipe, DatePipe, RouterLink],
+  imports: [
+    FontAwesomeModule,
+    NgClass,
+    FormsModule,
+    DecimalPipe,
+    DatePipe,
+    RouterLink,
+  ],
   templateUrl: './monthly-revenue.html',
   styleUrl: './monthly-revenue.css',
 })
@@ -52,11 +59,15 @@ export class MonthlyRevenue implements OnInit {
     cogs: faCogs,
     checkCircle: faCheckCircle,
     exclamationCircle: faExclamationCircle,
-    arrowLeft : faArrowLeft,
-    arrowUp : faArrowUp,
-    arrowRight : faArrowRight
+    arrowLeft: faArrowLeft,
+    arrowUp: faArrowUp,
+    arrowRight: faArrowRight,
   };
-  constructor(private planService: PlanService, private admin: AdminService, private router : Router) {}
+  constructor(
+    private planService: PlanService,
+    private admin: AdminService,
+    private router: Router
+  ) {}
   ngOnInit(): void {
     this.getLifeTimeIncome();
     this.loadAvailableYears();
@@ -75,7 +86,6 @@ export class MonthlyRevenue implements OnInit {
           'Life time income loaded successfully'
         );
         this.getQuickStats();
-       
       },
       error: (err: erroResponseModel & { err: HttpErrorResponse }) => {
         console.log('Error Occured ::=>');
@@ -107,7 +117,7 @@ export class MonthlyRevenue implements OnInit {
           'success',
           'Quick Stats loaded successfully'
         );
-         this.getRevenuePerPlan();
+        this.getRevenuePerPlan();
       },
       error: (err: erroResponseModel & { err: HttpErrorResponse }) => {
         console.log('Error Occured ::=>');
@@ -144,6 +154,7 @@ export class MonthlyRevenue implements OnInit {
           'success',
           'Fetched available years successfully'
         );
+        this.loadRevenueTrendByYear();
       },
       error: (err: erroResponseModel & { err: HttpErrorResponse }) => {
         console.log('Error Occured ::=>');
@@ -207,10 +218,20 @@ export class MonthlyRevenue implements OnInit {
     this.loading = true;
     this.messageText = 'Loading revenue per plan data';
     this.planService.getReveneueGeneratedByEachePlan().subscribe({
-      next: (res: AllPlanIncomes) => {
+      next: (res: { allPlanIncomes: AllPlanIncomes }) => {
         console.log('fetched result from backend');
         console.log(res);
-        this.revenuePerPlan = Object.values(res);
+        this.revenuePerPlan = Object.entries(res.allPlanIncomes).map(([, value]) => value);
+        console.log('logging revenue per plan array ');
+
+        console.log(this.revenuePerPlan);
+
+        this.loading = false;
+        this.showFullScreenMessage(
+          'success',
+          'Fetched revenue per plan data successfully'
+        );
+        this.loadRecentTransactions();
       },
       error: (err: erroResponseModel & { err: HttpErrorResponse }) => {
         console.log('Error Occured ::=>');
@@ -224,17 +245,17 @@ export class MonthlyRevenue implements OnInit {
     });
   }
 
-  viewRecentTransactions(){
+  viewRecentTransactions() {
     this.loadRecentTransactions();
     this.viewMode = true;
   }
 
-  closeViewMode(){
+  closeViewMode() {
     this.viewMode = false;
   }
 
   transactions: RecentTransactionsResponseDto[] = [];
-  viewMode : boolean = false;
+  viewMode: boolean = false;
   sortDirection: string = 'DESC';
   pageNo: number = 0;
   pageSize: number = 20;
@@ -284,7 +305,7 @@ export class MonthlyRevenue implements OnInit {
       this.showFullScreenMessage('error', 'No more pages to load');
       return;
     }
-    this.pageNo ++;
+    this.pageNo++;
     this.loadRecentTransactions();
   }
   goPreviousPage() {
@@ -292,20 +313,35 @@ export class MonthlyRevenue implements OnInit {
       this.showFullScreenMessage('error', 'You are already on the first page');
       return;
     }
-    this.pageNo --;
+    this.pageNo--;
     this.loadRecentTransactions();
   }
 
-  handleNavigation(){
-    this.router.navigate(['recentTransactions']);
+  handleNavigation() {
+    this.router.navigate(['dashboard']);
   }
   scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
- revenueChart?: Chart;
+  revenueChart?: Chart;
+  private readonly MONTH_ORDER: Record<string, number> = {
+  JAN: 1, JANUARY: 1,
+  FEB: 2, FEBRUARY: 2,
+  MAR: 3, MARCH: 3,
+  APR: 4, APRIL: 4,
+  MAY: 5,
+  JUN: 6, JUNE: 6,
+  JUL: 7, JULY: 7,
+  AUG: 8, AUGUST: 8,
+  SEP: 9, SEPTEMBER: 9,
+  OCT: 10, OCTOBER: 10,
+  NOV: 11, NOVEMBER: 11,
+  DEC: 12, DECEMBER: 12
+};
+
   private buildRevenueChart(): void {
-  // destroy old chart (important)
+  // 🧹 Destroy old chart safely
   if (this.revenueChart) {
     this.revenueChart.destroy();
     this.revenueChart = undefined;
@@ -315,8 +351,21 @@ export class MonthlyRevenue implements OnInit {
     return;
   }
 
-  const labels = this.revenueTrendData.map(d => d.month);
-  const revenues = this.revenueTrendData.map(d => d.revenue);
+  // 🧠 Sort months correctly (JAN → DEC)
+  const sortedData = [...this.revenueTrendData].sort(
+    (a, b) =>
+      (this.MONTH_ORDER[a.month.toUpperCase()] || 99) -
+      (this.MONTH_ORDER[b.month.toUpperCase()] || 99)
+  );
+
+  const labels = sortedData.map(d => d.month);
+  const revenues = sortedData.map(d => d.revenue);
+  const changes = sortedData.map(d => d.change);
+
+  // 🎨 Point color based on growth/drop
+  const pointColors = changes.map(c =>
+    c > 0 ? '#22c55e' : c < 0 ? '#ef4444' : '#94a3b8'
+  );
 
   this.revenueChart = new Chart('revenueChart', {
     type: 'line',
@@ -326,42 +375,78 @@ export class MonthlyRevenue implements OnInit {
         {
           label: 'Revenue (₹)',
           data: revenues,
-          borderColor: '#f97316',      // orange-500
+          borderColor: '#f97316',              // orange-500
           backgroundColor: 'rgba(249,115,22,0.15)',
           tension: 0.35,
           fill: true,
-          pointRadius: 5,
-          pointHoverRadius: 7,
-          pointBackgroundColor: '#f97316',
-          pointBorderColor: '#fff',
           borderWidth: 3,
+
+          pointRadius: 6,
+          pointHoverRadius: 8,
+          pointBackgroundColor: pointColors,
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
         }
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+
       plugins: {
         legend: {
-          labels: { color: '#334155' } // slate-700
+          display: false   // SaaS dashboards usually hide legends
         },
+
         tooltip: {
+          backgroundColor: '#0f172a', // slate-900
+          titleColor: '#f8fafc',
+          bodyColor: '#e5e7eb',
+          padding: 12,
+          cornerRadius: 8,
+
           callbacks: {
-            label: ctx => `₹ ${ctx.parsed.y !== null ? ctx.parsed.y.toLocaleString() : '0'}`
+            title: (items) => {
+              const idx = items[0].dataIndex;
+              return `${labels[idx]} ${sortedData[idx].year}`;
+            },
+            label: (ctx) => {
+              const idx = ctx.dataIndex;
+              const revenue = sortedData[idx].revenue.toLocaleString();
+              const change = sortedData[idx].change;
+
+              const arrow = change > 0 ? '↑' : change < 0 ? '↓' : '→';
+
+              return [
+                `Revenue: ₹ ${revenue}`,
+                `Change: ${arrow} ${change}%`
+              ];
+            }
           }
         }
       },
+
       scales: {
         x: {
-          ticks: { color: '#64748b' }, // slate-500
-          grid: { display: false }
+          grid: { display: false },
+          ticks: {
+            color: '#64748b', // slate-500
+            font: { size: 11 }
+          }
         },
         y: {
+          grid: {
+            color: '#e5e7eb' // gray-200
+          },
           ticks: {
             color: '#64748b',
-            callback: value => `₹ ${value}`
-          },
-          grid: { color: '#e5e7eb' } // gray-200
+            callback: (value) => `₹ ${value}`
+          }
         }
       }
     }
