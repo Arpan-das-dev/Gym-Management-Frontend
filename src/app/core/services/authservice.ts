@@ -74,7 +74,7 @@ export class Authservice {
   isLoggedIn(): boolean {
   const token = this.getToken();
   const role = this.getUserRole();
-// console.log(token);
+console.log(token);
 // console.log("role is"+role);
 
 
