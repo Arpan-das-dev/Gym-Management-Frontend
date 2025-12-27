@@ -143,7 +143,15 @@ export const routes: Routes = [
         (m) => m.ManagePlans
       ),
   },
-
+  {
+    path: 'manageTrainers',
+    canActivate: [roleGuard, authGuard],
+    data: { roles: ['ADMIN'] },
+    loadComponent: () => import('./featured/admin-dashboard/trainer-manager/trainer-manager')
+    .then((m) => m.TrainerManager) 
+    
+  }
+,
   {
     path: 'manageCuponCodes',
     canActivate: [roleGuard, authGuard],
