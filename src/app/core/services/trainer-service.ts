@@ -2,8 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
-import { AllMemberResponseWrapperDto, AllPublicTrainerInfoResponseWrapperDto, ReviewAddRequestDto, ReviewUpdateRequestDto, TrainerDashBoardInfoResponseDto, TrainerResponseDto } from '../Models/TrainerServiceModels';
-import { GenericResponse, genericResponseMessage } from '../Models/genericResponseModels';
+import { ReviewAddRequestDto, ReviewUpdateRequestDto } from '../Models/TrainerServiceModels';
 import { AddSessionRequestDto, UpdateSessionRequestDto } from '../Models/SessionServiceModel';
 
 @Injectable({
@@ -28,6 +27,10 @@ export class TrainerService {
     return this.http.get(url);
   }
 
+  getAdminInfoForAllTrainers() :Observable<any> {
+    const url = `${this.TRAINER_BASE_URL}/admin/getAll`;
+    return this.http.get(url);
+  }
   /**
    * retreives trainer's details for trainer's dasboard which contains more information
    * about the trainers
