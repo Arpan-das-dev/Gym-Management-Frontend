@@ -102,3 +102,20 @@ export interface ReviewUpdateRequestDto {
   comment: string;
   review: number;
 }
+
+export interface AllTrainerResponseDto {
+  id: string;
+  imageUrl: string;
+  firstName: string;
+  lastName: string;
+  about: string;
+  email: string;
+  phone: string;
+  gender: string;
+  frozen: boolean;
+  averageRating: number;
+  lastLoginTime: string;
+}
+export interface AllTrainerResponseDtoWrapper {
+  allTrainerResponseDtoWrappers: AllTrainerResponseDto[];
+}
