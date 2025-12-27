@@ -1,0 +1,45 @@
+<!-- ============================= -->
+<!-- 🌐 GLOBAL LOADER -->
+<!-- ============================= -->
+@if (loading) {
+  <div
+    class="fixed inset-0 z-[99998] flex items-center justify-center
+           bg-black/60 backdrop-blur-sm"
+  >
+    <div class="text-center animate-pulse">
+      <fa-icon [icon]="icons.cogs" class="text-5xl text-white mb-3"></fa-icon>
+      <p class="text-base font-semibold text-white">
+        {{ messageText }}...
+      </p>
+    </div>
+  </div>
+}
+
+<!-- ============================= -->
+<!-- 🌐 GLOBAL TOAST -->
+<!-- ============================= -->
+@if (showMessage) {
+  <div
+    class="fixed top-20 left-0 right-0 z-[99999]
+           flex justify-center pointer-events-none"
+  >
+    <div
+      class="px-5 py-3 rounded-xl shadow-xl text-white
+             pointer-events-auto animate-fadeIn"
+      [ngClass]="{
+        'bg-green-600': messageType === 'success',
+        'bg-red-600': messageType === 'error'
+      }"
+    >
+      <fa-icon
+        [icon]="messageType === 'success'
+          ? icons.checkCircle
+          : icons.exclamationCircle"
+        class="mr-2"
+      ></fa-icon>
+
+      <span class="font-medium">{{ messageText }}</span>
+    </div>
+  </div>
+}
+
