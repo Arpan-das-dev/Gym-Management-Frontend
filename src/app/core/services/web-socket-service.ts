@@ -8,72 +8,80 @@ import { Authservice } from './authservice';
 })
 export class WebSocketService {
 
-  constructor(private auth : Authservice){}
-  private stompClient!: Client;
-  private connected = false;
-  private subscriptionQueue: { topic: string, callback: (msg: number) => void }[] = [];
+  private clients = new Map<string, Client>();
+  private subscriptions = new Map<
+    string,
+    { topic: string; callback: (msg: number) => void }[]
+  >();
 
-  
-  connect(wsUrl: string): void {
-    if (this.connected) return;
-    const token  =this.auth.getToken()
-    console.log("connected");
-    this.stompClient = new Client({
-      brokerURL: wsUrl, // e.g., ws://localhost:8080/ws
+  connect(key: string, wsUrl: string): void {
+    if (this.clients.has(key)) return;
+
+    const client = new Client({
+      brokerURL: wsUrl,
       reconnectDelay: 5000,
-      
-      // connectHeaders:{
-      //   Authorization: `Bearer ${token}`
-      // },
       debug: () => {}
     });
 
-    this.stompClient.onConnect = () => {
-      console.log('WebSocket connected:', wsUrl);
-      this.connected = true;
+    client.onConnect = () => {
+      console.log(`✅ WS connected [${key}] → ${wsUrl}`);
 
-      if (!this.stompClient || !this.stompClient.active) {
-         console.warn('STOMP client is not active right after connect. Aborting subscription queue.');
-         return; // Exit if the connection is immediately lost
-      }
-      // Subscribe queued topics
-      this.subscriptionQueue.forEach(sub => {
-        this.stompClient.subscribe(sub.topic, (message: IMessage) => {
-          sub.callback(Number(message.body));
-          console.log("the websoket message is::+>", message);
-          
+      // 🔥 flush queued subscriptions
+      const queued = this.subscriptions.get(key) || [];
+      queued.forEach(sub => {
+        client.subscribe(sub.topic, msg => {
+          sub.callback(Number(msg.body));
         });
       });
-      this.subscriptionQueue = [];
+
+      this.subscriptions.delete(key);
     };
 
-    this.stompClient.onStompError = (err) => {
-      console.error('WebSocket Error:', err);
+    client.onStompError = err => {
+      console.error(`❌ STOMP error [${key}]`, err);
     };
 
-    this.stompClient.activate();
+    client.activate();
+    this.clients.set(key, client);
   }
 
-  subscribe(topic: string, callback: (msg: number) => void) {
-    if (this.connected) {
-      this.stompClient.subscribe(topic, (message: IMessage) => {
-        callback(Number(message.body));
-      });
-    } else {
-      // Queue until connected
-      this.subscriptionQueue.push({ topic, callback });
+  subscribe(
+    key: string,
+    topic: string,
+    callback: (msg: number) => void
+  ): void {
+    const client = this.clients.get(key);
+
+    // ⏳ Not connected yet → queue it
+    if (!client || !client.connected) {
+      const existing = this.subscriptions.get(key) || [];
+      existing.push({ topic, callback });
+      this.subscriptions.set(key, existing);
+      return;
+    }
+
+    // ✅ Already connected
+    client.subscribe(topic, msg => {
+      callback(Number(msg.body));
+    });
+  }
+
+  disconnect(key: string): void {
+    const client = this.clients.get(key);
+    if (client) {
+      client.deactivate();
+      this.clients.delete(key);
+      this.subscriptions.delete(key);
     }
   }
 
-  disconnect() {
-    if (this.stompClient) {
-      this.stompClient.deactivate();
-      this.connected = false;
-    }
+  disconnectAll(): void {
+    this.clients.forEach(client => client.deactivate());
+    this.clients.clear();
+    this.subscriptions.clear();
   }
 
-  ngOnDestroy() {
-    this.disconnect();
+  ngOnDestroy(): void {
+    this.disconnectAll();
   }
 }
-
