@@ -31,6 +31,14 @@ export class TrainerService {
     const url = `${this.TRAINER_BASE_URL}/admin/getAll`;
     return this.http.get(url);
   }
+  getTrainerClientCount(trainerId :string) : Observable<any> {
+    const url = `${this.TRAINER_BASE_URL}/admin/clientInfo/${trainerId}`;
+    return this.http.get(url);
+  }
+  freezeOrUnfreezeTrainer(trainerId: string, freeze : boolean) : Observable<any> {
+    const url = `${this.TRAINER_BASE_URL}/admin/freezeTrainer/${trainerId}?value=${freeze}`;
+    return this.http.post(url, null);
+  }
   /**
    * retreives trainer's details for trainer's dasboard which contains more information
    * about the trainers
