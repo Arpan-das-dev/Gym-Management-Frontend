@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -40,40 +40,28 @@ export class ActiveCountService {
   }
 
   // Admin APIs
-  private adminCountUrl = 'http://localhost:8080/fitStudio/admin-service/count';
+  private adminCountUrl = 'http://localhost:8080/fitStudio/admin/count';
 
   adminIncrement(id: string): Observable<any> {
-    return this.httpClient.post(`${this.adminCountUrl}/increment?id=${id}`, {});
+    return this.httpClient.post(`${this.adminCountUrl}/administrator/increment?id=${id}`, {});
   }
 
   adminDecrement(id: string): Observable<any> {
-    return this.httpClient.post(`${this.adminCountUrl}/decrement?id=${id}`, {});
+    return this.httpClient.post(`${this.adminCountUrl}/administrator/decrement?id=${id}`, {});
   }
 
   adminGetActiveCount(): Observable<number> {
-    return this.httpClient.get<number>(`${this.adminCountUrl}/active-count`);
+    return this.httpClient.get<number>(`${this.adminCountUrl}/all/active-count`);
   }
 
+getAllCount$(): Observable<[number, number, number]> {
+  return forkJoin ([
+    this.adminGetActiveCount(),
+    this.trainerGetActiveCount(),
+    this.memberGetActiveCount()
+  ]);
+}
 
-   
+  }
 
   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
