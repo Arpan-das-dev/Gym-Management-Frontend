@@ -146,5 +146,13 @@ export class AdminService {
   }
 
   // plan m
-
+  Trainer_Serivice_Admin_Url = `${environment.apiBaseUrl}${environment.microServices.TRAINER_SERVICE.MEMBERS}`
+  deleteClientFromTrainer(trainerId: string, memberId: string, value : boolean) : Observable<any> {
+    const url = `${this.Trainer_Serivice_Admin_Url}/trainer/deleteMember`;
+    const params = new HttpParams()
+    .set('trainerId', trainerId)
+    .set('memberId', memberId)
+    .set('value', value.toString());
+    return this.httpClient.delete<any>(url, { params });
+  }
 }
