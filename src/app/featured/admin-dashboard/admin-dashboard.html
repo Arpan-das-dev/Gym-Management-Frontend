@@ -34,10 +34,7 @@
       <h2 class="text-3xl font-bold text-orange-400 tracking-wide">
         {{ admin.firstName }} {{ admin.lastName }}
       </h2>
-      <p>
-        <strong class="text-blue-400">Admin ID:</strong>
-        <span class="text-blue-500">{{ admin.id }}</span>
-      </p>
+      <p><strong class="text-blue-400">Admin ID: </strong>{{ admin.id }}</p>
       <p><strong class="text-blue-400">Name:</strong> {{ admin.firstName }} {{ admin.lastName }}</p>
       <p><strong class="text-blue-400">Mail:</strong> {{ admin.email }}</p>
       <p><strong class="text-blue-400">Phone:</strong> {{ admin.phone }}</p>
@@ -74,7 +71,7 @@
     <div
       class="bg-[#1e1e1e] border border-orange-500 rounded-2xl p-6 shadow-md hover:shadow-orange-400/40 transition-all duration-300 flex flex-col justify-between text-white">
       <div>
-        <h3 class="font-semibold text-orange-400">Total Active Members</h3>
+        <h3 class="font-semibold text-orange-400">Plans Bought This Month</h3>
         <p class="text-3xl font-bold mt-2">{{ totalUsers }}</p>
         <p [ngClass]="{'text-green-500':userChange>=0,'text-red-500':userChange<0}" class="text-sm mt-1"> {{sign}}
           {{userChange}} % from last month
@@ -393,6 +390,7 @@
   <app-transactions/>
   <app-manage-cupon-code/>
   <app-manage-reports/>
+  <app-manage-trainers/>
 </div>
 </div>
  
