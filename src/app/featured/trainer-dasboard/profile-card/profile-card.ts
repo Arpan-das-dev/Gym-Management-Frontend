@@ -1,5 +1,5 @@
 import { NgClass, NgStyle } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCamera,
@@ -38,6 +38,7 @@ import {
 } from '../../../core/Models/genericResponseModels';
 import { FormsModule } from '@angular/forms';
 import { SerarchPipePipe } from '../../../shared/pipes/serarch-pipe-pipe';
+import { ActiveCountService } from '../../../core/services/active-count-service';
 
 @Component({
   selector: 'app-profile-cardT',
@@ -45,7 +46,7 @@ import { SerarchPipePipe } from '../../../shared/pipes/serarch-pipe-pipe';
   templateUrl: './profile-card.html',
   styleUrl: './profile-card.css',
 })
-export class ProfileCard implements OnInit {
+export class ProfileCard implements OnInit, OnDestroy{
   // user id (trainer id ) which is responsible to do operations for the rest of the class
   trainerId = '';
   // constructor
@@ -54,7 +55,8 @@ export class ProfileCard implements OnInit {
     private trainer: TrainerService,
     private notify: NotifyService,
     private loader: LoadingService,
-    private websocket: WebSocketService
+    private websocket: WebSocketService,
+    private activeCountService : ActiveCountService
   ) {}
   // implent ngOnInit to load required things when page loads
   ngOnInit(): void {
@@ -63,7 +65,7 @@ export class ProfileCard implements OnInit {
     setTimeout(() => {
       this.loadTrainerInfo();
     }, 500);
-    console.log('role class is ==> ', this.roleClass);
+    // console.log('role class is ==> ', this.roleClass);
     this.loadLiveUsersCount()
     console.log(this.loadLiveUsersCount());
     
@@ -115,7 +117,7 @@ export class ProfileCard implements OnInit {
     }
   }
   onFileSelected(event: Event) {
-    console.log('upload triggered');
+    // console.log('upload triggered');
 
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
@@ -126,8 +128,8 @@ export class ProfileCard implements OnInit {
     this.loader.show('Uploading Image..', faUpload);
     this.trainer.uploadNewProfileImage(this.trainerId, file).subscribe({
       next: (res: genericResponseMessage) => {
-        console.log('uploaded image successfully');
-        console.log(res);
+        // console.log('uploaded image successfully');
+        // console.log(res);
         this.profileImageMapper(res.message || '', this.trainerDetail.gender);
         this.loader.hide();
         this.notify.showSuccess('Image Uploaded SuccessFully');
@@ -136,7 +138,7 @@ export class ProfileCard implements OnInit {
         const errorMessage = error?.error?.message
           ? error.error.message
           : 'Failed to Upload Image Due to Aws Service Issue';
-        console.log(error);
+        // console.log(error);
         this.loader.hide();
         this.notify.showError(errorMessage);
       },
@@ -146,7 +148,7 @@ export class ProfileCard implements OnInit {
     this.loader.show('Fetching Profile Image', faDownload);
     this.trainer.getProfileImageByTrainerId(this.trainerId).subscribe({
       next: (res: GenericResponse) => {
-        console.log(res);
+        // console.log(res);
         this.profileImageMapper(res.message, this.trainerDetail.gender);
         this.loader.hide();
         this.notify.showSuccess('Successfully Fetched Your Profile Image');
@@ -155,8 +157,8 @@ export class ProfileCard implements OnInit {
         const errorMessage = error?.error?.message
           ? error.error.message
           : 'Failed to Load Profile Image Due to Internal Issue';
-        console.log('failed to load due to>>');
-        console.log(error);
+        // console.log('failed to load due to>>');
+        // console.log(error);
         this.profileImageMapper('', this.trainerDetail.gender);
         this.loader.hide();
         this.notify.showError(errorMessage);
@@ -175,7 +177,7 @@ export class ProfileCard implements OnInit {
       },
       error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
         const errorMessage = error?.error?.message ? error.error.message : 'Failed to Delete Your Image';
-        console.log(error);
+        // console.log(error);
         this.loader.hide()
         this.notify.showError(errorMessage)
       }
@@ -195,19 +197,19 @@ export class ProfileCard implements OnInit {
       case 'female':
         this.roleClass = 'text-xl text-rose-600';
         this.genderIcon = faVenus;
-        console.log("current gender is ",gender);
+        // console.log("current gender is ",gender);
         
         break;
       case 'male':
         this.roleClass = 'text-xl text-blue-600';
         this.genderIcon = faMars;
-        console.log("current gender is ",gender);
+        // console.log("current gender is ",gender);
         
         break;
       default:
         this.roleClass = 'text-xl text-gray-600';
         this.genderIcon = faGenderless;
-        console.log("current gender is ",gender);
+        // console.log("current gender is ",gender);
         
         break;
     }
@@ -228,8 +230,8 @@ export class ProfileCard implements OnInit {
     this.loader.show('Loading Your Account Details', faCogs);
     this.trainer.getTrainerById(this.trainerId).subscribe({
       next: (res: TrainerResponseDto ) => {
-        console.log('fetched from backend ::=>');
-        console.log(res);
+        // console.log('fetched from backend ::=>');
+        // console.log(res);
         this.trainerDetail = res;
         if (res.gender.toLowerCase() === 'female') {
           this.genderIcon = faVenus;
@@ -245,7 +247,7 @@ export class ProfileCard implements OnInit {
       },
       error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
         const errorMessage = error?.error?.message;
-        console.log(errorMessage);
+        // console.log(errorMessage);
         this.loader.hide();
         this.catchError(errorMessage,'Failed To Load Users Info')
       },
@@ -269,7 +271,7 @@ export class ProfileCard implements OnInit {
    */
   openAboutPopup(){
     this.aboutPopup = true;
-    console.log("about popupTriggered");
+    // console.log("about popupTriggered");
     
   }
   /**
@@ -283,7 +285,7 @@ export class ProfileCard implements OnInit {
     this.loader.show("Saving Your Update",faSave)
     this.trainer.setTrainerAbout(this.trainerId,this.aboutTrainer).subscribe({
       next:(res:GenericResponse) => {
-        console.log("Fetched response from backend ==> \n",res.message);
+        // console.log("Fetched response from backend ==> \n",res.message);
         this.aboutTrainer = res.message;
         this.loader.hide()
         this.closeAboutPopup()
@@ -291,7 +293,7 @@ export class ProfileCard implements OnInit {
       },
       error:(err:erroResponseModel & {err:HttpErrorResponse}) => {
         const errorMessage = err?.err?.message;
-        console.log(errorMessage);
+        // console.log(errorMessage);
         this.loader.hide()
         this.catchError(errorMessage,"Failed To Update About Please Try Again Later")        
       }
@@ -302,11 +304,11 @@ export class ProfileCard implements OnInit {
     this.trainer.getTrainerAbout(trainerId).subscribe({
       next:(res:GenericResponse) => {
         this.aboutTrainer = res.message;
-        console.log(res);
+        // console.log(res);
       },
       error:(err:erroResponseModel & {err:HttpErrorResponse}) => {
         const errorMessage = err?.err?.message;
-        console.log(errorMessage);
+        // console.log(errorMessage);
         this.catchError(errorMessage,"Failed To Update About Please Try Again Later")        
       }
     })
@@ -328,11 +330,11 @@ export class ProfileCard implements OnInit {
   getAllPreDefinedSpecialites() {
     this.trainer.getAllPreDefinedSpecialites().subscribe({
     next:(res:SpecialityResponseDto) => {
-      console.log("number of speciality fetched from backend is::=>",res.specialityList.length);
+      // console.log("number of speciality fetched from backend is::=>",res.specialityList.length);
       this.specialities = res.specialityList.map(item=> item.replace("_"," "));
     }, error:(err: erroResponseModel & {err:HttpErrorResponse}) => {
       const errorMessage = err?.err?.message;
-        console.log(errorMessage);
+        // console.log(errorMessage);
         this.catchError(errorMessage,"Failed To Load All PreDefined Specialites")
     }
     })
@@ -342,14 +344,14 @@ export class ProfileCard implements OnInit {
     this.loader.show("Loading Your Specialities",faDownload)
     this.trainer.getSpecialityByTrainerId(this.trainerId).subscribe({
       next:(res:SpecialityResponseDto) => {
-        console.log("fetched trainer's speciality of ",res.specialityList.length+" no");
-        console.log(res);
+        // console.log("fetched trainer's speciality of ",res.specialityList.length+" no");
+        // console.log(res);
         this.trainerSpecialities = res.specialityList;
         this.loader.hide();
         this.notify.showSuccess('Successfully Loaded All Specialites')        
       }, error:(err: erroResponseModel & {err:HttpErrorResponse}) => {
       const errorMessage = err?.err?.message;
-        console.log(errorMessage);
+        // console.log(errorMessage);
         this.catchError(errorMessage,"Failed To Load All PreDefined Specialites")
     }
     })
@@ -376,15 +378,15 @@ export class ProfileCard implements OnInit {
       next:(res:SpecialityResponseDto) => {
         this.newSpeciality = ''
         this.searchText = ''
-        console.log("fetched trainer's speciality of ",res.specialityList.length+" no");
-        console.log(res);
+        // console.log("fetched trainer's speciality of ",res.specialityList.length+" no");
+        // console.log(res);
         this.trainerSpecialities = res.specialityList;
         this.closeAddSpecialityPopup()
         this.loader.hide();
         this.notify.showSuccess('Successfully Updated Your Specialites')        
       },error: (error: HttpErrorResponse & { error: erroResponseModel }) => {
         const errorMessage = error?.error?.message ? error.error.message : 'Failed to Add Speciality';
-        console.log(error);
+        // console.log(error);
         this.loader.hide()
         this.notify.showError(errorMessage)
       }
@@ -395,13 +397,13 @@ export class ProfileCard implements OnInit {
   this.loader.show("Deleting Speciality From Your Profile", faTrash)
   this.trainer.deleteSpecialityByTrainerId(this.trainerId,sp).subscribe({
     next:(res: GenericResponse) => {
-      console.log(res.message);
+      // console.log(res.message);
       this.loadTrainerSpecialityById();
       this.loader.hide()
       this.notify.showSuccess(res.message);      
     }, error:(err: erroResponseModel & {err:HttpErrorResponse}) => {
       const errorMessage = err?.err?.message;
-        console.log(errorMessage);
+        // console.log(errorMessage);
         this.catchError(errorMessage,"Failed To Load All PreDefined Specialites")
     }
   })
@@ -422,14 +424,14 @@ export class ProfileCard implements OnInit {
   this.loader.show('Replacing Your Speciality',faRecycle)
   this.trainer.replaceSpeciality(this.oldSpeciality,this.newReplaceableSpeciality,this.trainerId).subscribe({
     next:(res:SpecialityResponseDto) => {
-      console.log("fetched trainer's speciality of ",res.specialityList.length+" no");
-        console.log(res);
+      // console.log("fetched trainer's speciality of ",res.specialityList.length+" no");
+        // console.log(res);
         this.trainerSpecialities = res.specialityList;
         this.loader.hide();
         this.notify.showSuccess('Successfully Updated Your Specialites')        
       }, error:(err: erroResponseModel & {err:HttpErrorResponse}) => {
       const errorMessage = err?.err?.message;
-        console.log(errorMessage);
+        // console.log(errorMessage);
         this.catchError(errorMessage,"Failed To Update Your Speciality Specialites")
     }
   })
@@ -445,16 +447,16 @@ export class ProfileCard implements OnInit {
     }
   }
   updateStaus(){
-    console.log("update status triggered");
+    // console.log("update status triggered");
     this.loader.show("Updating Staus",faCog)
     this.trainer.setStatus(this.trainerId,this.trainerStatus).subscribe({
       next:(res:GenericResponse) => {
-        console.log(`fecthed result from backend as ${res.message}`);
+        // console.log(`fecthed result from backend as ${res.message}`);
         this.trainerStatus = res.message;
         this.loader.hide()
       }, error:(err: erroResponseModel & {err:HttpErrorResponse}) => {
       const errorMessage = err?.err?.message;
-        console.log(errorMessage);
+        // console.log(errorMessage);
         this.catchError(errorMessage,"Failed To Update Your Status")
     }
     })    
@@ -463,12 +465,67 @@ export class ProfileCard implements OnInit {
   liveAdminCount = 0;
   liveTrainerCount = 0;
 
-  loadLiveUsersCount() {
-    this.websocket.connect('ws://localhost:8080/ws/trainers');
+loadLiveUsersCount() {
 
-    this.websocket.subscribe('/topic/activeMembers', (count) => {
+  // TRAINERS
+  this.websocket.connect(
+    'trainer',
+    'ws://localhost:8080/ws/trainers'
+  );
+  this.websocket.subscribe(
+    'trainer',
+    '/topic/activeTrainers',
+    count => {
+      this.liveTrainerCount = count;
+      console.log('👟 Trainers:', count);
+    }
+  );
+
+  // MEMBERS
+  this.websocket.connect(
+    'member',
+    'ws://localhost:8080/ws/member'
+  );
+  this.websocket.subscribe(
+    'member',
+    '/topic/activeMembers',
+    count => {
       this.liveMemberCount = count;
-      console.log('count is' + count);
-    });
-  }
+      console.log('🧍 Members:', count);
+    }
+  );
+
+  // ADMINS
+  this.websocket.connect(
+    'admin',
+    'ws://localhost:8080/ws/admins'
+  );
+  this.websocket.subscribe(
+    'admin',
+    '/topic/activeAdmins',
+    count => {
+      this.liveAdminCount = count;
+      console.log('🧑‍💼 Admins:', count);
+    }
+  );
+  this.loadCountServiceCount()
+}
+
+  loadCountServiceCount() {
+  this.activeCountService.getAllCount$().subscribe({
+    next: ([admin, trainer, member]) => {
+      this.liveAdminCount = admin;
+      this.liveTrainerCount = trainer;
+      this.liveMemberCount = member;
+
+      console.log(
+        `admin=${admin}, trainer=${trainer}, member=${member}`
+      );
+    }
+  });
+}
+ngOnDestroy(): void {
+  this.websocket.disconnectAll()
+}
+
 }

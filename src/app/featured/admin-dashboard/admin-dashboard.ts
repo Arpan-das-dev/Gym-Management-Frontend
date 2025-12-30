@@ -22,10 +22,11 @@ import { ManageCuponCode } from "./manage-cupon-code/manage-cupon-code";
 import { ActiveCountService } from '../../core/services/active-count-service';
 import { WebSocketService } from '../../core/services/web-socket-service';
 import { ManageReports } from "./manage-reports/manage-reports";
+import { ManageTrainers } from "./manage-trainers/manage-trainers";
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [Navbar, FontAwesomeModule, NgStyle, Footer, NgClass, FormsModule, DatePipe, ManagePlans, ManageProducts, Transactions, ManageCuponCode, ManageReports],
+  imports: [Navbar, FontAwesomeModule, NgStyle, Footer, NgClass, FormsModule, DatePipe, ManagePlans, ManageProducts, Transactions, ManageCuponCode, ManageReports, ManageTrainers],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css',
 })
@@ -83,10 +84,10 @@ export class AdminDashboard implements OnInit,OnDestroy {
     this.getSubScriptionsDetails();
     this.loadAllRequests();
     this.loadAllMemberRequests();
-    this.loadAllUsersCount();
+    this.loadLiveUsersCount();
   }
   ngOnDestroy(): void {
-      this.webSocket.disconnect()
+      this.webSocket.disconnectAll()
   }
   loadUserInfo() {
     const identifer = localStorage.getItem('identifer');
@@ -172,7 +173,7 @@ export class AdminDashboard implements OnInit,OnDestroy {
   totalOrders = 234;
   orderGrowth = 2;
   viewOrders() {
-    this.router.navigate(['']); // navigate to store orders page
+    this.router.navigate(['manageProducts']); // navigate to store orders page
   }
 
   // create sections which will lead to each create page
@@ -186,6 +187,7 @@ export class AdminDashboard implements OnInit,OnDestroy {
 
   createProduct() {
     console.log('Navigating to create product page...');
+    this.router.navigate(['manageProducts']);
   }
 
   // approve sections
@@ -385,22 +387,64 @@ submitApproval() {
     }, 5000);
   }
 
-  loadAllUsersCount(){
-      this.webSocket.connect("ws://localhost:8080/ws");
+loadLiveUsersCount() {
 
-  this.webSocket.subscribe("/topic/activeMembers", count => {
-    this.liveMemberCount = count;
-    console.log("count is"+ count);
-    
+  // TRAINERS
+  this.webSocket.connect(
+    'trainer',
+    'ws://localhost:8080/ws/trainers'
+  );
+  this.webSocket.subscribe(
+    'trainer',
+    '/topic/activeTrainers',
+    count => {
+      this.liveTrainerCount = count;
+      console.log('👟 Trainers:', count);
+    }
+  );
+
+  // MEMBERS
+  this.webSocket.connect(
+    'member',
+    'ws://localhost:8080/ws/member'
+  );
+  this.webSocket.subscribe(
+    'member',
+    '/topic/activeMembers',
+    count => {
+      this.liveMemberCount = count;
+      console.log('🧍 Members:', count);
+    }
+  );
+
+  // ADMINS
+  this.webSocket.connect(
+    'admin',
+    'ws://localhost:8080/ws/admins'
+  );
+  this.webSocket.subscribe(
+    'admin',
+    '/topic/activeAdmins',
+    count => {
+      this.liveAdminCount = count;
+      console.log('🧑‍💼 Admins:', count);
+    }
+  );
+
+  this.loadCountServiceCount()
+}
+loadCountServiceCount() {
+  this.activeCountService.getAllCount$().subscribe({
+    next: ([admin, trainer, member]) => {
+      this.liveAdminCount = admin;
+      this.liveTrainerCount = trainer;
+      this.liveMemberCount = member;
+
+      console.log(
+        `admin=${admin}, trainer=${trainer}, member=${member}`
+      );
+    }
   });
+}
 
-  // this.webSocket.subscribe("/topic/activeTrainers", count => {
-  //   this.liveTrainerCount = count;
-  // });
-
-  // this.webSocket.subscribe("/topic/activeAdmins", count => {
-  //   this.liveAdminCount = count;
-  // });
-
-  }
 }

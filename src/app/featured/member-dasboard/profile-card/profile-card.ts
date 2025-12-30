@@ -44,6 +44,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { LoadingService } from '../../../core/services/loading-service';
 import { NotifyService } from '../../../core/services/notify-service';
+import { ActiveCountService } from '../../../core/services/active-count-service';
 
 
 @Component({
@@ -105,7 +106,8 @@ export class ProfileCard implements OnInit, OnDestroy {
     private authservice: Authservice,
     private router: Router,
     private websocket: WebSocketService,
-    private member: MemberService, private loader : LoadingService, private notify : NotifyService
+    private member: MemberService, private loader : LoadingService, private notify : NotifyService,
+    private activeCountService : ActiveCountService
   ) {}
 
   interval = 3600 * 1000;
@@ -153,14 +155,65 @@ export class ProfileCard implements OnInit, OnDestroy {
   liveTrainerCount = 0;
 
   loadAllUsersCount() {
-    // this.websocket.connect('ws://localhost:8080/ws');
+  
 
-    // this.websocket.subscribe('/topic/activeMembers', (count) => {
-    //   this.liveMemberCount = count;
-    //   console.log('count is' + count);
-    // });
+  // TRAINERS
+  this.websocket.connect(
+    'trainer',
+    'ws://localhost:8080/ws/trainers'
+  );
+  this.websocket.subscribe(
+    'trainer',
+    '/topic/activeTrainers',
+    count => {
+      this.liveTrainerCount = count;
+      console.log('👟 Trainers:', count);
+    }
+  );
+
+  // MEMBERS
+  this.websocket.connect(
+    'member',
+    'ws://localhost:8080/ws/member'
+  );
+  this.websocket.subscribe(
+    'member',
+    '/topic/activeMembers',
+    count => {
+      this.liveMemberCount = count;
+      console.log('🧍 Members:', count);
+    }
+  );
+
+  // ADMINS
+  this.websocket.connect(
+    'admin',
+    'ws://localhost:8080/ws/admins'
+  );
+  this.websocket.subscribe(
+    'admin',
+    '/topic/activeAdmins',
+    count => {
+      this.liveAdminCount = count;
+      console.log('🧑‍💼 Admins:', count);
+    }
+  );
+  this.loadCountServiceCount()
   }
 
+  loadCountServiceCount() {
+  this.activeCountService.getAllCount$().subscribe({
+    next: ([admin, trainer, member]) => {
+      this.liveAdminCount = admin;
+      this.liveTrainerCount = trainer;
+      this.liveMemberCount = member;
+
+      console.log(
+        `admin=${admin}, trainer=${trainer}, member=${member}`
+      );
+    }
+  });
+}
   profileImage = '';
   onFileSelected(event: Event) {
     console.log('upload triggered');
@@ -367,7 +420,7 @@ deleteImage() {
 }
 
   ngOnDestroy(): void {
-    this.websocket.disconnect();
+    this.websocket.disconnectAll();
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
