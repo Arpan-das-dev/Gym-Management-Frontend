@@ -114,7 +114,10 @@ export interface AllTrainerResponseDto {
   gender: string;
   frozen: boolean;
   averageRating: number;
+  clientCount : number;
   lastLoginTime: string;
+  show:boolean;
+  clientViewMode: boolean
 }
 export interface AllTrainerResponseDtoWrapper {
   allTrainerResponseDtoWrappers: AllTrainerResponseDto[];
